@@ -79,6 +79,24 @@ interface BrowseStore {
 const norm = (u: any) => String(u || '').replace(/^(music-library|mnt)\//, '');
 export { norm as normUri };
 
+// Last 100 keeps one file under two addresses — "music-library/USB/…" and "mnt/USB/…", depending on
+// where it was started — so a track shows twice and both rows light up as playing. One row per file,
+// where it was played last, with the music-library address (the one the library itself plays).
+function oncePerFile(lists: BrowseList[]): BrowseList[] {
+  return lists.map((l) => {
+    const seen = new Map<string, BrowseItem>();
+    const items: BrowseItem[] = [];
+    (l.items || []).forEach((it) => {
+      if (!it || !it.uri || it.type !== 'song') { items.push(it); return; }
+      const key = (it.service || '') + '|' + norm(it.uri);
+      const kept = seen.get(key);
+      if (!kept) { const copy = { ...it }; seen.set(key, copy); items.push(copy); return; }
+      if (/^music-library\//.test(String(it.uri)) && !/^music-library\//.test(String(kept.uri))) { kept.uri = it.uri; kept.albumart = it.albumart || kept.albumart; }
+    });
+    return { ...l, items };
+  });
+}
+
 let searchTimer: number | null = null;
 let favTimer: number | null = null;
 
@@ -161,7 +179,8 @@ on('pushBrowseSources', (data: BrowseItem[]) => useBrowse.setState({ sources: Ar
 on('pushBrowseLibrary', (data: any) => {
   if (!data || !data.navigation) { return; }
   const st = useBrowse.getState();
-  const lists: BrowseList[] = data.navigation.lists || [];
+  const raw: BrowseList[] = data.navigation.lists || [];
+  const lists: BrowseList[] = st.request && st.request.uri === 'Last_100' ? oncePerFile(raw) : raw;
   const info = data.navigation.info || null;
   const patch: Partial<BrowseStore> = { lists, info, prev: data.navigation.prev || null, loading: false, stamp: st.stamp + 1 };
   const req = st.request;
