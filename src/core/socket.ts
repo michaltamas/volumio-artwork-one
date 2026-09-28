@@ -7,14 +7,12 @@
  */
 import io from 'socket.io-client';
 
-// the player: named in VITE_VOLUMIO_HOST in development; on the player it is the page's own
-// origin — or, when the page is served from another port (a side-by-side build), port 80 of it
+// the player: named in VITE_VOLUMIO_HOST in development; on the player it is always the page's own
+// origin — port 80 in a browser, but localhost:3000 on the display the player drives (kiosk), where
+// nothing listens on port 80: sending the socket to port 80 there left the display "Connection lost"
 function playerHost(): string {
   const env = import.meta.env.VITE_VOLUMIO_HOST as string | undefined;
-  if (env) { return env; }
-  const loc = window.location;
-  if (loc.port && loc.port !== '80' && loc.port !== '443') { return loc.protocol + '//' + loc.hostname; }
-  return '';
+  return env || '';
 }
 export const HOST: string = playerHost();
 
