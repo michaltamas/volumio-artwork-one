@@ -7,6 +7,7 @@ import { create } from 'zustand';
 import { on, emit } from '../socket';
 import { askUiConfig, onUiConfig } from '../uiConfig';
 import { rest } from '../api';
+import { usePlayer } from './player';
 import { useMenu, itemKey, type MenuItem } from './menu';
 
 export interface Section { id: string; label: string }
@@ -126,4 +127,14 @@ on('pushInstalledPlugins', (list: any) => {
   if (useSettings.getState().asking === '*installed') { useSettings.setState({ asking: null }); askNext(); }
 });
 emit('getInfoNetwork');
-rest<any>('collectionstats').then(s => { if (s) { useSettings.setState({ stats: s }); } });
+const loadStats = () => rest<any>('collectionstats').then(s => { if (s) { useSettings.setState({ stats: s }); } });
+loadStats();
+// while Volumio indexes the library the counts grow: asked again every 4 s, and once more when it is done
+let statsTimer = 0;
+usePlayer.subscribe((p, prev) => {
+  const now = !!p.state.updatedb, was = !!prev.state.updatedb;
+  if (now === was) { return; }
+  window.clearInterval(statsTimer);
+  if (now) { statsTimer = window.setInterval(loadStats, 4000); }
+  loadStats();
+});

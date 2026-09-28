@@ -52,3 +52,7 @@
   }
 }
 @media (prefers-reduced-motion: reduce) { #main-menu { transition: none; } }
+
+/* the library is being indexed (Volumio's message points at "the icon on bottom left"): a spinning ring above Zones */
+body#artwork #main-menu .rail__scan a { color: var(--ink-1); }
+body#artwork #main-menu .rail__scan-icon { display: grid; place-items: center; width: 23px; height: 23px; justify-self: center; }

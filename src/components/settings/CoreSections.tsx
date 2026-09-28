@@ -10,6 +10,7 @@ import { useModal } from '../../core/store/modal';
 import { useToasts } from '../../core/store/toast';
 import { Switch, Select, Progress, upload } from './controls';
 import Spinner from '../Spinner';
+import { usePlayer } from '../../core/store/player';
 
 function useSocket<T>(event: string, ask?: string | (() => void), initial?: T): T | undefined {
   const [v, setV] = useState<T | undefined>(initial);
@@ -58,6 +59,8 @@ export function NetworkStatus() {
 
 export function MyMusic() {
   const [stats, setStats] = useState<any>({});
+  // while Volumio indexes, the buttons give way to what it is doing (the counts below keep growing: asked every 4 s)
+  const scanning = usePlayer(s => !!s.state.updatedb);
   useEffect(() => { const off = on('pushMyCollectionStats', (d: any) => setStats(d || {})); emit('getMyCollectionStats'); const t = window.setInterval(() => emit('getMyCollectionStats'), 4000); return () => { off(); window.clearInterval(t); }; }, []);
   return (
     <div id="myMusic" className="panel panel-default">
@@ -69,8 +72,17 @@ export function MyMusic() {
           <div className="aw-mystats__item"><span className="aw-mystats__label">Tracks</span><span className="aw-mystats__value">{stats.songs}</span></div>
           <div className="aw-mystats__item"><span className="aw-mystats__label">Playtime</span><span className="aw-mystats__value">{stats.playtime}</span></div>
         </div>
-        <button type="button" className="btn btn-info" onClick={() => emit('updateDb')} title="Update music database entries for any changed, new, or deleted files"><span>Update</span></button>
-        <button type="button" className="btn btn-info" onClick={() => emit('rescanDb')} title="Remake music database entries for all files"><span>Rescan</span></button>
+        {scanning ? (
+          <div className="aw-mystats__scan" role="status">
+            <Spinner size={20} />
+            <span className="aw-mystats__scan-text"><span className="aw-mystats__scan-title">Scanning your library…</span><span className="aw-mystats__scan-sub">The numbers grow as files are found</span></span>
+          </div>
+        ) : (
+          <>
+            <button type="button" className="btn btn-info" onClick={() => emit('updateDb')} title="Update music database entries for any changed, new, or deleted files"><span>Update</span></button>
+            <button type="button" className="btn btn-info" onClick={() => emit('rescanDb')} title="Remake music database entries for all files"><span>Rescan</span></button>
+          </>
+        )}
       </div>
     </div>
   );

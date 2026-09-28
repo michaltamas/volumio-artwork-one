@@ -3,6 +3,8 @@ import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { goToMyVolumio } from '../core/store/auth';
 import Icon from './Icon';
+import Spinner from './Spinner';
+import { usePlayer } from '../core/store/player';
 import { useUi } from '../core/store/ui';
 import { useBrowse } from '../core/store/browse';
 import { useMultiroom } from '../core/store/multiroom';
@@ -27,6 +29,7 @@ export default function MobileMenu() {
     return () => document.removeEventListener('keydown', onKey);
   }, [open]);
   const hide = () => useUi.getState().hideMenu();
+  const scanning = usePlayer(s => !!s.state.updatedb);
   const go = (p: string) => { hide(); nav(p); };
   const at = (p: string) => loc.pathname === p;
   const source = (uri: string) => sources.find(s => s.uri === uri) || null;
@@ -55,6 +58,7 @@ export default function MobileMenu() {
         </div>
         <div className="aw-mm__eyebrow mono">SYSTEM</div>
         <div className="aw-mm__list">
+          {scanning ? <a className="aw-mm__item aw-mm__item--scan" onClick={() => go('/plugin/miscellanea-my_music')}><span className="aw-mm__scan"><Spinner size={20} /></span><span className="aw-mm__label">Updating library</span></a> : null}
           <a className={'aw-mm__item' + (loc.pathname.startsWith('/myvolumio') ? ' active' : '')} onClick={() => { hide(); goToMyVolumio(nav); }}><Icon name="person" /><span className="aw-mm__label">MyVolumio</span></a>
           <a className={'aw-mm__item' + (at('/multi-room') ? ' active' : '')} onClick={() => go('/multi-room')}><Icon name="speaker" /><span className="aw-mm__label">Zones</span></a>
           <a className={'aw-mm__item' + (isSettings ? ' active' : '')} onClick={() => go('/settings')}><Icon name="tune" /><span className="aw-mm__label">Settings</span></a>

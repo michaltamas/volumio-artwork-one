@@ -4,6 +4,8 @@ import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { goToMyVolumio } from '../core/store/auth';
 import Icon from './Icon';
+import Spinner from './Spinner';
+import { usePlayer } from '../core/store/player';
 import { useBrowse } from '../core/store/browse';
 import { useMenu } from '../core/store/menu';
 import { useUi } from '../core/store/ui';
@@ -25,6 +27,8 @@ export default function Rail() {
   const current = useBrowse(s => s.currentUri);
   const myVolumio = useMenu(s => s.hasMyVolumio());
   const open = useUi(s => s.railOpen);
+  // Volumio's own message while it indexes points here: "the icon on bottom left will keep spinning"
+  const scanning = usePlayer(s => !!s.state.updatedb);
   // the whole layout (head, page, mini player) follows the rail's width through --rail-w
   useEffect(() => { document.documentElement.classList.toggle('aw-rail-open', open); }, [open]);
   const at = (p: string) => loc.pathname === p;
@@ -46,6 +50,13 @@ export default function Rail() {
         <Item icon="graphic_eq" label="Now Playing" open={open} active={at('/playback')} onClick={() => nav('/playback')} />
       </ul>
       <ul className="main-menu-bottom">
+        {scanning ? (
+          <li className="rail__scan">
+            <a onClick={() => nav('/plugin/miscellanea-my_music')} aria-label="Updating library" title={open ? undefined : 'Updating library'}>
+              <span className="rail__scan-icon"><Spinner size={20} /></span><span className="rail__label">Updating library</span>
+            </a>
+          </li>
+        ) : null}
         {myVolumio && <Item icon="person" label="MyVolumio" open={open} active={loc.pathname.startsWith('/myvolumio')} onClick={() => goToMyVolumio(nav)} />}
         <Item icon="speaker" label="Zones" open={open} active={at('/multi-room')} onClick={() => nav('/multi-room')} />
         <Item icon="tune" label="Settings" open={open} active={loc.pathname.startsWith('/settings') || loc.pathname.startsWith('/plugin')} onClick={() => nav('/settings')} />

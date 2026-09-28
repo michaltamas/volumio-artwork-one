@@ -35,3 +35,7 @@ body#artwork .aw-mm__os { margin-left: auto; font-size: 10px; color: var(--ink-d
   body#artwork .aw-mm__foot { flex: none; }
 }
 @media (prefers-reduced-motion: reduce) { body#artwork .aw-mm, body#artwork .aw-mm__sheet, body#artwork .aw-mm__scrim { transition: none; } }
+
+/* the library is being indexed: the phone's counterpart of the rail's spinning ring */
+body#artwork .aw-mm__scan { flex: none; display: grid; place-items: center; width: 23px; height: 23px; }
+body#artwork .aw-mm__item--scan { color: var(--ink); }

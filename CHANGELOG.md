@@ -6,6 +6,14 @@ All notable changes to this project are documented here. The format is based on
 
 Versions 1.x and 2.x were published in [volumio-artwork-theme](https://github.com/michaltamas/volumio-artwork-theme).
 
+## [3.0.1] - 2026-09-28
+
+### Fixed
+
+- While Volumio indexes the library, the spinning icon its message points to ("the icon on bottom left") is there: at the foot of the side rail, above Zones, and in the phone's menu — *Updating library*, leading to Settings → Sources.
+- Settings → Sources says so too: while the library is indexed, *Scanning your library…* takes the place of Update and Rescan, and the counts — in the card and in the Library panel beside it — grow as files are found.
+- The library card in Settings → Sources no longer runs past its edge in a mid-sized window or with a big library's counts: the status goes under the counts, and the counts go two by two, when the card is narrow.
+
 ## [3.0.0] - 2026-09-28
 
 Artwork One rebuilt from the ground up in React. Same look, same features, a new home — and what the old code base could not carry.
@@ -28,4 +36,5 @@ Artwork One rebuilt from the ground up in React. Same look, same features, a new
 - Built with React and Vite instead of AngularJS: the release is a quarter of the size (1.8 MB instead of 7.8 MB), faster to open, with one stylesheet per part instead of layered theme overrides.
 - The release archive is now `artwork-one.tar.gz`; the installer puts it in the same place as before, so 1.x and 2.x are replaced in place.
 
+[3.0.1]: https://github.com/michaltamas/volumio-artwork-one/releases/tag/v3.0.1
 [3.0.0]: https://github.com/michaltamas/volumio-artwork-one/releases/tag/v3.0.0
