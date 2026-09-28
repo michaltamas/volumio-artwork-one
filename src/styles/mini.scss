@@ -1,0 +1,64 @@
+/* Artwork mini player (spec §5.10 / mockup): identity · transport + seek · volume, zone, queue. */
+#footer-content {
+  position: fixed; left: var(--rail-w); right: 0; bottom: 0; height: var(--mini-h); z-index: 3;
+  padding: 0 clamp(12px, 1.95vw, 28px);
+  background: var(--bar-fill); -webkit-backdrop-filter: blur(34px); backdrop-filter: blur(34px);
+  border-top: 1px solid var(--hairline-soft); color: var(--ink-1);
+  transition: transform .42s cubic-bezier(.2, .7, .2, 1); will-change: transform;
+  &.is-hidden { transform: translateY(100%); pointer-events: none; }
+  #player-bar { height: 100%; }
+
+  .artwork-mini {
+    height: 100%; display: grid;
+    grid-template-columns: minmax(0, min(300px, 23%)) minmax(auto, 1fr) auto;
+    grid-template-rows: auto auto; align-content: center; align-items: center;
+    row-gap: clamp(3px, calc((var(--mini-h) - 80px) / 2), 9px); column-gap: clamp(10px, 1.67vw, 24px);
+  }
+  .mini-identity { grid-column: 1; grid-row: 1 / 3; align-self: center; min-width: 0; }
+  .mini-transport { grid-column: 2; grid-row: 1; display: flex; align-items: center; justify-content: center;
+    #playerButtons { gap: clamp(4px, 1vw, 14px); }
+    .btn-link { color: var(--ink); padding: 6px; .material-symbols-rounded { font-size: 28px; } &:hover { color: var(--ink); } }
+    .player-action-shuffle, .repeat-button { color: var(--ink-65); .material-symbols-rounded { font-size: 22px; } &:hover { color: var(--ink-2); } &.active { color: var(--ink); } }
+    .playPause { width: 46px; height: 46px; color: var(--ground); .material-symbols-rounded { font-size: 27px; } &:hover { color: var(--ground); } }
+  }
+  .mini-right { grid-column: 3; grid-row: 1 / 3; align-self: center; display: flex; align-items: center; justify-content: flex-end; gap: 18px; }
+  .mini-volume { display: flex; align-items: center; min-width: 0; flex: none; }
+  .mini-zone {
+    display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px; border-radius: 18px;
+    background: var(--fill-10); border: 1px solid var(--fill-12); color: var(--ink-2); cursor: pointer; max-width: 160px;
+    .material-symbols-rounded { font-size: 19px; color: var(--ink-2); }
+    .mini-zone-name { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    &:hover { background: var(--fill-16); }
+  }
+  .mini-queue { color: var(--ink-3); display: inline-flex; align-items: center; gap: 6px; padding: 0 4px; height: 36px;
+    .material-symbols-rounded { font-size: 24px; }
+    .mini-queue__count { font-family: var(--font-mono); font-size: 11px; font-weight: 700; line-height: 15.7px; }
+    &:hover, &.selected { color: var(--ink); } }
+  .mini-seek { grid-column: 2; grid-row: 2; min-width: 0; }
+
+  /* identity: 60px cover, three fixed lines centred on it */
+  #trackInfo-compact {
+    display: grid; grid-template-columns: 60px 1fr; grid-template-areas: "cover title" "cover artist" "cover rates";
+    grid-template-rows: var(--mini-rows, 18px 15px 15px); align-content: center; align-items: center; column-gap: 14px; row-gap: var(--mini-line-gap, 4px);
+    min-height: 60px; padding: 0; overflow-y: hidden; scrollbar-width: none;
+  }
+  /* the frame's own leftover: between 992 and 1199px the compact block gets 4px of padding */
+  @media (min-width: 992px) and (max-width: 1199px) { #trackInfo-compact { padding: 4px; } }
+  .trackInfo-album-art-wrapper { grid-area: cover; width: 60px; height: 60px; overflow: hidden; border-radius: 5px; }
+  img.album-art { width: 60px; height: 60px; border-radius: 5px; object-fit: cover; cursor: pointer; display: block; }
+  #trackInfo-title { grid-area: title; max-width: 98%; font-size: 15px; font-weight: 600; line-height: 18px; color: var(--ink-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
+  #trackInfo-artist-album { grid-area: artist; max-width: 98%; font-size: 13px; line-height: 15px; color: var(--ink-65); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer;
+    #trackInfo-artist { font-size: 13px; line-height: 15px; } }
+  .track-info-rates {
+    grid-area: rates; font-family: var(--font-mono); font-size: 10px; letter-spacing: .06em; color: var(--ink-muted);
+    display: flex; align-items: center; gap: 6px; height: 15px; line-height: 15px; overflow: hidden; white-space: nowrap;
+    .track-info-rate + .track-info-type::before { content: '·'; margin-right: 6px; }
+  }
+}
+@supports not (backdrop-filter: blur(1px)) { body#artwork #footer-content { background: var(--bar-solid); } }
+@media (max-width: 900px) {
+  body#artwork #footer-content .mini-zone .mini-zone-name { display: none; } body#artwork #footer-content .mini-zone { padding: 0 11px; }
+  body#artwork #footer-content .mini-volume { display: none; }
+}
+@media (max-width: 700px) { body#artwork #footer-content .mini-transport .repeat-button, body#artwork #footer-content .mini-transport .player-action-shuffle { display: none; } }
+@media (prefers-reduced-motion: reduce) { body#artwork #footer-content { transition: none; } }

@@ -1,0 +1,373 @@
+/* The phone (portrait, ≤700px): the rail goes, the mini player shrinks to one row, Now Playing
+   stacks the cover over the text with tiles under it and a transport bar along the bottom. The
+   theme's rules, one to one; the notch and the home indicator pad the bars, never the art. */
+@media (max-width: 700px) and (orientation: portrait) {
+  :root { --rail-w: 0px; --sa-t: env(safe-area-inset-top, 0px); --sa-b: env(safe-area-inset-bottom, 0px); --mini-h: calc(80px + var(--sa-b)); --pad-screen: 20px; --pad-top: calc(14px + var(--sa-t)); --phone-top: calc(22px + var(--sa-t)); }
+  html, body#artwork { background: var(--ground); }
+  body#artwork { background-color: var(--aw-band, var(--ground)) !important; background-image: none !important; }
+  /* the page's top edge in the mini player's colour: solid over the safe area, fading into the art.
+     Currently inert: the frame's clearfix makes this pseudo a zero-width table, so it never
+     paints — status-bar tinting is handled by the `theme-color` meta tag instead (palette.ts). */
+  body#artwork #layout-container::before { content: ''; display: table; position: fixed; top: 0; left: 0; right: 0; height: calc(env(safe-area-inset-top, 0px) + 52px); z-index: 2; pointer-events: none;
+    background: linear-gradient(to bottom, var(--aw-band, var(--ground)) 0, var(--aw-band, var(--ground)) calc(env(safe-area-inset-top, 0px) + 8px), transparent 100%); }
+  /* the document itself never scrolls: the screens scroll inside, so Safari keeps its bars still.
+     Neither vh unit is right for both browsing modes on iOS: a regular Safari TAB needs `dvh`
+     (its address bar shows/hides, and static `vh` — sized for the chrome-hidden case — then
+     overshoots and clips content, like the play button, behind the visible bottom bar). A
+     STANDALONE app (Add to Home Screen) has no such chrome, and there `dvh` is the one that's
+     wrong instead — confirmed on-device that it reports a taller-than-visible height there,
+     leaving a dead strip of background below fixed-position UI (the mini player, among others).
+     `display-mode: standalone` is the standard way to tell the two apart and give each its own
+     correct unit, rather than fixing one browsing mode by breaking the other. */
+  html, body#artwork { height: 100dvh; overflow: hidden; overscroll-behavior: none; }
+  body#artwork #layout-container { height: 100dvh; }
+  @media (display-mode: standalone) {
+    html, body#artwork { height: 100vh; }
+    body#artwork #layout-container { height: 100vh; }
+  }
+  body#artwork #main-menu { display: none; }
+  body#artwork #contentWrapper { margin-left: 0; width: 100%; }
+
+  /* --- mini player: 80px, cover 52 r5, title 14/600, artist 12, rates mono 9; play 44 · next 26 · speaker 24 --- */
+  body#artwork #footer-content { left: 0; height: calc(80px + var(--sa-b)); padding: 0 16px var(--sa-b); background: var(--bar-fill); -webkit-backdrop-filter: blur(40px) saturate(1.15); backdrop-filter: blur(40px) saturate(1.15); border-top-color: var(--fill-09); }
+  body#artwork #footer-content .artwork-mini { grid-template-columns: minmax(0, 1fr) auto auto; grid-template-rows: auto; column-gap: 12px; align-content: center; }
+  body#artwork #footer-content .mini-identity { grid-column: 1; grid-row: 1; }
+  body#artwork #footer-content .mini-transport { grid-column: 2; grid-row: 1; }
+  body#artwork #footer-content .mini-right { grid-column: 3; grid-row: 1; gap: 14px; }
+  body#artwork #footer-content .mini-queue, body#artwork #footer-content .mini-seek, body#artwork #footer-content .mini-volume,
+  body#artwork #footer-content .mini-transport .repeat-button, body#artwork #footer-content .mini-transport .player-action-shuffle, body#artwork #footer-content .mini-transport #prev-button { display: none; }
+  body#artwork #footer-content .mini-transport #playerButtons { gap: 14px; }
+  body#artwork #footer-content .mini-transport .playPause { width: 44px; height: 44px; .material-symbols-rounded { font-size: 26px; } }
+  body#artwork #footer-content .mini-transport .btn-link .material-symbols-rounded { font-size: 26px; }
+  body#artwork #footer-content .mini-zone { padding: 0; height: auto; background: transparent; border: 0; .material-symbols-rounded { font-size: 24px; color: var(--ink-3); } .mini-zone-name { display: none; } }
+  body#artwork #footer-content #trackInfo-compact { grid-template-columns: 52px 1fr; column-gap: 12px; --mini-rows: 18px 16px 15px; --mini-line-gap: 2px; height: auto; min-height: 52px; }
+  body#artwork #footer-content .trackInfo-album-art-wrapper { width: 52px; height: 52px; }
+  body#artwork #footer-content img.album-art { width: 52px; height: 52px; border-radius: 5px; }
+  body#artwork #footer-content #trackInfo-title { font-size: 14px; font-weight: 600; line-height: 1.3; }
+  body#artwork #footer-content #trackInfo-artist-album { display: block; font-size: 12px; line-height: 1.3; color: var(--ink-55); }
+  body#artwork #footer-content .mini-identity .track-info-rates { font-size: 9px; letter-spacing: .1em; color: var(--ink-muted); }   /* outranks the badge colour, as the theme's did */
+
+  /* --- Now Playing --- */
+  body#artwork #content.playback { overflow-y: auto; }
+  body#artwork #np { height: auto; min-height: 100%; overflow: visible; padding: var(--phone-top) 20px 0; display: flex; flex-direction: column; }
+  body#artwork #np #np-topbar { display: flex; align-items: center; gap: 0; margin-top: 0; min-height: 44px; }
+  body#artwork #np .np-menu-btn { display: grid; place-items: center; height: 44px; width: 32px; border: 0; background: transparent; padding: 0; color: var(--ink-2); cursor: pointer; .material-symbols-rounded { font-size: 26px; } }
+  body#artwork #np .np-topbar-left { flex: 1; min-width: 0; display: flex; flex-direction: row-reverse; align-items: center; gap: 0; }
+  body#artwork #np .np-zone { flex: 1; text-align: center; font-size: 10px; letter-spacing: .18em; color: var(--ink-25); .np-zone-out { display: none; } }
+  body#artwork #np .np-sleep-tag { display: none; }
+  body#artwork #np .np-chevron { width: auto; height: auto; background: transparent; color: var(--ink-2); .material-symbols-rounded { font-size: 24px; } }
+  body#artwork #np #np-badge-slot { display: none; }
+  /* container-type: size (desktop, np.scss) needs a definite height from `flex: 1 1 0` in the
+     desktop flex column; phone sets `flex: none` instead and sizes #np-cover from the viewport
+     directly (no cqh/cqw below), so the container context must be turned back off here — left
+     on, it collapses #np-hero to 0 height, and every sibling after it (.np-m-actions) renders
+     where the hero's box should be, on top of the cover instead of below the whole hero block */
+  body#artwork #np #np-hero { flex: none; flex-direction: column; align-items: center; margin-top: 20px; gap: 0; container-type: normal; }
+  body#artwork #np #np-cover { height: auto; width: min(calc(100% - 32px), calc(100vh - 450px - var(--sa-t) - var(--sa-b))); max-width: none; border-radius: 11px;
+    img { border-radius: 11px; box-shadow: 0 34px 66px -22px var(--shadow-deep); } }
+  body#artwork #np #np-meta { padding: 0; width: 100%; display: block; text-align: center; margin-top: 26px; }
+  body#artwork #np .np-title + .np-byline .np-artist, body#artwork #np .np-title + .np-byline .np-album { margin-top: 9px; }
+  body#artwork #np .np-eyebrow, body#artwork #np .np-signalpath { display: none; }
+  body#artwork #np .np-title { font-size: 24px; font-weight: 800; letter-spacing: -.02em; line-height: 1.15; margin: 0; }
+  body#artwork #np .np-artist { display: inline; font-size: 15px; color: var(--ink-25); margin: 0; }
+  body#artwork #np .np-album { display: inline; font-size: 15px; color: var(--ink-25); margin: 0; &::before { content: ' · '; } }
+  body#artwork #np .np-artist:empty + .np-album::before { content: none; }
+  body#artwork #np #np-chip-slot { margin-top: 11px; }
+  body#artwork #np .np-quality { gap: 9px; justify-content: center; }
+  body#artwork #np .np-chip { height: 30px; padding: 0 11px; border-radius: 15px; background: var(--fill-12); border: 1px solid var(--fill-14); gap: 5px;
+    .np-chip-num { font-size: 11px; font-weight: 700; color: var(--ink); } .np-chip-unit { font-size: 10px; } .np-chip-num--rate { margin-left: 2px; } }
+  body#artwork #np .np-format { font-size: 10px; letter-spacing: .14em; color: var(--ink-45); }
+  /* the phone chip's own background/border beat the desktop quality rules on specificity (two ids vs one) — restate them here, by source */
+  body#artwork #np .np-chip.aw-q--hires { background: var(--q-hires-wash); border-color: var(--q-hires-line);
+    .np-chip-num, .np-chip-unit { color: var(--q-hires-ink); } }
+  body#artwork #np .np-chip.aw-q--dsd { background: var(--q-dsd-wash); border-color: var(--q-dsd-line);
+    .np-chip-num, .np-chip-unit { color: var(--q-dsd-ink); } }
+  body#artwork #np .np-chip.aw-q--lossless { background: var(--q-lossless-wash); border-color: var(--q-lossless-line);
+    .np-chip-num { color: var(--q-lossless-num); } .np-chip-unit { color: var(--q-lossless-unit); } }
+  body#artwork #np .np-chip.aw-q--lossy { background: var(--q-lossy-wash); border-color: var(--q-lossy-line);
+    .np-chip-num, .np-chip-unit, .np-chip-val { color: var(--q-lossy-ink); } }
+  body#artwork #np .np-chip.aw-q--radio { background: transparent; border: 1px dashed var(--q-radio-line);
+    .np-chip-num, .np-chip-unit, .np-chip-val { color: var(--q-radio-ink); } }
+  body#artwork #np .np-m-actions { display: flex; justify-content: center; gap: 12px; margin-top: 22px; }
+  body#artwork #np .np-m-tile { width: 54px; height: 54px; border-radius: 16px; display: grid; place-items: center; padding: 0; margin: 0;
+    background: var(--fill-07); border: 1px solid var(--fill-11); color: var(--ink-3); cursor: pointer; box-shadow: none;
+    .material-symbols-rounded { font-size: 24px; } }
+  body#artwork #np .np-m-tile.active { color: var(--ink); background: var(--fill-16); }
+  body#artwork #np .np-m-tile:disabled { opacity: .35; }
+  body#artwork #np #np-footer { margin-top: auto; padding: 24px 0 14px; }
+  body#artwork #np #np-seek { margin-bottom: 0; }
+  body#artwork #np #np-seek .artwork-seek__hit { width: 100%; height: 56px; }
+  body#artwork #np #np-seek .seek-track { height: 6px; border-radius: 3px; background: rgba(255, 255, 255, .15); box-shadow: inset 0 1px 2px rgba(0, 0, 0, .4); }
+  body#artwork #np #np-seek .seek-handle { width: 22px; height: 22px; margin: -11px 0 0 -11px; box-shadow: 0 0 0 4px rgba(255, 255, 255, .15), 0 0 16px rgba(255, 255, 255, .42), 0 2px 7px var(--shadow-soft); }
+  body#artwork #np #np-seek .artwork-seek { grid-template-columns: 1fr auto; grid-template-areas: "track track" "elapsed remaining"; row-gap: 2px; }
+  body#artwork #np #np-seek .seek-time { font-size: 11px; }
+  body#artwork #np #np-seek .seek-elapsed { color: var(--ink); }
+  body#artwork #np #np-seek .seek-remaining { justify-self: end; }
+  body#artwork #np #np-seek .seek-duration { display: none; }
+  body#artwork #np #np-footer-row { display: none; }
+  body#artwork #np .np-m-bar { display: flex; align-items: center; justify-content: space-between; height: calc(88px + var(--sa-b)); margin: 0 -20px; padding: 0 26px var(--sa-b); flex: none;
+    background: var(--bar-fill); -webkit-backdrop-filter: blur(40px) saturate(1.15); backdrop-filter: blur(40px) saturate(1.15); border-top: 1px solid var(--fill-09); }
+  body#artwork #np .np-m-bar__btn { border: 0; background: transparent; padding: 0; color: var(--ink-3); display: grid; place-items: center; cursor: pointer; .material-symbols-rounded { font-size: 27px; } }
+  body#artwork #np .np-m-bar__btn--skip { color: var(--ink); .material-symbols-rounded { font-size: 34px; } }
+  body#artwork #np .np-m-bar__btn--skip:disabled, body#artwork #np .np-m-bar__play:disabled { opacity: .35; cursor: default; }   /* an outside source drives the player */
+  body#artwork #np .np-m-bar__play { width: 66px; height: 66px; border-radius: 50%; border: 0; background: var(--ink); color: var(--on-ink); display: grid; place-items: center; cursor: pointer; .material-symbols-rounded { font-size: 36px; } }
+  body#artwork #content.playback { padding-bottom: 0; }
+  body#artwork #np .np-seg, body#artwork #np .np-library { display: none; }
+  body#artwork #np .np-m-tile--lyrics:disabled { opacity: .35; }
+  /* --- the words on the phone (6b): a panel that rises over what plays; its handle drags it away --- */
+  body#artwork #np .np-lyrics-host { display: none; }
+  body#artwork #np .np-lsheet-scrim { position: absolute; inset: 0; z-index: 1; background: var(--scrim-page); -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); }
+  body#artwork #np .np-lsheet {
+    display: flex; flex-direction: column; position: absolute; left: 0; right: 0; bottom: 0; top: calc(var(--phone-top) + 52px); z-index: 2;
+    border-radius: 20px 20px 0 0; padding: 26px 26px 0;
+    background: var(--panel-sheet); -webkit-backdrop-filter: blur(34px); backdrop-filter: blur(34px); border-top: 1px solid var(--fill-14);
+    animation: aw-outputs-up .22s ease-out; will-change: transform; overflow: hidden;
+  }
+  body#artwork #np.np--lyrics { overflow: hidden; }
+  body#artwork #np .np-meta--lyrics .np-byline { display: contents; }
+  body#artwork #np .np-meta--lyrics .np-title { font-size: 24px; letter-spacing: -.02em; line-height: 1.15; }
+  body#artwork #np .np-lsheet__grab { position: absolute; top: 0; left: 0; right: 0; height: 26px; padding: 0; border: 0; border-radius: 20px 20px 0 0; background: transparent; cursor: pointer; touch-action: none;
+    &::after { content: ''; position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 38px; height: 4px; border-radius: 2px; background: var(--fill-30); } }
+  body#artwork #np .np-lsheet__head { margin-top: 12px; min-width: 0; }
+  body#artwork #np .np-lsheet__title { font-size: 24px; font-weight: 800; letter-spacing: -.02em; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  body#artwork #np .np-lsheet__artist { font-size: 15px; color: var(--ink-2); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  body#artwork #np .np-lsheet__body { flex: 1 1 0; min-height: 0; overflow: hidden; display: flex; flex-direction: column; padding-bottom: calc(88px + var(--sa-b) + 140px); }
+  body#artwork #np .np-lsheet .np-lyrics { flex: 1 1 0; min-height: 0; overflow: hidden; display: flex; flex-direction: column; margin-top: 18px; }
+  body#artwork #np .np-lsheet .np-lyrics__col--plain { -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+  body#artwork #np .np-lsheet .np-lyrics__col--synced { mask-image: linear-gradient(#000 0, #000 calc(100% - 46px), transparent 100%); -webkit-mask-image: linear-gradient(#000 0, #000 calc(100% - 46px), transparent 100%); }
+  body#artwork #np .np-lsheet .np-lyrics__stack { gap: 12px; }
+  body#artwork #np .np-lsheet .np-lyrics__line { font-size: 18px; gap: 12px; &.is-now { font-size: 20px; } .np-lyrics__mark { margin: 3px 0; } }
+  body#artwork #np .np-lsheet .np-lyrics__empty { font-size: 18px; }
+  body#artwork #np .np-lsheet .np-lyrics__source { font-size: 10px; margin-top: 8px; }
+  body#artwork #np.np--lyrics #np-footer, body#artwork #np.np--lyrics .np-m-bar { position: relative; z-index: 3; }
+  body#artwork #np.np--lyrics #np-footer { margin: auto -20px 0; padding-left: 26px; padding-right: 26px; background: var(--panel-sheet); }
+
+  /* --- the heads: the menu button next to Back, the search takes the rest of the row --- */
+  body#artwork #browseTablesWrapper, body#artwork .aw-browse, body#artwork #artwork-home { --head-pad: var(--phone-top); }
+  body#artwork .aw-head__row { flex-wrap: nowrap; gap: 12px; }
+  body#artwork .aw-head__nav { min-width: 0; overflow: hidden; flex-shrink: 100; }
+  body#artwork .aw-head__actions { min-width: 0; }
+  body#artwork .aw-head .aw-menu-btn, body#artwork #artwork-home .aw-menu-btn { display: grid; place-items: center; height: 44px; width: 32px; border: 0; background: transparent; padding: 0; color: var(--ink-2); cursor: pointer; .material-symbols-rounded { font-size: 24px; } }
+  body#artwork .aw-head__row { min-height: 44px; margin-top: 0; }
+  body#artwork .aw-head--start .aw-head__row, body#artwork .aw-head--home .aw-head__row { gap: 12px; flex-wrap: nowrap; }
+  body#artwork .aw-head--start .aw-head__actions, body#artwork .aw-head--home .aw-head__actions { flex: 1; min-width: 0; }
+  /* --- Home --- */
+  body#artwork #artwork-home { padding: 0 20px calc(var(--mini-h) + 20px); min-height: 100%; }
+  body#artwork #artwork-home .aw-tab, body#artwork #artwork-home .aw-search-key { display: none; }
+  body#artwork #artwork-home .home-pins-edit { display: none; }
+  body#artwork #artwork-home .home-pin__more { opacity: 1; width: 28px; height: 28px; }
+  body#artwork #artwork-home .aw-search { flex: 1; width: auto; margin-left: 0; height: 44px; border-radius: 22px; padding: 0 14px; gap: 9px; background: var(--fill-09); border: 1px solid var(--fill-12); }
+  body#artwork #artwork-home .home-hero { margin-top: 24px; gap: 16px; align-items: center; flex-wrap: nowrap; }
+  body#artwork #artwork-home .home-hero-cover { flex: none; }
+  body#artwork #artwork-home .home-hero-cover img { width: 120px; height: 120px; }
+  body#artwork #artwork-home .home-hero-meta { padding-bottom: 0; }
+  body#artwork #artwork-home .home-hero-title { font-size: 24px; letter-spacing: -.02em; }
+  body#artwork #artwork-home .home-hero-actions { margin-top: 12px; flex-wrap: wrap; gap: 10px; }
+  body#artwork #artwork-home .home-resume { height: 40px; padding: 0 18px 0 14px; }
+  body#artwork #artwork-home .home-shelf { margin-top: 26px; }
+  body#artwork #artwork-home .main__row { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 16px; }
+  /* --- the queue: a full screen --- */
+  body#artwork .aw-queue { left: 0; right: 0; top: 0; bottom: 0; width: auto; border-radius: 0; border: 0; box-shadow: none; background: var(--panel-sheet); transform: translateY(24px); }
+  body#artwork .aw-queue.open { transform: none; }
+  body#artwork .aw-queue.on-playback { bottom: 0; }
+  body#artwork .aw-queue__head { padding: calc(28px + var(--sa-t)) 20px 0; }
+  body#artwork .aw-queue__title { font-size: 24px; font-weight: 800; letter-spacing: -.02em; }
+  body#artwork .aw-queue__sub { font-size: 10px; letter-spacing: .1em; color: var(--ink-45); }
+  body#artwork .aw-queue__close { border: 0; width: auto; height: auto; .material-symbols-rounded { font-size: 26px; } }
+  body#artwork .aw-queue__chips { padding: 18px 20px 0; gap: 10px; flex-wrap: nowrap; }
+  body#artwork .aw-queue__chip { width: 48px; height: 48px; padding: 0; border-radius: 14px; justify-content: center; > span:last-child { display: none; } .material-symbols-rounded { font-size: 22px; color: var(--ink-25); } }
+  body#artwork .aw-queue__chip--danger .material-symbols-rounded { color: var(--err-soft); }
+  body#artwork .aw-queue__sechead { padding: 22px 20px 0; > .mono { font-size: 10px; color: var(--ink-45); } .aw-queue__hint { display: inline; font-size: 12px; } }
+  body#artwork .aw-queue__scroll { padding: 10px 20px calc(var(--mini-h) + 12px); }
+  body#artwork .aw-queue__row { height: 64px; gap: 13px; padding: 0 12px; border-radius: 12px; }
+  body#artwork .aw-queue__drag { font-size: 19px; }
+  body#artwork .aw-queue__slot { width: 20px; }
+  body#artwork .aw-queue__num { font-size: 12px; color: var(--ink-dim); }
+  body#artwork .aw-queue__cover { width: 40px; height: 40px; }
+  body#artwork .aw-queue__name { font-size: 14px; }
+  body#artwork .aw-queue__meta { font-size: 12px; color: var(--ink-55); }
+  body#artwork .aw-queue__time { font-size: 12px; color: var(--ink-55); }
+  body#artwork .aw-queue__foot { display: none; }
+}
+
+/* ---- the library on the phone: the theme's rules, one to one ---- */
+@media (max-width: 700px) and (orientation: portrait) {
+  body#artwork #browseTablesWrapper, body#artwork .aw-browse, body#artwork #browse.browsing-artist #browseTablesWrapper { --head-pad: var(--phone-top); }
+  body#artwork #browse.browsing-list #browseTablesWrapper, body#artwork #browse.browsing-artist #browseTablesWrapper, body#artwork #browse.browsing-playlist #browseTablesWrapper { padding-top: 0; }
+  body#artwork .aw-head--album::after { content: ''; }
+  body#artwork .aw-head--album .aw-hblur { display: block; }
+  body#artwork .aw-head .aw-crumbs { overflow: hidden; }
+  body#artwork .aw-head .aw-crumbs a { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  /* the filter rests as a magnifier and slides open on a tap; it stays open while something is typed */
+  body#artwork .aw-head .aw-filter {
+    width: 44px; flex: none; padding: 0; gap: 0; justify-content: center; overflow: hidden; cursor: pointer;
+    transition: width .26s cubic-bezier(.4, 0, .2, 1), padding .26s cubic-bezier(.4, 0, .2, 1);
+    input { width: 0; flex: none; padding: 0; opacity: 0; transition: opacity .18s ease .04s; }
+    &:focus-within, &.aw-filter--on { width: min(45vw, 300px); flex: 0 1 auto; min-width: 0; padding: 0 16px; gap: 11px; cursor: text; input { width: auto; flex: 1; opacity: 1; } }
+  }
+
+  /* --- Browse landing: hamburger + search, title + count, 3-column tiles --- */
+  body#artwork .aw-head--home .aw-head__row { gap: 12px; flex-wrap: nowrap; }
+  body#artwork .aw-browse .aw-tab, body#artwork .aw-browse .aw-search-key { display: none; }
+  body#artwork .aw-browse .aw-menu-btn { display: grid; place-items: center; border: 0; background: transparent; padding: 0; color: var(--ink-2); cursor: pointer; .material-symbols-rounded { font-size: 24px; } }
+  body#artwork .aw-browse .aw-search { flex: 1; width: auto; margin-left: 0; height: 44px; border-radius: 22px; padding: 0 14px; gap: 9px; background: var(--fill-09); border: 1px solid var(--fill-12); input::placeholder { color: var(--ink-muted); } }
+  body#artwork .aw-browse .aw-browse-head { margin-top: 20px; align-items: baseline; gap: 12px; }
+  body#artwork .aw-browse .aw-browse-title { font-size: 30px; letter-spacing: -.025em; }
+  body#artwork .aw-browse .aw-browse-stats { font-size: 11px; color: var(--ink-45); }
+  body#artwork .aw-browse .aw-cards, body#artwork .aw-browse .aw-sources { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 20px; }
+  body#artwork .aw-browse .aw-sources { margin-top: 16px; }
+  body#artwork .aw-browse .aw-card, body#artwork .aw-browse .aw-source { display: flex; flex-direction: column; align-items: stretch; gap: 8px; padding: 0; background: transparent; border: 0; box-shadow: none; }
+  body#artwork .aw-browse .aw-tile, body#artwork .aw-browse .aw-source > .material-symbols-rounded:first-child, body#artwork .aw-browse .aw-source > .aw-source-logo:first-child {
+    width: auto; height: auto; aspect-ratio: 1; border-radius: 14px; display: grid; place-items: center; overflow: hidden;
+    background: var(--fill-06); border: 1px solid var(--fill-10); color: var(--ink-25); font-size: 34px; }
+  /* the source's own square is the logo's box; the img inside is centred like a glyph */
+  body#artwork .aw-browse .aw-source-logo__img { width: 100%; height: 100%; object-fit: contain; padding: 22px; box-sizing: border-box; }
+  body#artwork .aw-browse .aw-source-logo__img--pad { width: 100%; height: 100%; object-fit: contain; padding: 22px; box-sizing: border-box; transform: scale(1.35); }
+  body#artwork .aw-browse .aw-tile img, body#artwork .aw-browse .aw-tile--lines i { display: none; }
+  body#artwork .aw-browse .aw-tile--mosaic, body#artwork .aw-browse .aw-tile--avatars, body#artwork .aw-browse .aw-tile--stack { display: grid; grid-template-columns: 1fr; gap: 0; place-items: center; }
+  body#artwork .aw-browse .aw-tile .material-symbols-rounded { font-size: 34px; color: var(--ink-25); }
+  body#artwork .aw-browse .aw-tile__glyph { display: block; }
+  body#artwork .aw-browse .aw-card-body, body#artwork .aw-browse .aw-source-body { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+  body#artwork .aw-browse .aw-card-title, body#artwork .aw-browse .aw-source-name { font-size: 13px; font-weight: 600; color: var(--ink-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  body#artwork .aw-browse .aw-card-sub { font-family: var(--font-mono); font-size: 10px; color: var(--ink-55); margin: 0; }
+  body#artwork .aw-browse .aw-card-meta, body#artwork .aw-browse .aw-card-chev, body#artwork .aw-browse .aw-source-chev { display: none; }
+  body#artwork .aw-browse .aw-sources-head { margin-top: 22px; }
+
+  /* --- Album page: 150px square cover beside the title, then compact rows --- */
+  body#artwork #browse.browsing-album #browseTablesWrapper { padding: 0 20px calc(var(--mini-h) + 20px); }
+  body#artwork .aw-albumhead { display: grid; grid-template-columns: 150px minmax(0, 1fr); column-gap: 16px; align-items: center; }
+  /* .aw-head is fixed (see head.scss); `+ *` catches whatever follows it — its own spacer when
+     fixed, or the real next element on a layout that overrides it back to static */
+  body#artwork .aw-head--album + * { margin-top: 18px; }
+  body#artwork .aw-head--album .aw-head__row { gap: 12px; }
+  /* playlists and favourites share the album head on the phone (cover left, title right, the actions under) */
+  /* the album/playlist head and its action bar are children of the scroller: both stick for the whole list */
+  body#artwork .aw-headwrap { display: contents; }
+  body#artwork .aw-albumhead .aw-albumhead__cover { grid-column: 1; grid-row: 2; width: 150px; max-width: none; img { box-shadow: 0 16px 34px -16px var(--shadow-strong); } }
+  body#artwork .aw-albumhead .aw-albumhead__body { display: contents; }
+  body#artwork .aw-albumhead .aw-albumhead__title, body#artwork .aw-albumhead .aw-albumhead__artist, body#artwork .aw-albumhead .aw-albumhead__meta { grid-column: 2; min-width: 0; }
+  body#artwork .aw-albumhead .aw-albumhead__title { grid-row: 2; align-self: end; }
+  body#artwork .aw-albumhead .aw-albumhead__artist { grid-row: 3; }
+  body#artwork .aw-albumhead .aw-albumhead__meta { grid-row: 4; align-self: start; }
+  body#artwork .aw-albumhead .aw-albumhead__cover { grid-row: 2 / 5; align-self: center; }
+  body#artwork .aw-albumhead .aw-albumhead__eyebrow { display: none; }
+  body#artwork .aw-albumhead .aw-albumhead__title { font-size: 22px !important; letter-spacing: -.02em; line-height: 1.1; margin: 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  body#artwork .aw-albumhead .aw-albumhead__artist { font-size: 15px; margin-top: 6px; color: var(--ink-25); }
+  body#artwork .aw-albumhead .aw-albumhead__meta { font-size: 10px; margin-top: 8px; letter-spacing: .08em; white-space: normal; }
+  body#artwork .aw-albumhead .aw-albumhead__actions { grid-column: 1 / -1; grid-row: 5; margin-top: 18px !important; gap: 10px; }
+  body#artwork .aw-albumhead .aw-albumhead__actions .aw-btn { height: 44px; padding: 0 18px; font-size: 14px; }
+  body#artwork .aw-albumhead .aw-albumhead__actions .aw-iconbtn { width: 44px; height: 44px; }
+  body#artwork #browse.browsing-album #browseTablesWrapper > #browse-page { margin-top: 22px; }
+  body#artwork #browse.browsing-album .music-item { grid-template-columns: 22px minmax(0, 1fr) auto auto auto; gap: 10px; padding: 12px 8px; }
+  body#artwork #browse.browsing-album .music-item .item__number { font-size: 11px; }
+  body#artwork #browse.browsing-album .music-item:not(.aw-playing) .item__number-dot { display: none !important; }
+  /* an album page has no per-row artist to bridge */
+  body#artwork #browse.browsing-album .music-item .item__info__separator { display: none; }
+  body#artwork #browse.browsing-album .music-item .item__duration { width: auto; }
+  body#artwork #browse.browsing-album .music-item .item__title { font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  body#artwork #browse.browsing-album .music-item .item__duration { font-size: 11px; }
+  body#artwork #browse.browsing-album .music-item .item__favorite .item__favorite-heart .material-symbols-rounded::before { font-size: 18px; }
+  body#artwork #browse.browsing-album .music-item .item__play { left: 8px; width: 22px; }
+}
+
+@media (max-width: 700px) and (orientation: portrait) {
+  body#artwork #np .np-sleep-tag { display: none; }
+  /* --- Zones: device cards (icon · name / now playing / volume / actions) --- */
+  body#artwork .aw-zones { padding: var(--phone-top) 20px calc(var(--mini-h) + 20px); }
+  body#artwork .aw-zones .aw-listhead { gap: 12px; margin: 0 0 6px; align-items: center; min-height: 44px; }
+  body#artwork .aw-zones .aw-listhead .aw-menu-btn { display: grid; place-items: center; border: 0; background: transparent; padding: 0; color: var(--ink-2); cursor: pointer; height: 44px; width: 32px; .material-symbols-rounded { font-size: 24px; } }
+  body#artwork .aw-zones .aw-listhead__title { font-size: 24px; letter-spacing: -.02em; }
+  body#artwork .aw-zones .aw-zones__cols { display: none; }
+  body#artwork .aw-zones .aw-zone { grid-template-columns: 44px minmax(0, 1fr); grid-template-areas: "icon name" "np np" "vol vol" "act act"; gap: 12px 14px; padding: 14px; margin-top: 10px; border-top: 0; background: var(--fill-05); border: 1px solid var(--fill-08); border-radius: 14px; }
+  body#artwork .aw-zones .aw-zone__icon { grid-area: icon; } body#artwork .aw-zones .aw-zone__name { grid-area: name; }
+  body#artwork .aw-zones .aw-zone__np { grid-area: np; } body#artwork .aw-zones .aw-zone__vol { grid-area: vol; }
+  body#artwork .aw-zones .aw-zone__act { grid-area: act; justify-content: flex-start; flex-wrap: wrap; }
+  /* This browser: one line — icon · name and status · switch; the status may take two lines (it can carry "Listen here") */
+  body#artwork .aw-zones .aw-zone.aw-zone--local { grid-template-columns: 44px minmax(0, 1fr) auto; grid-template-areas: "icon name act"; align-items: center; }
+  body#artwork .aw-zones .aw-zone--local .aw-zone__np, body#artwork .aw-zones .aw-zone--local .aw-zone__vol { display: none; }
+  body#artwork .aw-zones .aw-zone--local .aw-zone__act { justify-content: flex-end; }
+  body#artwork .aw-zones .aw-zone--local .aw-zone__sub { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.35; }
+}
+
+@media (max-width: 700px) and (orientation: portrait) {
+  body#artwork #contentWrapper.aw-settings-shell .aw-mnav { padding-top: var(--phone-top); }
+  body#artwork #pluginWrapper { padding-top: var(--phone-top); }
+  body#artwork #pluginWrapper .boxHeader .title h2 { min-height: 44px; }
+  /* --- Settings: grouped list on the landing; plugin pages full width with their own back --- */
+  body#artwork #contentWrapper.aw-settings-shell, body#artwork #contentWrapper.aw-settings-shell.aw-settings-shell--noside { grid-template-columns: 1fr; grid-template-rows: minmax(0, 1fr); }
+  body#artwork #contentWrapper.aw-settings-shell .aw-snav { display: none; }
+  body#artwork #contentWrapper.aw-settings-shell > .aw-settings-side { display: none; }
+  body#artwork #contentWrapper.aw-settings-shell .aw-settings-nav { display: block; min-height: 0; overflow-y: auto; }
+  body#artwork #contentWrapper.aw-settings-shell .aw-mnav { display: block; padding: var(--phone-top) 20px calc(var(--mini-h) + 20px); color: var(--ink-1); }
+  body#artwork #contentWrapper.aw-settings-shell .aw-mnav ~ * { display: none; }
+  body#artwork #contentWrapper.aw-settings-shell.aw-state-volumio-settings > #content { display: none; }
+  body#artwork .aw-mnav__head { display: flex; align-items: flex-start; gap: 12px; margin-top: 0; min-height: 44px; }
+  body#artwork .aw-mnav__back { height: 44px; width: 32px; align-self: flex-start; margin-top: 0; border: 0; background: transparent; padding: 0; color: var(--ink-2); display: grid; place-items: center; cursor: pointer; .material-symbols-rounded { font-size: 24px; } }
+  body#artwork .aw-mnav__titles { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; line-height: normal; }
+  body#artwork .aw-mnav__title { font-size: 24px; font-weight: 800; letter-spacing: -.02em; color: var(--ink); }
+  body#artwork .aw-mnav__sub { font-size: 10px; letter-spacing: .1em; color: var(--ink-45); }
+  body#artwork .aw-mnav__eyebrow { font-size: 10px; letter-spacing: .18em; color: var(--ink-45); padding: 14px 2px 8px; line-height: normal; }
+  body#artwork .aw-mnav__card { border-radius: 14px; overflow: hidden; background: var(--fill-05); border: 1px solid var(--fill-10); }
+  body#artwork .aw-mnav__row { display: flex; align-items: center; gap: 13px; height: 52px; padding: 0 14px; border-bottom: 1px solid var(--fill-06); cursor: pointer; text-decoration: none; color: var(--ink-2);
+    &:last-child { border-bottom: 0; } &:hover { background: var(--fill-05); color: var(--ink); }
+    > .material-symbols-rounded:first-child { font-size: 22px; color: var(--ink-3); width: 22px; } }
+  body#artwork .aw-mnav__label { flex: 1; min-width: 0; font-size: 15px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  body#artwork .aw-mnav__value { font-size: 11px; color: var(--ink-55); }
+  body#artwork .aw-mnav__chev { font-size: 20px; color: var(--ink-faint); }
+  body#artwork #pluginWrapper { padding: var(--phone-top) 20px calc(var(--mini-h) + 20px); }
+  body#artwork #pluginWrapper .boxHeader .title h2 { display: flex; align-items: center; gap: 12px; font-size: 24px; letter-spacing: -.02em; line-height: normal; }
+  body#artwork #pluginWrapper .boxHeader .title h2 a.btn { display: grid; place-items: center; width: auto; height: auto; padding: 0; margin: 0; background: transparent; border: 0; box-shadow: none; color: var(--ink-2); flex: none;
+    /* the glyph box as the frame draws it: a block of 24px text, the symbol inline in it */
+    .fa { display: block; width: auto; height: auto; font-size: 24px; line-height: 24px; } .fa .material-symbols-rounded { display: inline; width: auto; font-size: 24px; line-height: inherit; vertical-align: baseline; } }
+  body#artwork #pluginWrapper .pluginDescription { margin-top: 6px; }
+}
+
+/* --- Settings on the phone: the shared page head (hamburger + Settings; back + Settings / page inside) --- */
+@media (max-width: 700px) and (orientation: portrait) {
+  body#artwork .aw-head--settings { display: block; }
+  body#artwork .aw-head--settings + * { margin-top: 26px; }
+  body#artwork #contentWrapper.aw-settings-shell .aw-mnav { padding-top: 0; --head-pad: var(--phone-top); }
+  body#artwork .aw-mnav__back { display: none; }
+  body#artwork #pluginWrapper { padding-top: 0; --head-pad: var(--phone-top); }
+  body#artwork #pluginWrapper .boxHeader .title h2 a.btn { display: none; }
+  body#artwork .aw-state-volumio-plugin-manager #content .box { padding: 0 20px calc(var(--mini-h) + 20px); --head-pad: var(--phone-top); }
+  body#artwork .aw-state-volumio-plugin-manager #content .boxHeader .title h2 a.btn { display: none; }
+  /* the page title sits where the list pages put theirs: right under the head */
+  body#artwork #pluginWrapper .boxHeader, body#artwork .aw-state-volumio-plugin-manager #content .boxHeader { margin-top: 0; }
+}
+/* --- playlists and favourites on the phone: the album head, with no artist line the title and the count share the cover's height --- */
+@media (max-width: 700px) and (orientation: portrait) {
+  body#artwork .aw-albumhead--playlist .aw-albumhead__meta { grid-row: 3; margin-top: 8px; }
+  body#artwork .aw-albumhead--playlist .aw-albumhead__cover { grid-row: 2 / 4; }
+}
+
+/* --- MyVolumio profile on the phone: the shared head (hamburger · MyVolumio · Logout), the tile beside the name, e-mail and Edit under it --- */
+@media (max-width: 700px) and (orientation: portrait) {
+  html body#artwork .aw-state-myvolumio-profile .box { padding-top: 0; --head-pad: var(--phone-top); }
+  body#artwork .aw-state-myvolumio-profile .box .boxHeader { display: none; }
+  body#artwork .aw-state-myvolumio-profile .box #authLoginPlugin .panel-heading .btn-danger { display: none; }
+  body#artwork .aw-state-myvolumio-profile .box .aw-head--settings + * { margin-top: 8px; }
+  body#artwork .aw-head--settings .aw-crumbs__cur:first-child { max-width: none; }   /* a lone title never ellipses */
+  body#artwork .aw-myv-logout { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px; border-radius: 18px; background: transparent; border: 1px solid var(--fill-16); color: var(--ink-2); font-size: 14px; font-weight: 500; cursor: pointer;
+    .glyphicon { display: inline-block; line-height: 1; .material-symbols-rounded { font-size: 16px; display: block; } } }
+  body#artwork .aw-state-myvolumio-profile .box .my-profile { grid-template-columns: 120px 1fr !important; column-gap: 16px; row-gap: 20px; align-items: center; margin-top: 8px; }
+  body#artwork .aw-state-myvolumio-profile .box .my-profile > :first-child { grid-column: 1 !important; grid-row: 1 !important; }
+  /* the text column and the plan card become grid items themselves: name beside the tile, the card under both */
+  body#artwork .aw-state-myvolumio-profile .box .my-profile > :last-child, body#artwork .aw-state-myvolumio-profile .box .my-profile > div > .row { display: contents; }
+  body#artwork .aw-state-myvolumio-profile .box .my-profile > div > .row .user-data { grid-column: 2 !important; grid-row: 1 !important; min-width: 0; padding-top: 0; }
+  body#artwork .aw-state-myvolumio-profile .box .my-profile > div > .row .plans-table { grid-column: 1 / -1 !important; grid-row: 2 !important; }
+  body#artwork .aw-state-myvolumio-profile .box .user-data .user-title { font-size: 24px; line-height: 1.1; display: block; }
+  body#artwork .aw-state-myvolumio-profile .box .user-data .user-username { margin-top: 2px; font-size: 13px; }
+  body#artwork .aw-state-myvolumio-profile .box .user-data .user-details { margin-top: 6px; font-size: 14px; }
+  body#artwork .aw-state-myvolumio-profile .box .user-data .aw-myv-edit { display: inline-flex; align-items: center; gap: 8px; height: 38px; padding: 0 16px; border-radius: 19px; margin-top: 12px; background: var(--ink); color: var(--on-ink); border: 0; font-size: 14px; font-weight: 700; box-shadow: none; float: none;
+    .fa { display: inline-block; line-height: 1; .material-symbols-rounded { font-size: 16px; display: block; color: var(--on-ink); } } }
+}
+
+/* --- MyVolumio pages on the phone: the shared head with the crumbs replaces the floating hamburger and the back pills --- */
+@media (max-width: 700px) and (orientation: portrait) {
+  html body#artwork [class*="aw-state-myvolumio-"] .box { padding-top: 0; --head-pad: var(--phone-top); }
+  body#artwork [class*="aw-state-myvolumio-"] .box > .boxHeader { display: none; }
+  body#artwork [class*="aw-state-myvolumio-"] .box .aw-head--settings + * { margin-top: 8px; }
+  body#artwork [class*="aw-state-myvolumio-"] .box my-volumio-back-button { display: none !important; }   /* the theme shows the pill with a heavier selector */
+  body#artwork .aw-state-myvolumio-plans .box .aw-plans { margin-top: 12px; }
+}

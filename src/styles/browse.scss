@@ -1,0 +1,635 @@
+/* The library: the base rows and tiles Volumio's browse is built from, then the theme's rules in
+   the order they shipped, then the fluid rules. The selectors keep the theme's names. */
+
+$aw-heart: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23fff' d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E");
+
+/* ---- bootstrap bits the markup leans on ---- */
+.hidden { display: none !important; }
+.text-center { text-align: center; }
+.mr-2 { margin-right: 8px; }
+.ghost-btn { background: transparent; border: none; }
+
+/* ---- the base browse (Contemporary), as far as the theme builds on it ---- */
+#browse { position: absolute; top: 0; bottom: 0; left: 0; right: 0; width: 100%; height: 100%;
+  .panel { position: absolute; top: 0; bottom: 0; left: 0; right: 0; width: 100%; height: 100%; margin: 0; z-index: 0; } }
+#browse .panel .body-content.new-browse { position: absolute; top: 0; left: 0; right: 0; bottom: 0; height: auto; display: flex; overflow: hidden; }
+#browseTablesWrapper { width: 100%; height: 100%; overflow-y: scroll !important; overflow-x: hidden; }
+.main__source { margin-bottom: 12px; }
+#browse-page .panel-title { color: var(--ink-1); display: inline-flex; align-items: center; width: 100%; margin-top: 24px; margin-bottom: 0; padding: 0; font-size: 18px; line-height: 20px; }
+.main__list .album__tracks:first-child { padding-top: 12px; }
+.main__list .album__tracks:last-child { padding-bottom: 12px; }
+.music-card__wrapper { min-width: 0; }
+
+/* cards */
+.music-card { width: 100%; }
+.music-card__header { position: relative; margin-bottom: 12px; background: var(--shade-60); }
+.music-card__img, .music-card__img-icon { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: block; }
+.music-card__img-icon { background: var(--panel-fill); color: white; display: flex; align-items: center; justify-content: center; .material-symbols-rounded { font-size: 50px; } }
+.music-card__overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: transparent; transition: background-color .15s ease-out 0s; }
+.music-card__info { display: flex; min-width: 0; justify-content: space-between; align-items: center; }
+.music-card__label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: bold; }
+.music-card__meta { font-size: 13px; line-height: 15px; color: #7a848e; margin-top: 6px; }
+.music-card__extension { display: block; flex: 0 0 20px; max-width: 20px; }
+.meta__genre { position: absolute; top: 12px; left: 12px; width: calc(100% - 24px); opacity: 0; transition: opacity .15s ease-out 0s; pointer-events: none; }
+.meta__actions { position: absolute; top: 12px; right: 6px; width: 24px; text-align: center; pointer-events: auto;
+  .action-btn { transition: opacity .15s ease-out 0s; text-shadow: 0 0 4px rgba(0, 0, 0, .35); font-size: 17px; padding: 1px 12px; cursor: pointer; line-height: normal; &:hover, &:active, &:focus { outline: none; }
+    /* a 17px FontAwesome ellipsis-v, 4px wide in a 24px line: the Material dots keep the box */
+    .material-symbols-rounded { position: relative; z-index: 20; display: inline-block; width: 4px; height: 24px; line-height: 24px; font-size: 20px; text-align: center; overflow: visible; vertical-align: top; } } }
+.meta__play { position: absolute; bottom: 12px; left: 12px; opacity: 0; transition: opacity .15s ease-out 0s; pointer-events: none;
+  .play-btn { display: flex; position: relative; width: 40px; height: 40px; border-radius: 40px; border: 2px solid rgba(255, 255, 255, 1); align-items: center; justify-content: center; transition: all .15s ease-out; cursor: pointer; }
+  .play-btn__icon { margin-top: 2px; margin-left: 3px; } }
+.meta__favorite { position: absolute; bottom: 12px; right: 12px; font-size: 20px; -webkit-text-stroke: 1px white; -webkit-text-fill-color: transparent; opacity: 0; transition: opacity .15s ease-out 0s; pointer-events: none; cursor: pointer;
+  &.favorited { opacity: 1; -webkit-text-fill-color: currentColor; -webkit-text-stroke: 1px transparent; } }
+.hamburgerMenu.dropdown.open .action-btn { opacity: 1; }
+@media (min-width: 768px) and (pointer: fine) {
+  .music-card:hover { cursor: pointer;
+    .music-card__overlay { background-color: var(--shade-60); }
+    .meta__genre, .meta__actions, .action-btn, .meta__play, .meta__favorite { opacity: 1; pointer-events: auto; } }
+}
+img.music-card__extension.tagrow { display: inline; height: 18px; }
+
+/* rows */
+.music-item { flex: 1 0 100%; display: flex; min-width: 0; padding: 0; align-items: center; border-bottom: 1px solid #333; cursor: pointer; transition: background-color .15s ease-out 0s;
+  &:hover .item__play, &:hover .item__favorite { opacity: 1; }
+  &.title { padding: 24px 16px; font-size: 18px; line-height: 20px; pointer-events: none; border-bottom: none; } }
+.item__play { display: block; flex: 0 0 48px; padding: 8px 0 8px 8px; opacity: 0;
+  .play-btn { width: 32px; height: 32px; border: 2px solid white; border-radius: 40px; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .play-btn__icon { padding-left: 2px; } }
+.item__image { flex: 0 0 auto; text-align: center; display: flex; align-items: center; justify-content: center; line-height: 1; }
+.item__image__img { width: 100%; }
+.item__number { display: block; width: 2em; text-align: right; color: #7a848e; margin: 0 16px 0 0; }
+.item__albumart { width: 40px; height: 40px; margin-right: 8px; }
+.item__albumart-icon { width: 40px; height: 40px; margin-right: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; .material-symbols-rounded { font-size: 18px; } }
+.item__info { flex-grow: 1; display: flex; flex-wrap: nowrap; min-width: 0; .truncate-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } }
+.item__title, .item__album, .item__artist { flex: 0 0 calc(100% / 3); min-width: 0; margin-bottom: 0; }
+.item__title__half { flex: 0 0 calc((100% / 3) * 2); }
+.item__title__full { flex: 1 1 100%; }
+.item__album, .item__artist { padding: 0 4px 0 0; color: #7a848e; }
+.item__info__separator { padding: 0 6px; display: none; line-height: normal; }
+.item__favorite { display: block; flex: 0 0 auto; padding: 0 8px; -webkit-text-stroke: 1px white; -webkit-text-fill-color: transparent; opacity: 0; transition: opacity .15s ease-out 0s; cursor: pointer;
+  .material-symbols-rounded { vertical-align: top; margin-top: 1px; }
+  &.favorited { opacity: 1; -webkit-text-fill-color: currentColor; -webkit-text-stroke: 1px transparent; } }
+.item__duration { padding: 0 8px; min-width: 64px; }
+.item__actions { padding-right: 8px; .action-btn { padding: 0 8px; cursor: pointer; }
+  /* the base glyph was a 15px FontAwesome ellipsis-v, 3.2px wide: the Material dots keep that layout box and overflow it */
+  .action-btn .material-symbols-rounded { display: inline-block; width: 3.2px; height: 15px; line-height: 15px; font-size: 15px; text-align: center; overflow: visible; vertical-align: top; } }
+/* the inherited theme paints the browse chrome white; children set their own ink */
+#browse { color: #fff; }
+label.aw-search, label.aw-filter { color: var(--ink-2); }
+
+@media (max-width: 767px) {
+  .music-item { padding: 8px; }
+  .item__play { display: none; }
+  .item__info { flex-wrap: wrap; }
+  .item__title { flex: 1 1 100%; margin-bottom: 8px; }
+  .item__album { flex: 0 1 auto; color: #54C688; }
+  .item__artist { flex: 0 1 auto; }
+  .item__info__separator { display: block; }
+  .item__favorite { display: none; }
+}
+
+/* ============ the theme's browse / library reskin (spec §5.3, §6.2) ============ */
+body#artwork {
+  #browse, #browse .panel, #browse .panel-default, #browse .panel-body, #browse .body-content { background: transparent !important; border: 0 !important; box-shadow: none !important; }
+  .music-card .action-btn, .music-card .meta__actions { position: absolute; top: 8px; right: 8px; .material-symbols-rounded { color: var(--ink-1); } }
+  .music-card .meta__favorite { position: absolute; top: 8px; left: 8px; .material-symbols-rounded { color: var(--ink-1); } }
+}
+/* the base .fa glyph slots, in Material: row heart / menu 15px var(--ink-3) */
+body#artwork .music-item .item__number { color: var(--ink-dim); font-family: var(--font-mono); font-size: 13px; }
+body#artwork .music-item .item__info { gap: 18px; min-width: 0; }
+body#artwork .music-item .item__title { color: var(--ink-1); font-size: 16px; font-weight: 500; flex: 1 1 auto; min-width: 0; }
+body#artwork .music-item .item__album, body#artwork .music-item .item__artist { color: var(--ink-dim); font-size: 14px; }
+body#artwork .music-item .item__duration { color: var(--ink-dim); font-family: var(--font-mono); font-size: 13px; }
+body#artwork .music-item .item__favorite .material-symbols-rounded, body#artwork .music-item .item__actions .material-symbols-rounded { color: var(--ink-3); font-size: 15px; }
+body#artwork .music-item .item__favorite .material-symbols-rounded:hover, body#artwork .music-item .item__actions .material-symbols-rounded:hover { color: var(--ink-1); }
+body#artwork .music-item { display: flex; align-items: center; gap: 14px; padding: 8px 14px; border-radius: var(--r-panel); min-height: 52px; transition: background .15s ease; &:hover { background: var(--fill-06); } }
+body#artwork #browse.browsing-album .album__tracks .item__album, body#artwork #browse.browsing-album .album__tracks .item__artist, body#artwork #browse.browsing-album .album__tracks .item__info__separator { display: none; }
+
+/* search page: Volumio's own search box in the head */
+body#artwork {
+  .dedicated-search { padding: var(--pad-top) var(--pad-screen) 6px; }
+  .dedicated-search form { margin: 0; }
+  .dedicated-search .search-icon { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); background: none; border: 0; padding: 0; z-index: 2; cursor: pointer; .material-symbols-rounded { color: var(--ink-muted); font-size: 19px; } }
+  #browse .dedicated-search { background: transparent !important; }
+  #browse .panel .body-content.new-browse.with-search-header { top: 0; height: 100%; padding-top: 0; }
+  .dedicated-search .search-container { max-width: 640px; margin: 0; position: relative; }
+  .dedicated-search input.form-control { height: 46px; font-size: 15px; border-radius: 23px; background: var(--fill-09); border: 1px solid var(--fill-11); padding: 0 20px 0 48px; width: 100%; color: var(--ink-1); box-shadow: none; outline: 0; font-family: var(--font-ui);
+    &::placeholder { color: var(--ink-dim); } &:focus { outline: none; border-color: var(--hairline); background: var(--glass-2-hover); } &::-webkit-search-cancel-button { -webkit-appearance: none; } }
+  .dedicated-search .search-icon .material-symbols-rounded { font-size: 17px; color: var(--ink-muted); }
+}
+
+/* track rows (8b): a small pill before the duration, only for Hi-Res and DSD */
+body#artwork .music-item .item__duration { display: inline-flex; align-items: center; justify-content: flex-end; gap: 12px; white-space: nowrap; }
+body#artwork .music-item .item__quality { display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 9px; border-radius: 999px; flex: none; border: 1px solid transparent; font-family: var(--font-mono);
+  .aw-q__num { font-size: 11px; font-weight: 700; letter-spacing: .04em; } .aw-q__unit { font-size: 9px; letter-spacing: .14em; } }
+
+/* ============ album / playlist detail ============ */
+/* the pinned-cover, 2-column grid is for a real album, which never scrolls its own cover away; a
+   playlist (Tidal's, Spotify's, a local one) scrolls as one column, cover included */
+body#artwork #browse.browsing-album #browseTablesWrapper {
+  /* two rows so the crumb bar (row 1) and the cover (row 2) share column 1 without overlapping,
+     while the track list spans both and keeps its own scroll — see the .aw-head comment in
+     AlbumHead.tsx for why the crumb bar is a column-1 sibling and not nested inside the cover's
+     own (much shorter) box */
+  display: grid; grid-template-columns: minmax(260px, 34%) 1fr; grid-template-rows: auto minmax(0, 1fr);
+  column-gap: clamp(24px, 3.9vw, 56px); row-gap: 0; align-items: start; padding: 0 var(--pad-screen);
+  overflow: hidden !important; overscroll-behavior: contain;
+  /* static here, not fixed: this column never scrolls, so .aw-head just sits in the grid like any
+     other cell — but its own padding-left (built for the full-bleed fixed bar elsewhere) would
+     then double up with the column's own inset, landing the back arrow further right than the
+     cover under it, so it's reset to 0 here and the vertical padding kept */
+  > .aw-head { grid-column: 1; grid-row: 1; position: static; padding-left: 0; padding-right: 0; }
+  > .aw-headwrap { grid-column: 1; grid-row: 2; align-self: stretch; min-height: 0; overflow: visible; }
+  > #browse-page { grid-column: 2; grid-row: 1 / span 2; align-self: stretch; min-height: 0; margin-top: 104px; height: calc(100% - 104px - var(--mini-h) - 18px); overflow-y: auto; overscroll-behavior: contain; padding-bottom: 12px;
+    .main__list .album__tracks:first-child { padding-top: 0; }
+    .main__source:last-child { margin-bottom: 0; }
+    .main__list .album__tracks:last-child { padding-bottom: 0; } }
+}
+.aw-albumhead {
+  display: flex; flex-direction: column; align-items: flex-start; position: relative;
+  &__bg { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
+    img { width: 100%; height: 100%; object-fit: cover; filter: blur(70px) saturate(1.3); opacity: .55; transform: scale(1.1); }
+    &::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, var(--cover-veil-1) 0%, var(--cover-veil-2) 100%); } }
+  &__cover--icon { background: var(--fill-08); border-radius: var(--r-cover); img { padding: 24%; filter: invert(var(--icon-invert, 0)); box-shadow: none; } }
+  &__cover { width: 100%; max-width: 380px; img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: var(--r-cover); box-shadow: var(--shadow-cover); display: block; } }
+  &__eyebrow { margin-top: 24px; font-size: 11px; letter-spacing: .18em; color: var(--ink-3); }
+  &__title { margin: 24px 0 0; font-family: var(--font-ui); font-weight: 800; letter-spacing: -.025em; font-size: var(--t-h1); line-height: 1.04; color: var(--ink); text-wrap: pretty;
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+  &__artist { margin-top: 8px; font-size: 19px; color: var(--ink-2); }
+  &__meta { margin-top: 14px; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-muted); }
+  &__actions { display: flex; align-items: center; gap: 12px; margin-top: 24px; flex-wrap: wrap; }
+}
+.aw-btn { display: inline-flex; align-items: center; gap: 9px; height: 48px; padding: 0 22px; border-radius: var(--r-pill); border: 1px solid var(--glass-2-border); background: var(--glass-2-fill); color: var(--ink-1); font-size: 15px; font-weight: 600; cursor: pointer;
+  .material-symbols-rounded { font-size: 22px; } &:hover { background: var(--glass-2-hover); } }
+.aw-btn--primary { background: var(--ink); color: var(--ground); border: 0; &:hover { background: var(--ink-1); color: var(--ground); } }
+.aw-iconbtn { width: 48px; height: 48px; border-radius: var(--r-pill); display: grid; place-items: center; cursor: pointer; background: transparent; border: 1px solid var(--glass-2-border); color: var(--ink-2);
+  .material-symbols-rounded { font-size: 22px; } &:hover { color: var(--ink-1); background: var(--glass-2-fill); } }
+body#artwork .album__tracks { display: flex; flex-direction: column; gap: 2px; grid-column: 2; }
+body#artwork #browse.browsing-album .panel .body-content.new-browse, body#artwork #browse.browsing-playlist .panel .body-content.new-browse, body#artwork #browse.browsing-home .panel .body-content.new-browse { top: 0; height: 100%; }
+.aw-head + .aw-headwrap { margin-top: 32px; }
+/* the playlist head is not a column: the head sticks for the whole list. Not `display: contents`
+   here — Safari does not resolve a sticky descendant's containing block through a `contents`
+   parent, so the head silently stopped sticking there; an ordinary block passes the sticky
+   context through in every engine. */
+body#artwork #browse.browsing-playlist .aw-headwrap { display: block; }
+
+/* ============ the landing (mockup 2b-browse) ============ */
+body#artwork .aw-browse { padding: var(--pad-top) var(--pad-screen) 40px; color: var(--ink-1); }
+.aw-browse-head { display: flex; align-items: baseline; gap: 16px; margin-top: 26px; margin-bottom: 14px; }
+.aw-browse-title { margin: 0; font-family: var(--font-ui); font-size: 46px; font-weight: 800; letter-spacing: -.03em; line-height: 1; color: var(--ink); }
+.aw-browse-stats { font-size: 12px; letter-spacing: .1em; color: var(--ink-muted); }
+.aw-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 28px; }
+.aw-card { display: flex; align-items: center; gap: 18px; padding: 18px; border-radius: 16px; min-width: 0; background: var(--fill-08); border: 1px solid var(--fill-12); cursor: pointer; transition: background .25s ease; &:hover { background: var(--fill-13); } }
+.aw-tile { width: 96px; height: 96px; border-radius: 8px; overflow: hidden; flex: none; background: var(--card-flat); }
+.aw-tile--mosaic { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 4px; } img:nth-child(n+5) { display: none; } }
+.aw-tile--stack img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.aw-tile--avatars { display: flex; align-items: center; background: none; overflow: visible; img { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; border: 2px solid var(--ground); flex: none; } img:nth-child(2) { margin-left: -30px; } }
+.aw-tile--icon { display: grid; place-items: center; background: var(--fill-07); .material-symbols-rounded { font-size: 44px; color: var(--ink-1); } }
+.aw-tile--lines { display: flex; flex-direction: column; justify-content: center; gap: 9px; padding: 0 16px;
+  i { display: block; height: 5px; border-radius: 3px; background: rgba(255, 255, 255, .7); } i:nth-child(2) { width: 78%; background: rgba(255, 255, 255, .5); } i:nth-child(3) { width: 56%; background: rgba(255, 255, 255, .35); } }
+.aw-tile__glyph { display: none; }
+.aw-card-body { min-width: 0; flex: 1; }
+.aw-card-title { font-size: 20px; font-weight: 700; letter-spacing: -.01em; color: var(--ink); }
+.aw-card-sub { font-size: 14px; color: var(--ink-muted); margin-top: 5px; }
+.aw-card-meta { font-size: 11px; letter-spacing: .1em; color: var(--ink-dim); margin-top: 9px; }
+.aw-card-chev { font-size: 22px; color: var(--ink-muted); flex: none; }
+.aw-sources-head { display: flex; align-items: center; gap: 14px; margin-top: 34px; padding-bottom: 12px; border-bottom: 1px solid var(--fill-10); .mono { font-size: 11px; letter-spacing: .18em; color: var(--ink-35); } }
+.aw-sources-manage { margin-left: auto; font-size: 13px; font-weight: 500; color: var(--ink-3); cursor: pointer; text-decoration: none; &:hover { color: var(--ink-1); } }
+.aw-sources { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 18px; }
+.aw-source { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 13px; min-width: 0; background: var(--fill-05); cursor: pointer; color: var(--ink-1); text-decoration: none;
+  > .material-symbols-rounded { font-size: 24px; color: var(--ink-2); flex: none; } &:hover { background: var(--fill-09); } }
+.aw-source-logo { width: 24px; height: 24px; flex: none; border-radius: 6px; overflow: hidden; display: grid; place-items: center; }
+.aw-source-logo__img { width: 100%; height: 100%; object-fit: contain; }
+/* Spotify's own icon file has a huge transparent safe-margin (the mark fills ~43% of the
+   canvas vs. ~65-70% for other services' icons) — scale it up so it reads at the same visual
+   size as its neighbours instead of looking shrunken; clipped by the wrapper above. */
+.aw-source-logo__img--pad { width: 100%; height: 100%; object-fit: contain; transform: scale(1.35); }
+.aw-source-body { min-width: 0; flex: 1; }
+.aw-source-name { font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.aw-source-sub { font-size: 12px; color: var(--ink-dim); margin-top: 2px; }
+.aw-source-chev { font-size: 20px; color: var(--ink-muted); flex: none; }
+body#artwork #browse-page { background: transparent; }
+
+/* ============ lists (artists, albums, genres…) ============ */
+body#artwork #browseTablesWrapper { padding-left: var(--pad-screen); padding-right: var(--pad-screen); }
+body#artwork .aw-browse { padding-left: 0; padding-right: 0; }
+.aw-listhead { display: flex; align-items: baseline; gap: 12px; margin: 26px 0 18px; }
+.aw-listhead__title { margin: 0; font-family: var(--font-ui); font-size: var(--t-h1); font-weight: 800; letter-spacing: -.03em; line-height: 1; color: var(--ink); }
+.aw-listhead__count { font-size: 13px; color: var(--ink-muted); }
+body#artwork .album__tracks { background: transparent; }
+body#artwork #browse.browsing-artists .music-card__header, body#artwork #browse.browsing-artists .music-card__img, body#artwork #browse.browsing-artists .music-card__overlay { border-radius: 50%; }
+body#artwork #browse.browsing-artists .music-card__info, body#artwork #browse.browsing-artists .music-card__label, body#artwork #browse.browsing-artists .music-card__meta { text-align: center; }
+body#artwork #browse.browsing-artists .music-card__label { font-size: 16px; font-weight: 600; margin-top: 14px; }
+
+/* ============ playlist page (mockup 2d) ============ */
+body#artwork #browse.browsing-playlist #browseTablesWrapper { padding-top: 0; }
+.aw-albumhead--playlist {
+  display: grid; grid-template-columns: 260px 1fr; column-gap: 40px; align-items: end;
+  .aw-albumhead__cover { max-width: 260px; grid-row: 2; }
+  .aw-albumhead__title, .aw-albumhead__artist, .aw-albumhead__meta, .aw-albumhead__actions { grid-column: 2; }
+  .aw-albumhead__body { grid-column: 2; grid-row: 2; align-self: end; display: flex; flex-direction: column; min-width: 0; padding-bottom: 6px; }
+  .aw-albumhead__title { font-size: var(--t-h1-xl); letter-spacing: -.035em; line-height: 1; margin: 0; }
+  .aw-albumhead__meta { margin-top: 14px; }
+  .aw-albumhead__actions { margin-top: 26px; }
+  .aw-albumhead__artist { display: none; }
+}
+.aw-albumhead:not(.aw-albumhead--playlist) .aw-albumhead__body { display: contents; }
+/* matches .music-item's own resolved template exactly (number, cover, info, actions) — the row's
+   duration/favourite columns collapse to nothing for a playlist (hidden there), so the header
+   must skip them too or its 1fr resolves to a different width than the row's and every column
+   past the number drifts out of alignment */
+.aw-cols { display: grid; grid-template-columns: 26px 44px 1fr 27px; align-items: center; gap: 14px; margin-top: 30px; padding: 22px 14px 11px; border-bottom: 1px solid var(--fill-10); font-size: 10px; letter-spacing: .16em; color: var(--ink-dim);
+  .aw-cols__info { display: grid; grid-template-columns: minmax(150px, 1fr) minmax(140px, 260px); column-gap: 20px; } }
+/* the non-playlist track list (Last 100, Favourites, genre/folder tracks, search) keeps its
+   favourite heart, unlike a playlist row — one more resolved track than .aw-cols above, so its
+   header needs the matching 5th column or the same 1fr-drift bug reappears */
+.aw-cols--fav { grid-template-columns: 26px 44px 1fr 30px 27px; }
+.aw-cols__duration { display: none; }
+/* ============ list pages (mockup 2e Artists) ============ */
+body#artwork #browse.browsing-list .panel .body-content.new-browse { top: 0; height: 100%; }
+body#artwork #browse.browsing-list #browseTablesWrapper { position: relative; }
+body#artwork .aw-hidden { display: none !important; }
+body#artwork #browse.browsing-list .main__list { display: flex; flex-direction: column; }
+.aw-crumbs { font-size: 15px; color: var(--ink-dim); display: flex; align-items: center; gap: 5px; min-width: 0; flex-wrap: nowrap; white-space: nowrap; overflow: hidden;
+  a, .aw-crumbs__cur { min-width: 0; max-width: clamp(70px, 13vw, 260px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 0 1 auto; }
+  .aw-crumbs__sep { flex: none; }
+  a { color: var(--ink-dim); text-decoration: none; cursor: pointer; &:hover { color: var(--ink-3); } }
+  .aw-crumbs__sep { color: var(--ink-75); }
+  .aw-crumbs__cur { color: var(--ink); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } }
+.aw-filter { margin-left: auto; display: flex; align-items: center; gap: 11px; height: 38px; padding: 0 16px; border-radius: 19px; width: 290px; margin-bottom: 0; font-weight: 400; background: var(--fill-09); border: 1px solid var(--fill-11); cursor: text;
+  .material-symbols-rounded { font-size: 20px; color: var(--ink-muted); flex: none; }
+  input { flex: 1; min-width: 0; background: transparent; border: 0; padding: 0; height: 100%; font-size: 14px; color: var(--ink); outline: 0; box-shadow: none; font-family: var(--font-ui);
+    &:focus, &:focus-visible { outline: none; box-shadow: none; } &::placeholder { color: var(--ink-muted); } &::-webkit-search-cancel-button { -webkit-appearance: none; } }
+  &:focus-within { border-color: var(--fill-30); } }
+.aw-viewtoggle { display: flex; gap: 4px; padding: 4px; border-radius: 12px; background: var(--fill-08); border: 1px solid var(--fill-11);
+  button { width: 34px; height: 30px; border-radius: 8px; border: 0; padding: 0; background: transparent; display: grid; place-items: center; cursor: pointer;
+    .material-symbols-rounded { font-size: 19px; color: var(--ink-muted); } &.active { background: var(--ink); .material-symbols-rounded { color: var(--on-ink); } }
+    &:hover:not(.active) .material-symbols-rounded { color: var(--ink); } &:focus-visible { outline: 2px solid var(--ink-1); outline-offset: 2px; } } }
+body#artwork #browse.browsing-list .aw-listhead { gap: 16px; margin: 26px 0 0; }
+.aw-sort { margin-left: auto; display: flex; align-items: center; gap: 9px; height: 34px; padding: 0 15px; border-radius: 17px; border: 1px solid var(--fill-16); background: transparent; cursor: pointer; align-self: center;
+  .aw-sort__k { font-size: 13px; color: var(--ink-muted); } .aw-sort__v { font-size: 13px; font-weight: 500; color: var(--ink-2); } .material-symbols-rounded { font-size: 17px; color: var(--ink-muted); }
+  &:hover { background: var(--fill-06); } &:focus-visible { outline: 2px solid var(--ink-1); outline-offset: 2px; } }
+body#artwork #browse.browsing-list .main__row { grid-template-columns: repeat(6, 1fr); gap: 24px; padding: 28px 0 0; }
+@media (max-width: 1400px) { body#artwork #browse.browsing-list .main__row { grid-template-columns: repeat(5, 1fr); } }
+@media (max-width: 1100px) { body#artwork #browse.browsing-list .main__row { grid-template-columns: repeat(4, 1fr); } }
+@media (max-width: 800px)  { body#artwork #browse.browsing-list .main__row { grid-template-columns: repeat(3, 1fr); } }
+body#artwork #browse.browsing-artists .music-card__info { margin-top: 12px; justify-content: center; }
+body#artwork #browse.browsing-artists .music-card__label { max-width: 100%; }
+body#artwork #browse.browsing-artists .music-card__label { font-size: 15px; font-weight: 600; margin-top: 0; }
+body#artwork #browse.browsing-artists .music-card__meta { font-size: 12px; color: var(--ink-dim); margin-top: 4px; }
+body#artwork #browse.browsing-artists .music-card .play-btn { width: 52px; height: 52px; .play-btn__icon { font-size: 22px; } }
+body#artwork #browse.browsing-artists .music-card__header { background: var(--fill-06); box-shadow: none; }
+body#artwork #browse.browsing-artists .music-card__img-icon { position: absolute; inset: 0; display: grid; place-items: center; .material-symbols-rounded { font-size: 40px; color: #6f757b; } }
+.aw-cols.aw-cols--artists { display: grid; grid-template-columns: 26px 52px 1fr 27px; align-items: center; gap: 14px; padding: 22px 14px 11px; margin-top: 14px; border-bottom: 1px solid var(--fill-10); font-size: 10px; letter-spacing: .16em; color: var(--ink-dim); }
+body#artwork #browse.browsing-artists .main__list { padding-top: 0; }
+.aw-alpha { position: fixed; right: 14px; top: calc(50% - 49px); transform: translateY(-50%); display: flex; flex-direction: column; align-items: center; gap: 1px; z-index: 2;
+  button { background: transparent; border: 0; padding: 1px 5px; font: inherit; font-size: 10px; line-height: 1.35; letter-spacing: .04em; color: var(--ink-dim); cursor: pointer;
+    &:hover, &.active { color: var(--ink); } &.active { font-weight: 700; } &:focus-visible { outline: 2px solid var(--ink-1); outline-offset: 1px; border-radius: 4px; } } }
+/* the artists' rows show horizontal dots (the theme swapped the glyph): 12px wide in a 20px line */
+body#artwork #browse.browsing-artists .music-item .item__actions .action-btn .material-symbols-rounded { font-size: 15px; width: 12px; height: 20px; line-height: 20px; vertical-align: top; }
+
+/* ============ album page track rows (mockup 2c) ============ */
+@keyframes aw-eq { 0%, 100% { height: 4px; } 50% { height: 13px; } }
+body#artwork .music-item.aw-playing.aw-paused .item__number::before, body#artwork .music-item.aw-playing.aw-paused .item__number::after, body#artwork .music-item.aw-playing.aw-paused .item__number .item__number-dot,
+body#artwork .music-item.aw-playing.aw-paused .aw-eq::before, body#artwork .music-item.aw-playing.aw-paused .aw-eq::after, body#artwork .music-item.aw-playing.aw-paused .aw-eq i { animation-play-state: paused; }
+/* ============ one shared row: album, playlist and plain-list/search track rows ============
+   Same component (MusicRow), same row, same hover/playing behaviour everywhere — the number is
+   always its own first column, and `:has()` adds a thumbnail column only when the row's own data
+   actually carries one (a same-artist album has none; a streaming playlist, or a Spotify "album"
+   that's really a various-artists mix, does) — no per-page reimplementation of the row itself. */
+body#artwork #browse.browsing-album .music-item,
+body#artwork #browse.browsing-playlist .music-item,
+body#artwork #browse.browsing-list:not(.browsing-artists) .music-item,
+body#artwork #browse.browsing-artists .music-item,
+body#artwork #browse.browsing-search .music-item {
+  position: relative; display: grid; grid-template-columns: 26px 1fr auto auto auto; align-items: center; gap: 14px;
+  padding: 13px 14px; margin: 0; min-height: 52px; border-radius: 0; border: 0;
+  &::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px; background: var(--fill-06); }
+  &:has(.item__image:not(.hidden)) { grid-template-columns: 26px 44px 1fr auto auto auto; }
+  /* a file-browser folder (MusicRow's isDir): no number column, and no play on hover */
+  &.aw-dir { grid-template-columns: 1fr auto auto auto; &:has(.item__image:not(.hidden)) { grid-template-columns: 44px 1fr auto auto auto; } .item__number { display: none; } }
+  .item__image { width: 44px; height: 44px; min-width: 0; margin: 0; display: flex; align-items: center; justify-content: center; }
+  .item__albumart, .item__image__img { width: 44px; height: 44px; margin: 0; border-radius: 6px; object-fit: cover; display: block; }
+  .item__albumart-icon { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; }
+  .item__number { display: block; font-family: var(--font-mono); font-size: 12px; color: var(--ink-dim); width: auto; text-align: left; margin: 0; }
+  .item__number-dot { display: none; }
+  .item__info { display: block; }
+  /* the old, unscoped `@media (max-width: 767px) { .item__title { margin-bottom: 8px; } }`
+     rule up above (a leftover from a pre-shared-row card layout) still matches `.item__title`
+     everywhere below that width, including here — CSS Grid centres a row's items by their
+     margin box, so that bottom-only margin pushed the visible text 4px above true centre on
+     phone widths. Reset it explicitly rather than track down and rescope the old rule. */
+  .item__title { font-size: 16px; font-weight: 500; color: var(--ink-1); margin: 0; }
+  .item__album, .item__artist { font-size: 14px; color: var(--ink-muted); }
+  .item__duration { font-family: var(--font-mono); font-size: 12px; color: var(--ink-dim); order: 2; }
+  .item__favorite { display: flex; align-items: center; justify-content: center; opacity: 1; padding: 0; order: 3; -webkit-text-stroke: 0; -webkit-text-fill-color: currentColor;
+    &.favorited .item__favorite-heart .material-symbols-rounded { color: var(--ink); }
+    .item__favorite-heart .material-symbols-rounded { display: flex; align-items: center; justify-content: center; height: 20px; font-size: 0; color: var(--ink-faint); margin: 0;
+      &::before { content: 'favorite'; font-family: 'Material Symbols Rounded'; font-size: 20px; font-weight: 400; line-height: 1; } }
+    &:hover .material-symbols-rounded { color: var(--ink); } }
+  .item__actions { order: 4; .material-symbols-rounded { color: var(--ink-faint); font-size: 15px; } }
+  &.aw-fav .item__favorite .item__favorite-heart .material-symbols-rounded { color: var(--ink);
+    &::before { content: ''; display: block; width: 20px; height: 20px; background: no-repeat center / 20px 20px $aw-heart; filter: invert(var(--icon-invert, 0)); } }
+  &:not(.aw-playing):hover, &:not(.aw-playing).aw-active { background: var(--row-hover); border-radius: 11px; &::after { display: none; } .item__number { visibility: hidden; } .item__play { display: block; } }
+  .item__play { display: none; position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 26px; height: 26px; z-index: 1; padding: 0; margin: 0; opacity: 1; flex: none;
+    .play-btn { width: 26px; height: 26px; padding: 0; border: 0; background: transparent; display: block; cursor: pointer; visibility: visible !important;
+      .play-btn__icon { display: grid; place-items: center; width: 26px; height: 26px; font-size: 22px; color: var(--ink); margin: 0; padding: 0; } } }
+  &.aw-playing {
+    background: var(--row-fill); border-radius: 11px;
+    &::after { display: none; }
+    .item__title { font-weight: 700; color: var(--ink); }
+    .item__duration { color: var(--ink-2); }
+    .item__favorite .item__favorite-heart .material-symbols-rounded { color: var(--ink); }
+    .item__number { font-size: 0; position: relative; width: 10px; height: 13px;
+      &::before, &::after, .item__number-dot { content: ''; display: block; position: absolute; bottom: 0; width: 2px; height: 4px; background: var(--ink); animation: aw-eq .9s ease-in-out infinite; }
+      &::before { left: 0; } &::after { left: 4px; animation-delay: .2s; } .item__number-dot { display: block; left: 8px; animation-delay: .4s; } }
+    &.aw-paused .item__number::before, &.aw-paused .item__number::after, &.aw-paused .item__number .item__number-dot { animation-play-state: paused; }
+  }
+}
+body#artwork #browse.browsing-album .album__tracks, body#artwork #browse.browsing-list .album__tracks, body#artwork #browse.browsing-search .album__tracks { gap: 0; }
+body#artwork .music-item .item__image, body#artwork .music-item .item__albumart-icon, body#artwork .music-item .item__albumart-icon .material-symbols-rounded, body#artwork .aw-card .item__albumart-icon .material-symbols-rounded { color: var(--ink-2); }
+/* a playlist page (Tidal, a local playlist…) never switches to the wide 2-column album grid at
+   any width — #browseTablesWrapper there is always the plain scrolling block — so unlike the
+   album head, its crumb bar always sits over moving content and always needs the frosted glass,
+   not just below the narrow-fallback breakpoint where head.scss/browse.scss turn it on for albums. */
+body#artwork #browse.browsing-playlist .aw-head--album::after { content: ''; }
+body#artwork #browse.browsing-playlist .aw-head--album .aw-hblur { display: block; }
+/* the Artists list is the shared row too, only with a round 52px portrait and the counts
+   ("7 albums · 64 tracks") under the name; after the shared block, so source order wins */
+body#artwork #browse.browsing-artists .music-item {
+  &:has(.item__image:not(.hidden)) { grid-template-columns: 26px 52px 1fr auto; }
+  .item__image, .item__albumart, .item__image__img { width: 52px; height: 52px; }
+  .item__albumart, .item__image__img { border-radius: 50%; }
+  .item__counts { margin-top: 3px; font-size: 13px; color: var(--ink-dim); }
+}
+/* every track list is one row shape — a plain playlist (Tidal, local), Spotify's album-art
+   "playlist", Last 100, Favourites, a genre's or a folder's tracks, search results (isTrackList,
+   so .aw-tracklist, in Browse.tsx): title over artist beside an album column, the favourite heart,
+   the ⋯. Explicit px, not auto, for the heart and the ⋯, so the rows line up with .aw-cols--fav's
+   header track for track (the header has nothing real to size an "auto" track from). Comes after
+   the shared row block and must outrank every selector of it: the plain-list one,
+   `#browse.browsing-list:not(.browsing-artists)`, counts two classes on #browse (the :not adds
+   one), so this one names two as well (.boxTable is always on #browse) and wins on source order. */
+body#artwork #browse.boxTable.aw-tracklist .music-item {
+  grid-template-columns: 26px 1fr 30px 27px;
+  &:has(.item__image:not(.hidden)) { grid-template-columns: 26px 44px 1fr 30px 27px; }
+  .item__duration { display: none; }
+  .item__info { display: grid; grid-template-columns: minmax(150px, 1fr) minmax(140px, 260px); grid-template-areas: "title album" "artist album"; column-gap: 20px; row-gap: 2px; align-items: center; }
+  .item__title { grid-area: title; font-size: 16px; font-weight: 600; }
+  .item__artist { grid-area: artist; display: block; font-size: 13px; color: var(--ink-dim); }
+  .item__album { grid-area: album; display: block; font-size: 15px; color: var(--ink-muted); }
+  .item__info__separator { display: none; }
+  /* a row without a heart of its own (the Favourites list itself) keeps the heart's column, so its
+     ⋯ stays under the header's */
+  .item__favorite.hidden { display: flex !important; visibility: hidden; }
+}
+/* the duration column (with the quality pill), after ALBUM: only on wide screens — on a phone or a
+   narrow window the title/album pair is already tight, and duration is the least useful of the three.
+   A fixed width, not auto: the header and every row are separate grids, so an auto track sized by
+   each one's own content (a pill + time in a row, the word DURATION in the header) left the 1fr —
+   and the ALBUM column inside it — at a different x in each. 180px holds the widest pill + time
+   (Spotify's "16/320 SPOTIFY 3:01"). A row without a duration keeps the column, likewise. */
+@media (min-width: 1100px) {
+  .aw-cols { grid-template-columns: 26px 44px 1fr 180px 27px; }
+  .aw-cols--fav { grid-template-columns: 26px 44px 1fr 180px 30px 27px; }
+  .aw-cols__duration { display: block; text-align: right; }
+  body#artwork #browse.boxTable.aw-tracklist .music-item .item__duration { display: inline-flex; }
+  body#artwork #browse.boxTable.aw-tracklist .music-item .item__duration.hidden { display: inline-flex !important; visibility: hidden; }
+  body#artwork #browse.boxTable.aw-tracklist .music-item {
+    grid-template-columns: 26px 1fr 180px 30px 27px;
+    &:has(.item__image:not(.hidden)) { grid-template-columns: 26px 44px 1fr 180px 30px 27px; }
+  }
+}
+
+/* ============ context menu (mockup "Context menu") ============ */
+body#artwork .hamburgerMenu ul.dropdown-menu.buttonsGroup {
+  li { list-style: none; }
+  li > a > span:not(.material-symbols-rounded):not(.aw-menu__badge) { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  .aw-menu__badge { font-size: 11px; color: var(--ink-faint); }
+  .aw-menu__danger > a:hover { background: rgba(255, 143, 143, .08); color: var(--err-soft); .material-symbols-rounded { color: var(--err-soft); } }
+  .aw-menu__head { display: flex; align-items: center; gap: 12px; padding: 10px 14px 12px;
+    img { width: 36px; height: 36px; border-radius: 5px; object-fit: cover; flex: none; }
+    .aw-menu__head-text { min-width: 0; }
+    .aw-menu__title { font-size: 14px; font-weight: 600; color: var(--ink-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .aw-menu__sub { font-size: 10px; letter-spacing: .08em; color: var(--ink-muted); margin-top: 2px; } }
+}
+body#artwork #browse.browsing-album .music-item.aw-fav .item__favorite .item__favorite-heart .material-symbols-rounded { color: var(--ink);
+  &::before { content: ''; display: block; width: 20px; height: 20px; background: no-repeat center / 20px 20px $aw-heart; filter: invert(var(--icon-invert, 0)); } }
+
+body#artwork #browse.browsing-search {
+  .panel .body-content.new-browse { top: 0; height: 100%; }
+  .aw-browse { padding-bottom: 0; }
+  #browse-page { padding: 0 0 48px; }
+  .aw-listhead--search { margin: 26px 0 6px; }
+  .main__source { margin: 0; }
+  .main__source__title { display: block; margin: 22px 0 6px; padding: 0 0 10px; border-bottom: 1px solid var(--fill-10); background: transparent; font-family: var(--font-mono); font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-35); font-weight: 400; }
+  .main__row { padding: 12px 0 8px; }
+}
+
+/* ============ artist page (mockup "Artist detail") ============ */
+body#artwork #browse.browsing-artist .panel .body-content.new-browse { top: 0; height: 100%; }
+body#artwork #browse.browsing-artist #browseTablesWrapper { padding-top: 26px; padding-bottom: 48px; }
+body#artwork .aw-artist {
+  color: var(--ink-1);
+  &__filter { width: 304px; height: 40px; }
+  &__bar .aw-crumbs { line-height: normal; }
+  &__hero { display: flex; align-items: flex-end; gap: 28px; padding-top: 26px; }
+  &__img { width: 158px; height: 158px; border-radius: 50%; object-fit: cover; flex: none; box-shadow: 0 26px 54px -22px var(--shadow-deep); border: 1px solid var(--fill-10); background: var(--fill-06); }
+  &__body { display: flex; flex-direction: column; gap: 12px; padding-bottom: 6px; min-width: 0; }
+  &__eyebrow { font-size: 11px; letter-spacing: .18em; color: var(--ink-muted); }
+  &__name { margin: 0; font-family: var(--font-ui); font-size: var(--t-h1-lg); font-weight: 800; letter-spacing: -.035em; line-height: 1; color: var(--ink); text-wrap: pretty; }
+  &__meta { display: flex; align-items: center; gap: 18px; line-height: normal; .mono { font-size: 13px; color: var(--ink-3); } }
+  &__dot { width: 5px; height: 5px; background: rgba(255, 255, 255, .4); flex: none; }
+  &__story { font-size: 13px; color: var(--ink-muted); line-height: 1.5; max-width: 640px; > span { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; } }
+  &__more { background: transparent; border: 0; padding: 0; margin-top: 4px; font-size: 13px; font-weight: 600; color: var(--ink-3); cursor: pointer; &:hover { color: var(--ink); } }
+  &__actions { margin-left: auto; display: flex; align-items: center; gap: 10px; padding-bottom: 8px; flex: none; }
+  &__play { display: flex; align-items: center; gap: 10px; height: 46px; padding: 0 24px; border-radius: 23px; border: 0; background: var(--ink); color: var(--on-ink); cursor: pointer; .material-symbols-rounded { font-size: 23px; } > span:last-child { font-size: 15px; font-weight: 700; } &:hover { background: var(--ink-1); } }
+  &__shuffle { display: flex; align-items: center; gap: 9px; height: 48px; padding: 0 20px; border-radius: 23px; border: 1px solid var(--fill-16); background: transparent; color: var(--ink-2); cursor: pointer; .material-symbols-rounded { font-size: 21px; } > span:last-child { font-size: 14px; font-weight: 600; } &:hover { background: var(--fill-08); } }
+  &__iconbtn { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; padding: 0; border: 1px solid var(--fill-16); background: transparent; color: var(--ink-3); cursor: pointer; .material-symbols-rounded { font-size: 21px; } &:hover { background: var(--fill-08); color: var(--ink); } }
+  &__menu { position: relative; display: block; .dropdown-menu { top: 100%; margin-top: 8px; right: 0; left: auto; } }
+  &__play:focus-visible, &__shuffle:focus-visible, &__iconbtn:focus-visible { outline: 2px solid var(--ink-1); outline-offset: 2px; }
+  &__sechead { display: flex; align-items: center; gap: 14px; padding-top: 26px; line-height: normal; }
+  &__sechead--tracks { padding-top: 24px; }
+  &__label { font-size: 11px; letter-spacing: .18em; color: var(--ink-muted); }
+  &__count { font-size: 11px; color: var(--ink-75); }
+  &__link { margin-left: auto; background: transparent; border: 0; padding: 0; font-size: 13px; font-weight: 600; color: var(--ink-3); cursor: pointer; &:hover { color: var(--ink); } }
+  &__albums { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 20px; padding-top: 16px; }
+  @media (max-width: 1400px) { &__albums { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+  @media (max-width: 1150px) { &__albums { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+  @media (max-width: 900px)  { &__albums { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+}
+body#artwork .aw-artist-album {
+  display: flex; flex-direction: column; gap: 11px; cursor: pointer; min-width: 0; position: relative;
+  &__cover { position: relative; aspect-ratio: 1; border-radius: 10px; border: 1px solid var(--fill-08); box-shadow: 0 20px 40px -18px var(--shadow-deep); background: var(--fill-06); img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 10px; } }
+  &__overlay { position: absolute; inset: 0; border-radius: 10px; background: transparent; transition: background-color .15s ease-out; pointer-events: none; }
+  &:hover .aw-artist-album__overlay { background: var(--shade-60); }
+  &__play { position: absolute; right: 10px; bottom: 10px; width: 40px; height: 40px; border-radius: 50%; border: 0; padding: 0; background: var(--ink); color: var(--on-ink); display: grid; place-items: center; opacity: 0; transition: opacity .25s ease; cursor: pointer; .material-symbols-rounded { font-size: 24px; } }
+  &:hover .aw-artist-album__play, &__play:focus-visible { opacity: 1; }
+  &__actions { position: absolute; top: 8px; right: 8px; z-index: 2; }
+  &__more, .hamburgerMenu .action-btn { width: 30px; height: 30px; border-radius: 9px; border: 0; padding: 0; margin: 0; display: grid; place-items: center; background: rgba(8, 10, 13, .55); color: #fff; cursor: pointer; opacity: 0; transition: opacity .15s ease; text-shadow: none; .material-symbols-rounded { font-size: 19px; } }
+  &:hover .aw-artist-album__more, &:hover .hamburgerMenu .action-btn, .hamburgerMenu.open .action-btn { opacity: 1; }
+  &__actions .dropdown-menu { right: 0; left: auto; top: 100%; margin-top: 6px; }
+  &:hover, &:focus-within, &.is-menu-open, &:has(.dropdown.open) { z-index: 6; }
+  &__title { font-size: 14px; font-weight: 600; line-height: normal; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  &__sub { font-size: 11px; line-height: normal; color: var(--ink-dim); }
+}
+body#artwork #browse.browsing-artist #browse-page .main__source.aw-artist-albums { display: none; }
+body#artwork #browse.browsing-artist #browse-page .main__source { margin-bottom: 0; }
+body#artwork #browse.browsing-artist #browse-page .main__source__title { display: none; }
+body#artwork #browse.browsing-artist #browse-page { padding-top: 12px; }
+body#artwork #browse.browsing-artist:not(.aw-artist-all) #browse-page .aw-artist-tracks .album__tracks:nth-child(n+6) { display: none; }
+body#artwork #browse.browsing-artist #browse-page .main__list { display: flex; flex-direction: column; padding: 0; .album__tracks { padding: 0; flex: none; } .music-item { flex: none; } }
+/* was its own counter()-on-.item__image hack, same family of bug as the playlist one above: it
+   drew a fake number over where a cover would go, so once MusicRow started always rendering the
+   real .item__number as its own element (no longer nested inside .item__image, so the old
+   `.item__image .item__number { display: none }` stopped matching anything) both showed at once.
+   No thumbnails wanted in this row shape (matches the mockup), so .item__image is just hidden and
+   .item__number takes its 26px slot directly — same hover/playing treatment as the shared row. */
+body#artwork #browse.browsing-artist .music-item {
+  position: relative; display: flex; align-items: center; gap: 20px; height: 57px; min-height: 0; padding: 0 16px 1px; margin: 0; border-radius: 0; border: 0;
+  &::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: var(--fill-05); }
+  &:hover { background: var(--fill-04); }
+  .item__image { display: none; }
+  .item__number { display: block; width: 26px; flex: none; text-align: center; font-family: var(--font-mono); font-size: 13px; color: var(--ink-faint); }
+  .item__number-dot { display: none; }
+  .item__play { display: block; position: absolute; left: 16px; top: 0; bottom: 0; width: 26px; padding: 0; margin: 0; opacity: 0; flex: none;
+    .play-btn { width: 26px; height: 100%; padding: 0; margin: 0; background: transparent; border: 0; display: grid; place-items: center; .play-btn__icon { font-size: 22px; color: var(--ink); margin: 0; padding: 0; } } }
+  &:hover .item__play, &.aw-active .item__play { opacity: 1; }
+  &:hover .item__number, &.aw-active .item__number { visibility: hidden; }
+  .item__info { display: flex; align-items: center; gap: 20px; flex: 1; min-width: 0; }
+  .item__title { width: 290px; flex: none; min-width: 0; font-size: 15px; font-weight: 500; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .item__album { flex: 1; min-width: 0; display: block; font-size: 14px; color: var(--ink-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .item__artist, .item__info__separator, .item__duration { display: none; }
+  .item__favorite { display: flex; align-items: center; justify-content: center; opacity: 1; padding: 0; -webkit-text-stroke: 0; -webkit-text-fill-color: currentColor;
+    .item__favorite-heart .material-symbols-rounded { display: flex; align-items: center; justify-content: center; height: 20px; font-size: 0; color: var(--ink-faint); margin: 0;
+      &::before { content: 'favorite'; font-family: 'Material Symbols Rounded'; font-size: 20px; font-weight: 400; line-height: 1; } }
+    &:hover .material-symbols-rounded { color: var(--ink); } }
+  &.aw-fav .item__favorite .item__favorite-heart .material-symbols-rounded, .item__favorite.favorited .item__favorite-heart .material-symbols-rounded { color: var(--ink); }
+  .item__actions { padding: 0; .action-btn { width: 20px; padding: 0; margin: 0; display: grid; place-items: center; }
+    .material-symbols-rounded { color: var(--ink-faint); font-size: 20px; font-weight: 400; } }
+  &.aw-active { background: var(--fill-07); border-radius: 11px; &::after { display: none; } }
+  &.aw-playing { background: var(--row-fill); border-radius: 11px;
+    &::after { display: none; }
+    .item__title { font-weight: 700; color: var(--ink); }
+    .item__number { font-size: 0; position: relative; width: 10px; height: 13px; margin: 0 8px;
+      &::before, &::after, .item__number-dot { content: ''; display: block; position: absolute; bottom: 0; width: 2px; height: 4px; background: var(--ink); animation: aw-eq .9s ease-in-out infinite; }
+      &::before { left: 0; } &::after { left: 4px; animation-delay: .2s; } .item__number-dot { display: block; left: 8px; animation-delay: .4s; } }
+    &.aw-paused .item__number::before, &.aw-paused .item__number::after, &.aw-paused .item__number .item__number-dot { animation-play-state: paused; } }
+}
+body#artwork #browse.browsing-artists .music-card__header, body#artwork #browse.browsing-artists .music-card__overlay { overflow: visible; }
+body#artwork #browse.browsing-artists .music-card__img { border-radius: 50%; }
+body#artwork #browse.browsing-artists .music-card .meta__actions { top: 0; right: 0; }
+body#artwork #browse.browsing-artists .music-card .meta__actions .dropdown-menu { right: 0; left: auto; }
+body#artwork .music-card__wrapper { position: relative; }
+body#artwork .music-card__wrapper:hover, body#artwork .music-card__wrapper:focus-within, body#artwork .music-card__wrapper.is-menu-open, body#artwork .music-card__wrapper:has(.dropdown.open) { z-index: 6; }
+body#artwork #browse .music-card__header, body#artwork #browse .music-card__overlay { overflow: visible; }
+body#artwork #browse .music-card__img { border-radius: var(--r-cover); }
+body#artwork #browse .music-card__overlay { border-radius: var(--r-cover); }
+body#artwork #browse .music-card .meta__actions .dropdown-menu { right: 0; left: auto; }
+body#artwork #browse .music-card__wrapper:nth-child(odd) .meta__actions .dropdown-menu { left: 0; right: auto; }
+
+/* ============ the page head hands the screens their top padding ============ */
+body#artwork {
+  #browse.browsing-list #browseTablesWrapper, #browse.browsing-playlist #browseTablesWrapper, #browse.browsing-artist #browseTablesWrapper { padding-top: 0; }
+  #browse .panel .body-content.new-browse.with-search-header { padding-top: 0; }
+  .aw-browse { padding-top: 0; }
+}
+body#artwork .aw-head--search { .aw-head__nav { flex: 1; min-width: 0; } .dedicated-search { flex: 1; min-width: 0; padding: 0; background: transparent; } .dedicated-search .search-container { max-width: 640px; margin: 0; } .dedicated-search form { float: none !important; width: 100%; } }
+
+/* ============ fluid (zz-fluid), the browse part ============ */
+body#artwork #browse .panel .body-content.new-browse { bottom: 0; height: auto !important; }
+body#artwork #browseTablesWrapper { padding-bottom: calc(var(--mini-h) + 16px); }
+body#artwork #browse.browsing-artist #browseTablesWrapper { padding-bottom: calc(var(--mini-h) + 48px); }
+body#artwork #browse.browsing-album #browseTablesWrapper > .aw-headwrap { padding-bottom: calc(var(--mini-h) + 24px); }
+body#artwork .aw-browse { padding-bottom: calc(var(--mini-h) + 40px); }
+body#artwork .aw-cards { grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: clamp(10px, 1.25vw, 18px); }
+body#artwork .aw-sources { grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); }
+body#artwork .aw-search { width: 320px; min-width: 0; }
+body#artwork #browse.browsing-list .main__row { grid-template-columns: repeat(auto-fill, minmax(clamp(120px, 13vw, 190px), 1fr)); gap: clamp(12px, 1.7vw, 24px); }
+body#artwork #browse.browsing-artists .main__row { row-gap: clamp(28px, 2.8vw, 40px); }
+body#artwork .aw-head__row { flex-wrap: wrap; row-gap: 10px; }
+body#artwork .aw-filter { width: min(290px, 100%); }
+body#artwork .aw-listhead { flex-wrap: wrap; row-gap: 10px; }
+@media (max-width: 640px) {
+  body#artwork #browse:not(.browsing-album):not(.browsing-artist) .music-item .item__info { display: flex !important; flex-wrap: wrap; align-content: center; gap: 2px 0; min-width: 0; }
+  body#artwork #browse:not(.browsing-album):not(.browsing-artist) .music-item .item__title { flex: 0 0 100%; order: 0; width: auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  body#artwork #browse:not(.browsing-album):not(.browsing-artist) .music-item .item__artist { order: 1; }
+  body#artwork #browse:not(.browsing-album):not(.browsing-artist) .music-item .item__info__separator { order: 2; display: block; margin: 0 6px; }
+  body#artwork #browse:not(.browsing-album):not(.browsing-artist) .music-item .item__album { order: 3; }
+  body#artwork #browse:not(.browsing-album):not(.browsing-artist) .music-item .item__artist, body#artwork #browse:not(.browsing-album):not(.browsing-artist) .music-item .item__album, body#artwork #browse:not(.browsing-album):not(.browsing-artist) .music-item .item__info__separator { display: block; flex: 0 1 auto; width: auto; min-width: 0; font-size: 13px; color: var(--ink-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  body#artwork .aw-filter { flex-basis: 100%; margin-left: 0; }
+  body#artwork .aw-alpha { display: none; }
+}
+@media (max-height: 520px) { body#artwork .aw-alpha { display: none; } }
+body#artwork .aw-albumhead__cover { max-width: min(380px, 100%, 44vh, calc(100vh - 480px)); }
+body#artwork #browse.browsing-album .aw-albumhead__title { font-size: min(var(--t-h1), 6vh); }
+body#artwork #browse.browsing-album .aw-albumhead__actions { margin-top: clamp(12px, 2.6vh, 24px); }
+@media (max-width: 860px), (max-height: 560px) {
+  body#artwork #browse.browsing-album #browseTablesWrapper { display: block; overflow-y: auto !important; padding-bottom: calc(var(--mini-h) + 16px); }
+  body#artwork #browse.browsing-album #browseTablesWrapper > .aw-headwrap { overflow: visible; margin: 0; padding: 0; scrollbar-width: auto; }
+  body#artwork #browse.browsing-album #browseTablesWrapper > #browse-page { height: auto; margin-top: 28px; overflow: visible; }
+  body#artwork .aw-albumhead__cover { max-width: min(320px, 60vw); }
+  /* only here does the crumb bar truly sit over scrolling content (the wide 2-column grid never
+     scrolls its head column at all, so head.scss turns the frosted glass off there by default) */
+  body#artwork .aw-head--album::after { content: ''; }
+  body#artwork .aw-head--album .aw-hblur { display: block; }
+  /* the wide-mode grid rule above (`#browseTablesWrapper > .aw-head { position: static; ... }`)
+     isn't itself confined to a wide-only media query, so it's still in effect here — without
+     this override the crumb bar stayed a static grid cell and scrolled away with everything
+     else once the layout stacked into one scrolling column. Fixed is what every other context
+     already gets from head.scss's own base rule; only the grid-cell padding reset needs undoing. */
+  body#artwork #browse.browsing-album #browseTablesWrapper > .aw-head { position: fixed; padding-left: var(--pad-screen); padding-right: var(--pad-screen); }
+}
+@media (max-width: 700px) {
+  body#artwork .aw-albumhead--playlist { grid-template-columns: 1fr; }
+  body#artwork .aw-albumhead--playlist .aw-albumhead__cover { grid-row: auto; max-width: min(260px, 60vw); }
+  body#artwork .aw-albumhead--playlist .aw-albumhead__body { grid-column: 1; grid-row: auto; }
+  body#artwork .aw-cols { display: none; }
+  /* every track-list row (playlists, Favourites, Last 100, search…): number · cover · text · heart · ⋯ */
+  /* 12px inside the row, as the Mobile mockup's queue rows: the hover / playing fill doesn't end at the number and the ⋯ */
+  body#artwork #browse.boxTable.aw-tracklist .music-item { grid-template-columns: 22px minmax(0, 1fr) 28px 24px; gap: 12px; padding: 10px 12px; min-height: 64px; }
+  /* the hover play button sits exactly over the number column (the desktop one is 14px in, 26px wide) */
+  body#artwork #browse.boxTable.aw-tracklist .music-item .item__play { left: 12px; width: 22px; .play-btn { width: 22px; .play-btn__icon { width: 22px; } } }
+  body#artwork #browse.boxTable.aw-tracklist .music-item:has(.item__image:not(.hidden)) { grid-template-columns: 22px 44px minmax(0, 1fr) 28px 24px; }
+  body#artwork #browse.boxTable.aw-tracklist .music-item .item__number { font-size: 11px; }
+  body#artwork #browse.boxTable.aw-tracklist .music-item .item__image { width: 44px; height: 44px; }
+  body#artwork #browse.boxTable.aw-tracklist .music-item .item__albumart img { border-radius: 5px; }
+  body#artwork #browse.boxTable.aw-tracklist .music-item .item__info { display: flex !important; flex-wrap: wrap; align-content: center; gap: 2px 0; min-width: 0; }
+  body#artwork #browse.boxTable.aw-tracklist .music-item .item__title { flex: 0 0 100%; order: 0; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  body#artwork #browse.boxTable.aw-tracklist .music-item .item__artist { order: 1; }
+  body#artwork #browse.boxTable.aw-tracklist .music-item .item__info__separator { order: 2; display: block; margin: 0 6px; }
+  body#artwork #browse.boxTable.aw-tracklist .music-item .item__album { order: 3; }
+  body#artwork #browse.boxTable.aw-tracklist .music-item .item__artist, body#artwork #browse.boxTable.aw-tracklist .music-item .item__album, body#artwork #browse.boxTable.aw-tracklist .music-item .item__info__separator { display: block; flex: 0 1 auto; min-width: 0; font-size: 13px; color: var(--ink-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  body#artwork #browse.boxTable.aw-tracklist .music-item .item__title, body#artwork #browse.boxTable.aw-tracklist .music-item .item__artist, body#artwork #browse.boxTable.aw-tracklist .music-item .item__album { grid-area: auto; }
+  /* artist • album stays one line: the artist takes at most 60% and the album the rest, each cut
+     with "…" — sized from their content they wrapped, leaving the • at a line's end and the album
+     on a line of its own */
+  body#artwork #browse.boxTable.aw-tracklist .music-item .item__artist { max-width: 60%; padding: 0; }   /* no base 4px after it: 6px either side of the • */
+  body#artwork #browse.boxTable.aw-tracklist .music-item .item__album { padding: 0; }
+  body#artwork #browse.boxTable.aw-tracklist .music-item .item__info__separator { flex: none; padding: 0; }   /* the base 6px padding doubled the 6px margin */
+  body#artwork #browse.boxTable.aw-tracklist .music-item .item__album { flex: 1 1 0; }
+}
+body#artwork .aw-artist__hero { flex-wrap: wrap; row-gap: 18px; gap: clamp(16px, 2vw, 28px); }
+body#artwork .aw-artist__img { width: clamp(96px, 11vw, 158px); height: clamp(96px, 11vw, 158px); }
+body#artwork .aw-artist__albums { grid-template-columns: repeat(auto-fill, minmax(clamp(112px, 12vw, 165px), 1fr)); gap: clamp(12px, 1.4vw, 20px); }
+body#artwork #browse.browsing-artist .music-item .item__title { width: clamp(140px, 30vw, 290px); }
+@media (max-width: 700px) {
+  body#artwork .aw-artist__actions { margin-left: 0; flex-basis: 100%; padding-bottom: 0; }
+  body#artwork #browse.browsing-artist .music-item .item__title { width: auto; flex: 1; }
+  body#artwork .aw-artist__menu .dropdown-menu { max-width: calc(100vw - 40px); }
+  body#artwork #browse.browsing-artist .music-item { gap: 12px; padding: 0 8px; height: 60px; }
+  body#artwork #browse.browsing-artist .music-item .item__image { width: 22px; }
+  body#artwork #browse.browsing-artist .music-item .item__play { left: 8px; width: 22px; }
+  body#artwork #browse.browsing-artist .music-item .item__info { flex-wrap: wrap; gap: 2px 0; align-content: center; }
+  body#artwork #browse.browsing-artist .music-item .item__title { flex: 0 0 100%; font-size: 15px; }
+  body#artwork #browse.browsing-artist .music-item .item__album { flex: 0 1 auto; font-size: 13px; }
+  body#artwork #browse.browsing-artist .music-item .item__favorite .item__favorite-heart .material-symbols-rounded::before { font-size: 18px; }
+}
+/* the browse page owns its scroller */
+body#artwork #content.browse, body#artwork #content.search { overflow: hidden; padding-bottom: 0; }
+
+/* the playing row while this browser still waits for the stream: a spinner where the bars dance */
+/* The bars are drawn by several row blocks of different weight (album page, plain lists with their
+   :not(), the phone rules) — while loading they must go whatever block drew them, hence !important. */
+body#artwork .music-item.aw-playing.aw-loading .item__number { width: auto !important; height: auto !important; display: grid !important; place-items: center;
+  &::before, &::after, .item__number-dot { display: none !important; } }

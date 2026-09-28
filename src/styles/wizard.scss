@@ -1,0 +1,72 @@
+/* The first-run wizard (/wizard): the frame's page, dressed by the theme's globals only —
+   the pills, the glass inputs, white text on a dark 60% card with the theme's green hairline.
+   Every box below is the frame's (its grid row, its 24 columns, its headings). */
+#wizardScrim { background-color: rgba(0, 0, 0, .8); position: absolute; top: 0; left: 0; height: 100vh; width: 100vw; z-index: 4; display: none; }
+body#artwork #wizard { height: auto; overflow-y: auto; overflow-x: hidden; color: #fff; font-size: 14px; line-height: 1.42857143;
+  h1, h2, h3, h4, h5, h6 { font-family: var(--font-ui); font-weight: 500; line-height: 1.1; color: inherit; }
+  h1, h2, h3 { margin: 20px 0 10px; } h4, h5, h6 { margin: 10px 0; }
+  h1 { font-size: 36px; } h2 { font-size: 30px; } h3 { font-size: 20px; } h4 { font-size: 18px; } h5 { font-size: 14px; } h6 { font-size: 12px; }
+  p { margin: 0 0 10px; }
+  .text-center { text-align: center; } .text-right { text-align: right; }
+  .row { margin: 8px; } .row::before, .row::after { content: ' '; display: table; } .row::after { clear: both; }
+  .row h1 { text-align: center; margin-bottom: 25px; }
+  #wizard-container { position: relative; float: left; box-sizing: border-box; min-height: 1px; width: 100%; padding: 30px 25px 65px; min-height: 450px;
+    border: 1px solid #54c688; background-color: rgba(0, 0, 0, .6); }
+  /* the pills (the frame's buttons under the theme's globals) */
+  .btn { display: inline-block; margin: 0; padding: 6px 12px; font-family: var(--font-ui); font-size: 16px; font-weight: 400; line-height: 1.42857143; text-align: center; white-space: nowrap; vertical-align: middle; cursor: pointer; user-select: none;
+    color: var(--ink-1); background-color: rgba(255, 255, 255, .1); border: 1px solid rgba(255, 255, 255, .13); border-radius: 999px; box-shadow: 0 0 1px transparent; text-shadow: none;
+    &:hover { background-color: rgba(255, 255, 255, .16); color: var(--ink); } &[disabled] { opacity: .65; cursor: not-allowed; } }
+  .btn.btn-link { background: transparent; border-color: transparent; color: #fff; border-radius: 4px; box-shadow: none; &:hover { color: #54c688; background: transparent; } }
+  #wizard-navigator { text-align: center;
+    button { margin-right: 10px; cursor: pointer;
+      &.selected { background-color: #333 !important; border-bottom: 1px solid #54c688; border-radius: 0; transition: all .3s; } } }
+  /* the frame's 24-column grid, on the two spans the views use */
+  .wizard-panel { position: relative; min-height: 1px; padding: 0 15px; box-sizing: border-box; }
+  @media (min-width: 768px) {
+    #wizard-container { width: 75%; margin-left: 12.5%; }
+    .wizard-panel { float: left; width: 100%; }
+    .wizard-panel.col-sm-10 { width: 41.66666667%; } .wizard-panel.col-sm-offset-7 { margin-left: 29.16666667%; }
+    .wizard-panel.col-sm-12 { width: 50%; } .wizard-panel.col-sm-offset-5 { margin-left: 20.83333333%; } }
+  @media (min-width: 992px) { .col-md-8 { float: left; width: 33.33333333%; position: relative; min-height: 1px; padding: 0 15px; box-sizing: border-box; } }
+  #logo-wizard { left: 50%; text-align: center; padding: 30px; img { max-width: 100%; vertical-align: middle; } }
+  /* the frame's select: a pill of 34px with the caret at the right */
+  .ui-select-container { position: relative; display: block; height: 34px; border-radius: 50px; border: 0; background: transparent; color: #54c688; font-size: 14px; }
+  .ui-select-match { display: block; height: 34px; }
+  .ui-select-toggle { display: inline-block; position: relative; width: 100%; height: 34px; box-sizing: border-box; padding: 6px 12px; text-align: left; font-size: 16px; line-height: 1.42857143; color: var(--ink-1); background-color: rgba(255, 255, 255, .1); border: 1px solid rgba(255, 255, 255, .13); border-radius: 999px; box-shadow: none;
+    .ui-select-match-text { display: block; float: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: calc(100% - 20px); }
+    .ui-select-placeholder { color: #777; }
+    .caret { display: block; position: absolute; right: 10px; top: 50%; margin-top: -2px; width: 0; height: 10px; box-sizing: border-box; margin-left: 0; vertical-align: middle; border-top: 4px dashed; border-right: 4px solid transparent; border-left: 4px solid transparent; }
+ }
+  .ui-select-container .ui-select-search { display: none; }   /* the frame's search box, never shown here */
+  .wz-native { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; appearance: none; -webkit-appearance: none; }
+  /* the frame's text inputs (the theme's glass fill, the frame's 34px) */
+  input.form-control { display: block; width: 100%; height: 34px; box-sizing: border-box; padding: 8px 12px; font-size: 14px; line-height: 1.42857143; color: var(--ink-1); background-color: rgba(255, 255, 255, .1); border: 1px solid rgba(255, 255, 255, .13); border-radius: 12px; box-shadow: none; outline: 0;
+    &:focus { border-color: var(--fill-30); } }
+  #custom-amount { display: inline-block; width: 55px; vertical-align: baseline; }
+  form#donate-button { display: inline-block; }
+  .donate-button { font-family: 'Lato', sans-serif; .wz-paypal { display: inline-block; width: .9em; overflow: visible; margin: 0; font-size: 16px; vertical-align: -3px; } }   /* the paypal glyph's .9em advance */
+  .congratulations-message { text-align: center; margin: 20px 0 30px; font-weight: bolder; color: #54c688; }
+  .done-message { margin-top: 20px; margin-bottom: 20px; }
+  .h-wizard { margin-top: 30px; margin-left: 20px; }
+  #status-bar { position: absolute; bottom: 20px; left: 40px; }
+  #button-bar { position: absolute; bottom: 10px; right: 25px; }
+  /* the frame's switch as it stands outside the settings pages */
+  .bootstrap-switch { display: inline-block; position: relative; vertical-align: middle; box-sizing: content-box; width: 98px; height: 32px; line-height: 8px; border: 2px solid #54c688; border-radius: 50px; overflow: hidden; text-align: left; cursor: pointer; direction: ltr; user-select: none; background: transparent; box-shadow: 0 0 1px transparent;
+    .bootstrap-switch-container { display: inline-block; width: 147px; height: 32px; margin-left: -49px; border-radius: 4px; background-color: rgba(20, 20, 20, .6); white-space: nowrap; transition: margin-left .5s; }
+    &.bootstrap-switch-on .bootstrap-switch-container { margin-left: 0; }
+    .bootstrap-switch-handle-on, .bootstrap-switch-handle-off, .bootstrap-switch-label { display: inline-block; box-sizing: border-box; width: 49px; height: 32px; padding: 6px 12px; font-size: 14px; line-height: 20px; text-align: center; vertical-align: baseline; }
+    .bootstrap-switch-handle-on { background-color: rgba(255, 255, 255, .3); color: #54c688; }
+    .bootstrap-switch-label { margin: -1px 0; background: transparent; color: #333; }
+    .bootstrap-switch-handle-off { background-color: rgba(20, 20, 20, .6); color: rgba(255, 255, 255, .3); }
+    input[type="checkbox"] { display: block; width: 13px; height: 13px; margin: 4px 0 0; opacity: 0; } }
+  #wifiPlugin, #networkDrives { color: var(--ink-1); }
+}
+
+/* The iframe page (Help, Volumio Shop): the frame's title bar — a Bootstrap h2 with the back pill and a 24px arrow */
+body#artwork .iframe-page-title {
+  h2 { margin: 10px; font-family: var(--font-ui); font-size: 30px; font-weight: 500; line-height: 1.1; color: #fff; }
+  .btn { display: inline-block; margin: 0; padding: 6px 12px; font-family: var(--font-ui); font-size: 16px; font-weight: 400; line-height: 1.42857143; text-align: center; white-space: nowrap; vertical-align: middle; cursor: pointer; text-decoration: none;
+    color: var(--ink-1); background-color: rgba(255, 255, 255, .1); border: 1px solid rgba(255, 255, 255, .13); border-radius: 999px; &:hover { background-color: rgba(255, 255, 255, .16); } }
+  .fa { display: inline-block; width: .857em; height: 24px; font-size: 24px; line-height: 24px; font-style: normal; vertical-align: 1px;   /* FontAwesome's baseline sits a pixel higher than Figtree's at 24px */
+    .material-symbols-rounded { display: inline-block; vertical-align: top; width: 24px; height: 24px; font-size: 24px; line-height: 24px; margin-left: -1.7px; } }
+}

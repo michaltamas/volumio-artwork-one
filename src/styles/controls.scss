@@ -1,0 +1,49 @@
+/* The shared controls: the seek bar, the transport, the volume strip, the glyph buttons. */
+
+/* ---- seek bar (mockup 2a 2b 2e): one markup, three sizes ---- */
+.artwork-seek { display: flex; align-items: center; gap: 12px; width: 100%; }
+.artwork-seek .seek-time { flex: none; font-size: 11px; letter-spacing: 0; color: var(--ink-muted); }
+.artwork-seek .seek-elapsed { color: var(--ink); }
+.artwork-seek .seek-duration { margin-left: auto; }
+.artwork-seek .seek-remaining { display: none; }
+.artwork-seek__hit {
+  position: relative; flex: 1 1 auto; min-width: 0; height: 16px; display: flex; align-items: center;
+  cursor: pointer; touch-action: none; user-select: none; -webkit-user-select: none;
+  &:focus-visible { outline: 2px solid var(--ink-1); outline-offset: 4px; border-radius: 4px; }
+}
+.seek-track { position: relative; width: 100%; height: 4px; border-radius: 2px; background: var(--fill-18); }
+.seek-fill { position: absolute; top: 0; bottom: 0; left: 0; border-radius: inherit; background: var(--ink-1); }
+.seek-handle {
+  position: absolute; top: 50%; width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%; background: var(--ink); pointer-events: none;
+  box-shadow: 0 0 0 3px var(--fill-16), 0 2px 6px rgba(0, 0, 0, .6);
+}
+
+/* ---- glyph buttons ---- */
+.btn-link { border: 0; background: none; padding: 0; cursor: pointer; display: inline-grid; place-items: center; color: var(--ink-2);
+  &:disabled { opacity: .4; cursor: default; }
+  &:focus-visible { outline: 2px solid var(--ink-1); outline-offset: 2px; border-radius: 8px; } }
+
+/* ---- transport (spec §5.8): shuffle · prev · play · next · repeat ---- */
+#playerButtons { display: flex; align-items: center; }
+#playerButtons .playPause {
+  border-radius: var(--r-pill); background: var(--ink); color: var(--ground); border: 0; display: grid; place-items: center;
+  &:hover { color: var(--ground); }
+}
+
+/* ---- volume: speaker glyph + a thin track with an ink fill (mockup §5.10) ---- */
+.volume-slider { display: flex; align-items: center; gap: 9px;
+  .button-mute { width: 26px; height: 26px; color: var(--ink-3); border-radius: var(--r-control);
+    .material-symbols-rounded { font-size: 22px; }
+    &:hover { color: var(--ink); } &.selected { color: var(--ink-muted); } }
+  input[type=range] { -webkit-appearance: none; appearance: none; width: 70px; height: 20px; margin: 0; padding: 0; background: transparent; cursor: pointer;
+    --aw-fill: 0%;
+    &::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--ink) var(--aw-fill), var(--fill-20) var(--aw-fill)); }
+    &::-moz-range-track { height: 4px; border-radius: 2px; background: var(--fill-20); }
+    &::-moz-range-progress { height: 4px; border-radius: 2px; background: var(--ink); }
+    &::-webkit-slider-thumb { -webkit-appearance: none; width: 10px; height: 10px; margin-top: -3px; border-radius: 50%; background: var(--ink); border: 0; opacity: 0; }
+    &::-moz-range-thumb { width: 10px; height: 10px; border-radius: 50%; background: var(--ink); border: 0; opacity: 0; }
+    &:focus-visible { outline: none; &::-webkit-slider-thumb { opacity: 1; } &::-moz-range-thumb { opacity: 1; } }
+    &.disabled::-webkit-slider-runnable-track { background: linear-gradient(90deg, var(--ink-faint) var(--aw-fill), var(--fill-20) var(--aw-fill)); }
+    &:disabled { cursor: default; }
+  }
+}

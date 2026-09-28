@@ -1,0 +1,178 @@
+/**
+ * The library: the sources, the page that is open (its lists and, for an album, artist or
+ * playlist, its info), the trail walked to get there, and the search.
+ *
+ * `browseLibrary {uri}` answers with `pushBrowseLibrary`. The trail is Volumio's navigation
+ * stack: every answered page is pushed with its lists, so Back shows the previous page again
+ * without asking the player; revisiting a uri already on the trail rewinds to it.
+ */
+import { create } from 'zustand';
+import { on, emit } from '../socket';
+import { rest } from '../api';
+
+export interface BrowseItem {
+  uri: string;
+  service?: string;
+  type?: string;
+  title?: string;
+  name?: string;
+  artist?: string;
+  album?: string;
+  albumart?: string;
+  icon?: string;
+  duration?: number;
+  tracknumber?: number;
+  year?: string | number;
+  genre?: string;
+  samplerate?: string;
+  bitdepth?: string;
+  trackType?: string;
+  plugin_name?: string;
+  plugin_type?: string;
+  favourite?: boolean;
+  meta?: string;
+  tagImage?: string;
+  static?: boolean;
+  [k: string]: any;
+}
+export interface BrowseList { title?: string; icon?: string; availableListViews?: string[]; items: BrowseItem[]; [k: string]: any }
+export interface BrowseInfo { uri?: string; title?: string; service?: string; type?: string; albumart?: string; artist?: string; album?: string; year?: string | number; genre?: string; duration?: string | number; trackType?: string; [k: string]: any }
+interface Trail extends BrowseItem { lists: BrowseList[]; info: BrowseInfo | null; prev: any }
+
+// the same key (and JSON value) Volumio's localStorageService used, so a preference set in one build holds in the other; unset = list
+const GRID_KEY = 'ls.showGridView';
+function readGrid(): boolean { try { const v = localStorage.getItem(GRID_KEY); return v === null ? true : JSON.parse(v) === true; } catch { return true; } }   // Grid by default (Artists, Albums — wherever the source offers it); List is a saved choice, not the fallback
+
+interface BrowseStore {
+  sources: BrowseItem[];
+  lists: BrowseList[] | null;
+  info: BrowseInfo | null;
+  prev: any;
+  request: BrowseItem | null;      // the item the open page was asked for
+  currentUri: string;
+  trail: Trail[];
+  isBrowsing: boolean;
+  isSearching: boolean;
+  dedicatedSearch: boolean;
+  loading: boolean;
+  showGridView: boolean;
+  searchField: string;
+  favourites: Record<string, boolean>;
+  scroll: Record<string, number>;
+  stamp: number;                   // bumps on every answered page, for the scroll restore
+  fetch: (item: BrowseItem, back?: boolean) => void;
+  open: (item: BrowseItem, fresh?: boolean) => void;
+  goBack: () => void;
+  backHome: () => void;
+  home: () => void;
+  refresh: () => void;
+  setGridView: (on: boolean) => void;
+  search: (value: string) => void;
+  clearSearch: () => void;
+  setDedicated: (on: boolean) => void;
+  loadFavourites: () => void;
+  favouritesChanged: () => void;
+  canShowGridView: (list: BrowseList) => boolean;
+  showGridViewSelector: () => boolean;
+}
+
+const norm = (u: any) => String(u || '').replace(/^(music-library|mnt)\//, '');
+export { norm as normUri };
+
+let searchTimer: number | null = null;
+let favTimer: number | null = null;
+
+export const useBrowse = create<BrowseStore>((set, get) => ({
+  sources: [],
+  lists: null,
+  info: null,
+  prev: null,
+  request: null,
+  currentUri: '',
+  trail: [],
+  isBrowsing: false,
+  isSearching: false,
+  dedicatedSearch: false,
+  loading: false,
+  showGridView: readGrid(),
+  searchField: '',
+  favourites: {},
+  scroll: {},
+  stamp: 0,
+  fetch: (item, back) => {
+    if (item.uri === '/') { get().backHome(); return; }
+    if (item.uri === 'cd') { return; }
+    const scroll = { ...get().scroll };
+    if (!back) { delete scroll[item.uri]; }
+    set({ request: item, currentUri: String(item.uri || ''), loading: true, isBrowsing: item.static ? get().isBrowsing : true, scroll });
+    emit('browseLibrary', { uri: item.uri });
+  },
+  open: (item, fresh) => { if (fresh) { set({ trail: [], isSearching: false, searchField: '' }); } get().fetch(item); },
+  goBack: () => {
+    const trail = get().trail;
+    const depth = trail.length;
+    if (depth > 1) {
+      const to = trail[depth - 2];
+      set({ lists: to.lists, info: to.info, prev: to.prev, request: to, currentUri: String(to.uri || ''), trail: trail.slice(0, -1), isBrowsing: true, isSearching: false, stamp: get().stamp + 1 });
+    } else {
+      get().backHome();
+    }
+  },
+  backHome: () => set({ isBrowsing: false, isSearching: false, trail: [], info: null, lists: null, request: null, currentUri: '', searchField: '', prev: null, stamp: get().stamp + 1 }),
+  home: () => get().backHome(),
+  refresh: () => { const r = get().request; if (r) { set({ loading: true }); emit('browseLibrary', { uri: r.uri }); } },
+  setGridView: (on) => { try { localStorage.setItem(GRID_KEY, JSON.stringify(on)); } catch { /* private mode */ } set({ showGridView: on }); },
+  // the landing's pill and the search page: Volumio's global search, results render in place
+  search: (value) => {
+    set({ searchField: value });
+    if (searchTimer) { window.clearTimeout(searchTimer); searchTimer = null; }
+    if (value && value.length >= 2) {
+      set({ isSearching: true });
+      searchTimer = window.setTimeout(() => { emit('search', { type: 'any', value }); }, 600);
+    } else if (!value) {
+      get().clearSearch();
+    }
+  },
+  clearSearch: () => {
+    if (searchTimer) { window.clearTimeout(searchTimer); searchTimer = null; }
+    set({ searchField: '', isSearching: false, lists: get().isBrowsing ? get().lists : null });
+  },
+  setDedicated: (on) => {
+    if (on) { set({ dedicatedSearch: true, isSearching: true, isBrowsing: false, lists: [], info: null, request: null, trail: [] }); }
+    else if (get().dedicatedSearch) { set({ dedicatedSearch: false, isSearching: false, lists: null, searchField: '' }); }
+  },
+  // Volumio does not flag library items: the Favourites list is read over REST and the rows are marked from it
+  loadFavourites: () => {
+    rest<any>('browse', { uri: 'favourites' }).then(j => {
+      const lists = (j && j.navigation && j.navigation.lists) || [];
+      const fav: Record<string, boolean> = {};
+      lists.forEach((l: any) => (l.items || []).forEach((i: any) => { if (i.uri) { fav[norm(i.uri)] = true; } }));
+      // the items themselves carry the flag too: the row menu reads it
+      (get().lists || []).forEach(l => (l.items || []).forEach(i => { if (i && i.uri && i.type === 'song') { i.favourite = !!fav[norm(i.uri)]; } }));
+      set({ favourites: fav });
+    });
+  },
+  favouritesChanged: () => { if (favTimer) { window.clearTimeout(favTimer); } favTimer = window.setTimeout(() => { favTimer = null; get().loadFavourites(); }, 900); },
+  canShowGridView: (list) => !!(list && list.availableListViews && list.availableListViews.indexOf('grid') > -1),
+  showGridViewSelector: () => { const l = get().lists || []; return l.some(x => get().canShowGridView(x)); },
+}));
+
+on('pushBrowseSources', (data: BrowseItem[]) => useBrowse.setState({ sources: Array.isArray(data) ? data : [] }));
+on('pushBrowseLibrary', (data: any) => {
+  if (!data || !data.navigation) { return; }
+  const st = useBrowse.getState();
+  const lists: BrowseList[] = data.navigation.lists || [];
+  const info = data.navigation.info || null;
+  const patch: Partial<BrowseStore> = { lists, info, prev: data.navigation.prev || null, loading: false, stamp: st.stamp + 1 };
+  const req = st.request;
+  if (req && req.uri && st.isBrowsing) {
+    // a page already on the trail (a breadcrumb, a loop back) is returned to, not stacked twice
+    let trail = st.trail;
+    const seen = trail.findIndex(s => s.uri && s.uri === req.uri);
+    if (seen > -1) { trail = trail.slice(0, seen); }
+    patch.trail = [...trail, { ...req, lists, info, prev: data.navigation.prev || null }];
+  }
+  useBrowse.setState(patch);
+  st.loadFavourites();
+});
+emit('getBrowseSources');

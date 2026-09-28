@@ -1,0 +1,38 @@
+/* Home (spec §6.2 + mockup): the hero, the recent albums shelf, the pinned shelf. */
+body#artwork #artwork-home {
+  position: relative; z-index: 1; padding: 0 var(--pad-screen) 60px; color: var(--ink-1); min-height: 100%; box-sizing: border-box;
+  .home-hero { display: flex; flex-wrap: wrap; gap: 36px; margin-top: 34px; align-items: flex-end; }   /* 36 fixed: the fluid clamp loses to this block's two ids */
+  /* 224 fixed: the frame's fluid clamp for this image loses to the page block's specificity (two ids), so it never applies on desktop */
+  .home-hero-cover img { width: 224px; height: 224px; object-fit: cover; border-radius: var(--r-cover); box-shadow: 0 34px 70px -22px var(--shadow-strong); display: block; }
+  .home-hero-meta { display: flex; flex-direction: column; padding-bottom: 6px; min-width: 0; }
+  .home-eyebrow { font-size: 11px; letter-spacing: .2em; color: var(--ink-3); }
+  .home-hero-title { font-family: var(--font-ui); font-size: var(--t-h1-lg); font-weight: 800; letter-spacing: -.03em; line-height: 1.02; margin-top: 12px; color: var(--ink); text-wrap: pretty; }
+  .home-hero-actions { display: flex; align-items: center; gap: 16px; margin-top: 22px; }
+  .home-resume { display: flex; align-items: center; gap: 9px; height: 46px; padding: 0 24px 0 19px; border-radius: var(--r-pill); background: var(--ink); color: var(--ground); border: 0; cursor: pointer;
+    .material-symbols-rounded { font-size: 23px; } span:last-child { font-size: 15px; font-weight: 700; } &:hover { background: var(--ink-1); } }
+  .home-hero-sub { font-size: 15px; color: var(--ink-muted); }
+  .home-shelf { margin-top: 44px; }
+  .home-shelf-head { display: flex; align-items: center; gap: 14px; }
+  .home-shelf-title { font-size: 11px; letter-spacing: .18em; color: var(--ink-3); }
+  .home-shelf-nav { margin-left: auto; display: flex; gap: 8px;
+    button { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--fill-16); background: transparent; padding: 0; display: grid; place-items: center; cursor: pointer; color: var(--ink-2);
+      .material-symbols-rounded { font-size: 18px; } &:disabled { color: var(--ink-muted); cursor: default; opacity: .6; } &:hover:not(:disabled) { background: var(--fill-08); } } }
+  .main__row { grid-template-columns: repeat(auto-fill, minmax(clamp(110px, 12vw, 180px), 1fr)); gap: clamp(12px, 1.5vw, 22px); margin-top: 20px; padding-bottom: 0; }
+  .music-card__header { background: var(--card-flat); }
+  /* pins */
+  .home-pins-count { font-size: 11px; letter-spacing: .16em; color: var(--ink-faint); }
+  .home-pins-edit { margin-left: auto; border: 0; background: transparent; padding: 4px 2px; font-family: var(--font-ui); font-size: 13px; color: var(--ink-3); cursor: pointer; &:hover { color: var(--ink); } }
+  .home-pin { position: relative; user-select: none; -webkit-user-select: none;
+    &.is-lifted { z-index: 5; transition: none; box-shadow: 0 26px 50px -18px var(--shadow-deep); outline: 1px solid var(--fill-20); border-radius: var(--r-cover); }
+    .music-card__header { position: relative; overflow: visible; }
+    .music-card__img, .music-card__overlay { border-radius: var(--r-cover); }
+    &:hover .home-pin__more { opacity: 1; } }
+  .is-editing .home-pin { cursor: grab; touch-action: none; .music-card { pointer-events: none; } .home-pin__menu { pointer-events: auto; } }
+  .home-pin__glyph { position: absolute; inset: 0; border-radius: var(--r-cover); background: var(--card-flat, var(--fill-06)); display: grid; place-items: center; .material-symbols-rounded { font-size: 52px; color: var(--ink-3); } }
+  .home-pin .music-card__meta { font-family: var(--font-mono); font-size: 10px; letter-spacing: .14em; color: var(--ink-dim); text-transform: uppercase; }
+  .home-pin__menu { position: absolute; top: 8px; right: 8px; z-index: 2; }
+  .home-pin__more { width: 30px; height: 30px; border-radius: 9px; border: 0; padding: 0; display: grid; place-items: center; background: rgba(8, 10, 13, .55); color: #fff; cursor: pointer; opacity: 0; transition: opacity .15s ease;
+    .material-symbols-rounded { font-size: 19px; } }
+  .home-pin__menu.open .home-pin__more, .is-editing .home-pin__more { opacity: 1; }
+  .home-pin__menu .dropdown-menu { right: 0; left: auto; top: 100%; margin-top: 6px; }
+}

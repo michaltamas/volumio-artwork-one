@@ -1,0 +1,37 @@
+/* Phone menu sheet (mockup "Mobile — Menu"): 308px sheet 14px from the edges over a dimmed screen. */
+body#artwork .aw-mm { position: fixed; inset: 0; z-index: 30; visibility: hidden; pointer-events: none; transition: visibility 0s linear .24s;
+  &.open { visibility: visible; pointer-events: auto; transition-delay: 0s; } }
+body#artwork .aw-mm__scrim { position: absolute; inset: 0; background: var(--scrim-page); opacity: 0; transition: opacity .24s ease; }
+body#artwork .aw-mm.open .aw-mm__scrim { opacity: 1; }
+body#artwork .aw-mm__sheet {
+  position: absolute; left: 14px; top: 14px; bottom: 14px; width: min(308px, calc(100vw - 28px)); border-radius: 22px; overflow: hidden;
+  display: flex; flex-direction: column; padding: 22px 14px 16px;
+  background: var(--panel-fill); -webkit-backdrop-filter: blur(24px) saturate(1.15); backdrop-filter: blur(24px) saturate(1.15);
+  border: 1px solid var(--fill-11); box-shadow: 40px 0 90px -30px var(--shadow-deep); color: var(--ink-1);
+  transform: translateX(-24px); opacity: 0; transition: transform .24s cubic-bezier(.2, .7, .2, 1), opacity .2s ease; will-change: transform, opacity;
+}
+body#artwork .aw-mm.open .aw-mm__sheet { transform: none; opacity: 1; }
+body#artwork .aw-mm__head { display: flex; align-items: center; gap: 13px; padding: 0 12px; }
+body#artwork .aw-mm__brand { width: 41px; height: 41px; border-radius: 11px; border: 1.5px solid var(--ink-1); display: grid; place-items: center; font-family: var(--font-ui); font-size: 17px; font-weight: 800; flex: none; }
+body#artwork .aw-mm__zone { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; line-height: normal; }
+body#artwork .aw-mm__zone-name { font-size: 16px; font-weight: 700; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+body#artwork .aw-mm__zone-out { font-size: 10px; letter-spacing: .08em; color: var(--ink-55); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+body#artwork .aw-mm__close { border: 0; background: transparent; padding: 0; color: var(--ink-3); cursor: pointer; display: grid; place-items: center; .material-symbols-rounded { font-size: 23px; } }
+body#artwork .aw-mm__eyebrow { font-size: 10px; letter-spacing: .18em; color: var(--ink-45); padding: 22px 14px 8px; line-height: normal; }
+body#artwork .aw-mm__eyebrow + .aw-mm__list + .aw-mm__eyebrow { padding-top: 20px; }
+body#artwork .aw-mm__list { display: flex; flex-direction: column; gap: 2px; }
+body#artwork .aw-mm__item { display: flex; align-items: center; gap: 14px; height: 56px; padding: 0 14px; border-radius: 12px; cursor: pointer; color: var(--ink-2);
+  .material-symbols-rounded { font-size: 23px; color: var(--ink-3); width: 23px; }
+  &:hover { background: var(--fill-06); color: var(--ink); }
+  &.active { background: var(--fill-10); color: var(--ink); .material-symbols-rounded { color: var(--ink); } .aw-mm__label { font-weight: 600; } } }
+body#artwork .aw-mm__label { flex: 1; min-width: 0; font-size: 15px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+body#artwork .aw-mm__value { font-size: 10px; letter-spacing: .08em; color: var(--ink-55); }
+body#artwork .aw-mm__foot { margin-top: auto; display: flex; align-items: center; gap: 12px; padding: 14px 14px 0; border-top: 1px solid var(--fill-09); }
+body#artwork .aw-mm__power { display: flex; align-items: center; gap: 12px; color: var(--ink-2); font-size: 14px; font-weight: 600; cursor: pointer;
+  .material-symbols-rounded { font-size: 21px; color: var(--ink-muted); } &:hover { color: var(--ink); } }
+body#artwork .aw-mm__os { margin-left: auto; font-size: 10px; color: var(--ink-dim); }
+@media (max-width: 700px) and (orientation: portrait) {
+  body#artwork .aw-mm__sheet { z-index: 2; top: calc(14px + var(--sa-t)); bottom: calc(14px + var(--sa-b)); overflow-y: auto; scrollbar-width: none; &::-webkit-scrollbar { display: none; } }
+  body#artwork .aw-mm__foot { flex: none; }
+}
+@media (prefers-reduced-motion: reduce) { body#artwork .aw-mm, body#artwork .aw-mm__sheet, body#artwork .aw-mm__scrim { transition: none; } }

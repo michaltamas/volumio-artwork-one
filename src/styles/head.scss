@@ -1,0 +1,96 @@
+/* The shared page head, the tabs and the search pill, and the cards every shelf is built from. */
+.aw-head {
+  position: fixed; top: 0; left: var(--rail-w); right: 0; z-index: 25;
+  padding: var(--head-pad, 34px) var(--pad-screen) 12px;
+}
+/* the row sits in its own positive layer: Safari otherwise paints the blur strips (backdrop-filter,
+   z-index -1) over the sticky head's content */
+.aw-head__row { display: flex; align-items: center; gap: 16px; min-height: 40px; position: relative; z-index: 1; }
+.aw-head__nav { min-width: 0; display: flex; align-items: center; gap: 16px; }
+.aw-head__actions { margin-left: auto; display: flex; align-items: center; gap: 16px; }
+.aw-head__back { background: transparent; border: 0; padding: 0; margin: 0; display: grid; place-items: center; cursor: pointer;
+  .material-symbols-rounded { font-size: 22px; color: var(--ink-3); } &:hover .material-symbols-rounded { color: var(--ink); }
+  &:focus-visible { outline: 2px solid var(--ink-1); outline-offset: 2px; border-radius: 6px; } }
+.aw-menu-btn { display: none; }
+.aw-head::after { content: ''; position: absolute; left: 0; right: 0; top: 0; bottom: calc(-1 * var(--head-fade, 40px)); z-index: -1; pointer-events: none;
+  background: linear-gradient(to bottom, var(--head-tint-1) 0%, var(--head-tint-2) 52%, transparent 100%); }
+/* progressive blur: strips with a decreasing radius, each faded by its own mask.
+   Safari-only delayed fade-in: Safari has been seen showing a frame or two of unblurred
+   content (e.g. the page title) through this strip right as it mounts, before its
+   backdrop-filter layers are actually composited — hiding it for 50ms sidesteps that window.
+   `hanging-punctuation: first` + the `-apple-system-body` font keyword are both real,
+   WebKit/Safari-only features — Blink (Chrome/Edge) recognizes neither, so this rule never
+   applies there, where the blur must stay visible immediately, with no such glitch.
+   (`-webkit-touch-callout` looked like the standard Safari @supports sniff but, verified via
+   headless WebKit, is NOT actually recognized there either — don't reach for it again.) */
+@keyframes aw-hblur-in { to { opacity: 1; } }
+@supports (hanging-punctuation: first) and (font: -apple-system-body) {
+  .aw-head .aw-hblur { opacity: 0; animation: aw-hblur-in .15s ease .05s forwards; }
+}
+.aw-head .aw-hblur { position: absolute; left: 0; right: 0; top: 0; bottom: calc(-1 * var(--head-fade, 40px)); z-index: -1; pointer-events: none;
+  i { position: absolute; left: 0; right: 0; top: 0; bottom: 0; display: block; }
+  $radii: 0.25px 0.35px 0.5px 0.7px 1px 1.4px 2px 2.9px 4.2px 6px 8.6px 12.5px;
+  $stops: 84% 77% 70% 63% 56% 49% 42% 35% 28% 21% 14% 7%;
+  $ends: 100% 93% 86% 79% 72% 65% 58% 51% 44% 37% 30% 23%;
+  @for $i from 1 through 12 {
+    i:nth-child(#{$i}) { $r: nth($radii, $i); $stop: nth($stops, $i); $end: nth($ends, $i);
+      -webkit-backdrop-filter: blur($r); backdrop-filter: blur($r);
+      -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 $stop, transparent $end); mask-image: linear-gradient(to bottom, #000 0%, #000 $stop, transparent $end); }
+  }
+}
+.aw-head--album { &::after { content: none; } .aw-hblur { display: none; } }
+
+.aw-tab { font-size: 15px; color: var(--ink-dim); cursor: pointer; &.active { color: var(--ink); font-weight: 600; } &:hover { color: var(--ink-2); } }
+.aw-search {
+  margin-left: auto; display: flex; align-items: center; gap: 11px; height: 38px; padding: 0 16px; border-radius: 19px; width: 320px; min-width: 0; cursor: pointer;
+  background: var(--fill-09); border: 1px solid var(--fill-11); margin-bottom: 0; font-weight: 400;
+  .material-symbols-rounded { font-size: 20px; color: var(--ink-muted); }
+  .aw-search-label { font-size: 14px; color: var(--ink-muted); }
+  .aw-search-key { margin-left: auto; font-size: 11px; color: var(--ink-faint); }
+  &:hover { background: var(--fill-13); }
+  input { flex: 1; min-width: 0; background: transparent; border: 0; padding: 0; height: 100%; font-size: 14px; color: var(--ink); outline: 0; box-shadow: none; font-family: var(--font-ui);
+    &::placeholder { color: var(--ink-muted); } &::-webkit-search-cancel-button { -webkit-appearance: none; } }
+  &:focus-within { border-color: var(--fill-30); cursor: text; }
+  .aw-search-clear { margin-left: auto; width: 22px; height: 22px; border-radius: 6px; border: 0; background: transparent; padding: 0; display: grid; place-items: center; color: var(--ink-muted); cursor: pointer;
+    .material-symbols-rounded { font-size: 18px; } &:hover { color: var(--ink); background: var(--fill-10); } }
+}
+
+/* ---- the cards (spec §5.3): a shelf grid, the cover box, the play overlay, two lines ---- */
+body#artwork {
+  .main__row { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: var(--gap-shelf); padding: 8px 0 40px; }
+  .music-card__wrapper { width: auto; padding: 0; margin: 0; transition: transform .35s cubic-bezier(.2, .7, .2, 1); will-change: transform; position: relative; }
+  /* a tile with its menu open is raised over its later siblings — on touch screens a tapped button
+     takes no focus, so the open state itself carries the raise (class from the tile, :has as a backstop) */
+  .music-card__wrapper:hover, .music-card__wrapper:focus-within, .music-card__wrapper.is-menu-open, .music-card__wrapper:has(.dropdown.open) { z-index: 6; }
+  .music-card { background: transparent; border: 0; cursor: pointer; }
+  .music-card__header { position: relative; aspect-ratio: 1 / 1; border-radius: var(--r-cover); overflow: hidden; box-shadow: 0 20px 40px -16px var(--shadow-strong); margin-bottom: 12px; }   /* the 12px under the cover came from the inherited card; kept */
+  .music-card__img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .music-card__overlay { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(6, 9, 12, .42); opacity: 0; transition: opacity .25s ease; }
+  .music-card .meta__play { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; .play-btn { pointer-events: auto; } }
+  .music-card .play-btn { width: 56px; height: 56px; border-radius: var(--r-pill); background: var(--ink); border: 0; display: grid; place-items: center; cursor: pointer;
+    .play-btn__icon { color: var(--ground); font-size: 20px; margin-left: 2px; } }
+  .music-card .action-btn, .music-card .meta__actions { position: absolute; top: 8px; right: 8px; }
+  .music-card__info { margin-top: 10px; padding: 0; display: flex; min-width: 0; }
+  .music-card__label { font-size: 15px; font-weight: 500; color: var(--ink-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .music-card__meta { font-size: 13px; line-height: 15px; color: var(--ink-dim); margin: 2px 0 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  @media (hover: hover) { .music-card__wrapper:hover { transform: translateY(-8px); } .music-card__wrapper:hover .music-card__overlay { opacity: 1; } }
+  @media (hover: none) { .music-card__overlay { opacity: 1; background: rgba(6, 9, 12, .28); } .music-card .play-btn { width: 44px; height: 44px; } }
+  .music-card.is-artist .music-card__header, .music-card.is-artist .music-card__img, .music-card.is-artist .music-card__overlay { border-radius: 50%; }
+  .music-card.is-artist .music-card__info, .music-card.is-artist .music-card__meta, .music-card.is-artist .music-card__label { text-align: center; }
+}
+
+/* ---- the row / tile menu (mockup "Context menu"): glass, 44px rows with a glyph ---- */
+body#artwork .dropdown { position: relative; }
+body#artwork .dropdown-menu { position: absolute; z-index: 1000; list-style: none; margin: 0; }
+body#artwork .hamburgerMenu ul.dropdown-menu.buttonsGroup, body#artwork .home-pin__menu ul.dropdown-menu.buttonsGroup {
+  padding: 8px; border-radius: 14px; overflow: hidden; width: 272px; text-align: left;   /* the rows read left whatever the tile centres */
+  background: var(--menu-fill); -webkit-backdrop-filter: blur(60px) saturate(1.6) brightness(var(--menu-bright)); backdrop-filter: blur(60px) saturate(1.6) brightness(var(--menu-bright));
+  border: 1px solid var(--fill-14); box-shadow: 0 34px 70px -26px var(--shadow-deep);
+  li > a { display: flex; align-items: center; gap: 13px; height: 44px; padding: 0 14px; border-radius: 10px; color: var(--ink-2); font-size: 14px; font-weight: 500; white-space: nowrap; cursor: pointer;
+    .material-symbols-rounded { width: 20px; font-size: 20px; color: var(--ink-muted); flex: none; }
+    .aw-menu__badge { margin-left: auto; font-size: 11px; color: var(--ink-dim); }
+    &:hover, &:focus { background: var(--fill-09); color: var(--ink); .material-symbols-rounded { color: var(--ink); } } }
+  .aw-menu__sep { height: 1px; margin: 6px 10px; background: var(--fill-09); }
+  .aw-menu__danger > a, .aw-menu__danger > a .material-symbols-rounded { color: var(--err-soft); }
+}
+body#artwork .home-pin__menu ul.dropdown-menu.buttonsGroup { width: 200px; }

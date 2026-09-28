@@ -1,0 +1,67 @@
+/* Zones & outputs sheet: a panel on the right on wide screens, a bottom sheet on phones. */
+body#artwork {
+  #sideMenu { position: relative; z-index: 401; }
+  #sideMenuScrim { position: fixed; inset: 0; z-index: 399; background: var(--scrim-page); -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); }
+  .outputs__menu {
+    position: fixed; z-index: 400; top: 12px; right: 12px; bottom: 12px; left: auto; width: min(350px, calc(100vw - 24px)); max-height: calc(100vh - 91px);   /* what Volumio's own frame left the sheet with */
+    padding: 20px 20px calc(20px + env(safe-area-inset-bottom, 0px));
+    overflow-y: auto; -webkit-overflow-scrolling: touch; border-radius: 18px;
+    background: var(--panel-deep); -webkit-backdrop-filter: blur(34px) saturate(1.1); backdrop-filter: blur(34px) saturate(1.1);
+    border: 1px solid var(--fill-10); box-shadow: 0 30px 70px -24px var(--shadow-strong); color: var(--ink-1);
+    opacity: 1; transform: none; animation: aw-outputs-in .22s ease-out;
+  }
+  .outputs__grab {
+    position: absolute; top: 10px; right: 14px; width: 32px; height: 32px; padding: 0; border: 0; border-radius: 50%; background: var(--fill-08); color: var(--ink-3); cursor: pointer;
+    &::after { content: 'close'; font-family: 'Material Symbols Rounded'; font-size: 18px; line-height: 32px; }
+    &:hover { background: var(--fill-16); color: var(--ink); } &:focus-visible { outline: 2px solid var(--ink-1); outline-offset: 2px; }
+  }
+  .outputs__title { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 18px; }
+  .outputs__title__text { font-family: var(--font-mono); font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-35); }
+  .outputs__action { display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 13px; border-radius: 17px; cursor: pointer;
+    background: transparent; border: 1px solid var(--fill-16); color: var(--ink-2); font-size: 13px; font-weight: 500;
+    &:hover { background: var(--fill-08); color: var(--ink); } .outputs__action__icon { font-size: 17px; } }
+  .outputs__subtitle { margin: 0 0 10px; font-family: var(--font-mono); font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-dim); }
+  .outputs__device, .device { display: flex; align-items: center; gap: 12px; margin: 0 0 10px; padding: 12px; border-radius: 14px; background: var(--fill-06); border: 1px solid var(--fill-09); flex-wrap: wrap; }
+  .device__thumb { flex: none; width: 44px; height: 44px; margin-right: 12px; border-radius: 6px; overflow: hidden; cursor: pointer; img { width: 100%; height: 100%; object-fit: cover; } }
+  .device__info { min-width: 0; flex: 1 1 auto; }
+  .device__title { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .device__title__text { font-size: 15px; line-height: 1.5; font-weight: 600; color: var(--ink-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
+  .device__subtitle, .device__info small { font-size: 12px; color: var(--ink-muted); }
+  .device__meta { display: flex; align-items: center; gap: 8px; font-size: 14px; color: #7a848e; margin-top: 0; min-width: 0; }
+  .device__meta__song { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .device__control--play { height: 28px; padding: 0 8px; .material-symbols-rounded { font-size: 18px; } }
+  .device__group { flex-basis: 100%; display: flex; flex-direction: column; gap: 8px; }
+  .device__group__item { padding-top: 8px; border-top: 1px solid var(--fill-08); }
+  .device__group__action { flex-basis: 100%; margin-top: 6px; }
+  .device__volume { display: flex; align-items: center; gap: 10px; margin: 8px 0 0; }
+  .device__control--volume { flex: none; width: 26px; height: 26px; padding: 0; border: 0; border-radius: 8px; background: transparent; display: grid; place-items: center; color: var(--ink-3);
+    .outputs__action__icon { font-size: 15px; } &:hover { background: transparent; color: var(--ink); } }
+  .volume-control__popover { position: static; display: block; flex: 1 1 auto; min-width: 0; padding: 0; margin: 0; background: none; border: 0; box-shadow: none; }
+  .outputs__menu input[type="range"] {
+    -webkit-appearance: none; appearance: none; width: 100%; height: 18px; margin: 0; background: transparent;
+    &::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: var(--fill-20); }
+    &::-moz-range-track { height: 4px; border-radius: 2px; background: var(--fill-20); }
+    &::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; margin-top: -5px; border-radius: 50%; background: var(--ink); box-shadow: 0 0 0 3px var(--fill-16), 0 2px 6px rgba(0, 0, 0, .6); }
+    &::-moz-range-thumb { width: 14px; height: 14px; border: 0; border-radius: 50%; background: var(--ink); }
+  }
+  .outputs__menu .material-symbols-rounded { color: var(--ink-3); }
+  .device.disabled { opacity: .5; }
+}
+@keyframes aw-outputs-in { from { transform: translateY(12px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes aw-outputs-up { from { transform: translateY(100%); } to { transform: none; } }
+@media (max-width: 700px) and (orientation: portrait) {
+  body#artwork .outputs__menu { top: auto; right: 0; left: 0; bottom: 0; width: auto; max-height: 72vh; border-radius: 20px 20px 0 0; border-bottom: 0; padding-top: 26px; animation: aw-outputs-up .22s ease-out; will-change: transform; }
+  body#artwork .outputs__grab { top: 0; left: 0; right: 0; width: auto; height: 26px; border-radius: 20px 20px 0 0; background: transparent; touch-action: none;
+    &::after { content: ''; position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 38px; height: 4px; border-radius: 2px; background: var(--fill-30); }
+    &:hover { background: transparent; &::after { background: var(--fill-30); } } }
+}
+
+/* Play in this browser: the Zones & outputs row and the banner every other client shows */
+body#artwork .outputs__menu .aw-local { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; align-items: center; gap: 14px;
+  .aw-local__icon { width: 44px; height: 44px; border-radius: 10px; display: grid; place-items: center; background: var(--fill-08); .material-symbols-rounded { font-size: 22px; color: var(--ink-1); } }
+  .aw-local__hint { font-size: 12px; color: var(--ink-dim); margin-top: 2px; } }
+/* shared by the sheet row and the Zones page row */
+body#artwork .aw-local__busy { width: 52px; height: 30px; display: grid; place-items: center; flex: none; }
+body#artwork .aw-local__spin { color: var(--ink-2); }
+body#artwork .aw-local__loading { display: inline-flex; align-items: center; gap: 6px; }
+body#artwork .aw-local__link { background: none; border: 0; padding: 0; font: inherit; color: var(--ink-1); text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }

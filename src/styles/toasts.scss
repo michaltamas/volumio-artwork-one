@@ -1,0 +1,86 @@
+/* Toasts (mockup "Toasts"): card 394 wide, pad 16 18 18, r14, glass; 34px icon tile per type; eyebrow = the
+   title; message 14/600; close 19; 3px progress bar. Stack: top 28 / right 32, gap 12. And the undo toast. */
+body#artwork #toast-container {
+  position: fixed; z-index: 999999; top: 28px; right: 32px; display: flex; flex-direction: column; align-items: flex-end; gap: 12px; pointer-events: none;
+  > .toast {
+    pointer-events: auto; position: relative; overflow: hidden; width: 394px; margin: 0; padding: 16px 18px 18px; border-radius: 14px; opacity: 1;
+    display: flex; align-items: flex-start; gap: 14px;
+    background: var(--menu-fill); -webkit-backdrop-filter: blur(60px) saturate(1.6) brightness(var(--menu-bright)); backdrop-filter: blur(60px) saturate(1.6) brightness(var(--menu-bright));
+    border: 1px solid var(--fill-16); box-shadow: 0 26px 60px -24px var(--shadow-deep); color: var(--ink-1);
+    &::before { content: 'info'; flex: none; width: 34px; height: 34px; border-radius: 11px; display: grid; place-items: center; font-family: 'Material Symbols Rounded'; font-size: 20px; font-weight: 400; color: var(--ink-2); background: var(--fill-08); border: 1px solid var(--fill-13); }
+    &.toast-success::before { content: 'check'; color: var(--ok); background: var(--ok-wash); border-color: var(--ok-line); }
+    &.toast-error::before { content: 'error'; color: var(--err-soft); background: var(--err-wash); border-color: var(--err-line); }
+    &.toast-warning::before { content: 'warning'; color: var(--warn-ink); background: var(--warn-wash); border-color: var(--warn-line); }
+    &.toast-error { border-color: var(--err-line); }
+    .toast-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+    .toast-title { font-family: var(--font-mono); font-size: 10px; letter-spacing: .16em; text-transform: uppercase; font-weight: 400; color: var(--ink-muted); margin: 0; padding: 0; }
+    .toast-message { font-family: var(--font-ui); font-size: 14px; font-weight: 600; line-height: 1.35; color: var(--ink-1); text-wrap: pretty; margin: 0; word-wrap: break-word; a { color: var(--ink); } }
+    .toast-close-button { order: 3; flex: none; margin: 0; padding: 0; width: 19px; height: 19px; font-size: 0; line-height: 0; color: var(--ink-faint); background: transparent; border: 0; cursor: pointer; align-self: flex-start;
+      &::before { content: 'close'; font-family: 'Material Symbols Rounded'; font-size: 19px; line-height: 1; } &:hover, &:focus { color: var(--ink); } }
+    &::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--fill-12); }
+    .toast-progress { position: absolute; left: 0; bottom: 0; height: 3px; opacity: 1; z-index: 1; background: rgba(255, 255, 255, .75); }
+    &.toast-success .toast-progress { background: var(--ok); }
+    &.toast-error .toast-progress { background: var(--err-soft); }
+    &.toast-warning .toast-progress { background: #e8c76a; }
+  }
+}
+body#artwork #toast-container > .toast { width: min(394px, calc(100vw - 24px)); }
+@media (max-width: 480px) {
+  html body#artwork #toast-container { left: 12px !important; right: 12px !important; top: calc(12px + env(safe-area-inset-top, 0px)) !important; align-items: stretch; }
+  html body#artwork #toast-container > .toast { width: auto !important; }
+  body#artwork #toast-container > .toast .toast-message, body#artwork #toast-container > .toast .toast-title { overflow-wrap: anywhere; word-break: break-word; }
+}
+
+/* the undo toast (handoff 7b) */
+body#artwork .aw-undo {
+  position: fixed; left: 50%; bottom: calc(var(--mini-h) + 16px); z-index: 950; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 14px; width: 420px; max-width: calc(100vw - 32px); padding: 14px 18px; border-radius: 14px;
+  background: var(--menu-fill); -webkit-backdrop-filter: blur(34px) brightness(var(--menu-bright)); backdrop-filter: blur(34px) brightness(var(--menu-bright));
+  border: 1px solid var(--fill-16); box-shadow: 0 20px 44px -22px var(--shadow-deep); color: var(--ink-1);
+  animation: aw-undo-in .26s cubic-bezier(.2, .7, .2, 1) both;
+  &__icon { flex: none; font-size: 22px; color: var(--ink); }
+  &__text { min-width: 0; flex: 1; }
+  &__eyebrow { font-size: 10px; letter-spacing: .16em; color: var(--ink-muted); }
+  &__title { font-size: 15px; font-weight: 600; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  &__btn { flex: none; margin-left: auto; border: 0; background: transparent; padding: 6px 2px; font-family: var(--font-ui); font-size: 14px; font-weight: 600; color: var(--ink); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; &:hover { opacity: .8; } }
+}
+@keyframes aw-undo-in { from { opacity: 0; transform: translate(-50%, 12px); } to { opacity: 1; transform: translate(-50%, 0); } }
+body#artwork .aw-undo--np { bottom: 118px; }
+@media (max-width: 700px) and (orientation: portrait) { body#artwork .aw-undo--np { bottom: calc(88px + var(--sa-b) + 16px); } }
+
+/* the player cannot be reached: a dimmed layer over everything, a card in the toasts' glass */
+body#artwork .aw-connlost {
+  position: fixed; inset: 0; z-index: 1000000; display: grid; place-items: center; padding: 16px;
+  background: rgba(0, 0, 0, .55); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  animation: aw-connlost-in .3s ease both;
+  &__card { box-sizing: border-box; width: min(400px, calc(100vw - 32px)); padding: 30px 28px 26px; border-radius: 18px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px;
+    background: var(--menu-fill); -webkit-backdrop-filter: blur(60px) saturate(1.6) brightness(var(--menu-bright)); backdrop-filter: blur(60px) saturate(1.6) brightness(var(--menu-bright));
+    border: 1px solid var(--fill-16); box-shadow: 0 26px 60px -24px var(--shadow-deep); color: var(--ink-1);
+    .aw-spinner { margin-bottom: 10px; } .aw-btn { margin-top: 12px; } }
+  &__title { margin: 0; font-family: var(--font-ui); font-size: 20px; font-weight: 600; color: var(--ink); }
+  &__text { margin: 0; font-size: 14px; color: var(--ink-2); }
+  &__seen { margin: 4px 0 0; font-size: 10px; letter-spacing: .16em; color: var(--ink-muted); }
+  &__hint { margin: 6px 0 0; font-size: 13px; line-height: 1.45; color: var(--ink-dim); text-wrap: pretty; }
+}
+@keyframes aw-connlost-in { from { opacity: 0; } to { opacity: 1; } }
+
+/* the playlist sheet (Dialogs mockup) and the web radio sheet */
+body#artwork .modal.aw-dlg--playlist .modal-dialog { width: 480px; }
+body#artwork .aw-sheet--playlist, body#artwork .aw-sheet--radio {
+  .aw-playlist__new { padding: 4px 26px 0; display: flex; gap: 10px; }
+  .aw-playlist__input { flex: 1; display: flex; align-items: center; gap: 10px; height: 46px; padding: 0 14px; border-radius: 12px; margin: 0; font-weight: 400; cursor: text; background: var(--fill-06); border: 1px solid var(--fill-11);
+    .material-symbols-rounded { font-size: 20px; color: var(--ink-muted); }
+    input { flex: 1; min-width: 0; background: transparent; border: 0; padding: 0; height: 100%; font-size: 14px; color: var(--ink); outline: 0; box-shadow: none; font-family: var(--font-ui); &::placeholder { color: var(--ink-dim); } &:focus, &:focus-visible { outline: none; box-shadow: none; } }
+    &:focus-within { border-color: var(--fill-30); } }
+  .aw-playlist__create { height: 46px; padding: 0 20px; border-radius: 12px; display: grid; place-items: center; font-size: 14px; font-weight: 600; color: var(--ink-2); cursor: pointer; background: var(--fill-08); border: 1px solid var(--fill-12);
+    &:disabled { color: var(--ink-dim); background: var(--fill-04); border-color: var(--fill-09); cursor: default; } &:not(:disabled):hover { background: var(--fill-12); color: var(--ink); } }
+  .aw-playlist__list-wrap { padding: 18px 26px 0; .aw-sheet__eyebrow { margin-bottom: 10px; } }
+  .aw-playlist__list { border-radius: 14px; overflow: hidden; background: var(--fill-04); border: 1px solid var(--fill-10); max-height: 336px; overflow-y: auto; }
+  .aw-playlist__row { display: flex; align-items: center; gap: 14px; height: 56px; width: 100%; padding: 0 16px; background: transparent; border: 0; border-bottom: 1px solid var(--fill-07); color: var(--ink-1); text-align: left; cursor: pointer;
+    &:last-child { border-bottom: 0; } .material-symbols-rounded { font-size: 21px; color: var(--ink-dim); }
+    .aw-playlist__name { flex: 1; min-width: 0; font-size: 15px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    &:hover { background: var(--fill-04); } &.active { background: var(--fill-07); .material-symbols-rounded { color: var(--ink-1); } .aw-playlist__name { font-weight: 600; } } }
+  .aw-sheet__foot .aw-sheet__status { font-size: 11px; letter-spacing: .08em; color: var(--ink-muted); margin-right: auto; }
+  .aw-sheet__btn:disabled { opacity: .5; cursor: default; }
+  .aw-sheet__doc { font-size: 12px; color: var(--ink-dim); }
+}

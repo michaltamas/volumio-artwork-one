@@ -1,0 +1,152 @@
+:root {
+  /* ground & ink (spec §3.1) */
+  --ground:#0a0c0e; --ground-deep:#080a0c; --card-flat:#141414;
+  --ink:#ffffff; --ink-1:#f2f3f5; --ink-2:#e4e7ea; --ink-3:#c2c8cd;
+  --ink-muted:#a7adb3; --ink-dim:#8c9298; --ink-faint:#71777d;
+  /* glass (spec §3.2) */
+  --glass-1-fill:rgba(8,10,13,.42); --glass-1-blur:30px; --glass-1-border:rgba(255,255,255,.07);
+  --rail-fill:rgba(8,10,13,.42);
+  --wash-opacity:.9; --wash-saturate:1.6;
+  /* Volumio ships its source icons as white glyphs: on paper they have to turn over */
+  --icon-invert:0;
+  /* how much of the ground sampled from the cover the scrim carries */
+  --art-mix-1:58%; --art-mix-2:86%;
+  --glass-2-fill:rgba(255,255,255,.10); --glass-2-border:rgba(255,255,255,.13); --glass-2-hover:rgba(255,255,255,.16);
+  --glass-3-fill:rgba(0,0,0,.28); --glass-3-blur:34px; --glass-3-border:rgba(255,255,255,.14);
+  --hairline:rgba(255,255,255,.14); --hairline-soft:rgba(255,255,255,.08);
+  /* Overlay scale (the theme's white veils, from barely-there to prominent). These carry the
+     polarity of the interface: in a light theme they become dark veils on a light ground, so
+     every surface, hover and hairline in the theme is written in terms of these, never as a
+     literal rgba(255,255,255,…). */
+  --fill-04:rgba(255,255,255,.04); --fill-05:rgba(255,255,255,.05); --fill-06:rgba(255,255,255,.06);
+  --fill-07:rgba(255,255,255,.07); --fill-08:rgba(255,255,255,.08); --fill-09:rgba(255,255,255,.09);
+  --fill-10:rgba(255,255,255,.10); --fill-11:rgba(255,255,255,.11); --fill-12:rgba(255,255,255,.12);
+  --fill-13:rgba(255,255,255,.13); --fill-14:rgba(255,255,255,.14); --fill-16:rgba(255,255,255,.16);
+  --fill-18:rgba(255,255,255,.18); --fill-20:rgba(255,255,255,.20); --fill-30:rgba(255,255,255,.30);
+  /* the ground seen through a veil: scrims and the darkening under sticky bars */
+  --shade-28:rgba(0,0,0,.28); --shade-40:rgba(0,0,0,.40); --shade-50:rgba(0,0,0,.50);
+  --shade-55:rgba(0,0,0,.55); --shade-60:rgba(0,0,0,.60); --shade-80:rgba(0,0,0,.80);
+  --shade-90:rgba(0,0,0,.90);
+  /* text that sits on an ink-coloured surface (the play button's glyph, an active pill) */
+  --on-ink:#0d0e10;
+  /* the veils the artwork is seen through: the full-frame scrim, the tint under a sticky head,
+     and the bars (mini player, side panels) */
+  --art-veil-1:rgba(6,10,13,.40); --art-veil-2:rgba(6,10,13,.72); --art-veil-3:rgba(6,10,13,.94);
+  --head-tint-1:rgba(0,0,0,.50); --head-tint-2:rgba(0,0,0,.36);
+  --bar-fill:rgba(8,10,13,.55); --bar-solid:rgba(8,10,13,.86); --bar-veil:rgba(8,10,13,.45);
+  /* the album page's own backdrop, a shade lighter than the full-frame scrim */
+  --cover-veil-1:rgba(8,10,12,.55); --cover-veil-2:rgba(8,10,12,.86);
+  /* panels that float over the page (the queue, the sheets) and the scrim behind them */
+  --panel-fill:rgba(13,15,18,.86); --panel-deep:rgba(0,0,0,.9); --panel-sheet:rgba(13,15,18,.92); --scrim-page:rgba(5,6,8,.5);
+  --menu-fill:rgba(255,255,255,.09); --menu-bright:.72;
+  /* the row that plays, and the row under the pointer */
+  --row-fill:rgba(255,255,255,.12); --row-hover:rgba(255,255,255,.07);
+  --warn-ink:#e8c76a; --warn-wash:rgba(232,199,106,.14); --warn-line:rgba(232,199,106,.30);
+  --shade-05:rgba(0,0,0,.05); --err-line:rgba(224,69,58,.45); --err-wash:rgba(224,69,58,.12);
+  --err-deep-soft:rgba(176,30,33,.6);
+
+  /* the steps between the named inks: the ramp the components actually reach for */
+  --ink-25:#d6dade; --ink-35:#cfd4d8; --ink-45:#b6bcc2; --ink-55:#a2a8ae; --ink-65:#9aa0a8; --ink-75:#5f6669;
+  /* signal (spec §3.3) */
+  --ok:#7de3b4; --ok-alt:#5fd35f; --warn:#e07b2c; --err:#e0453a; --err-soft:#ff8f8f; --err-deep:#b01e21;
+  /* the bit-perfect chip: a wash, a line and its own ink */
+  --ok-wash:rgba(125,227,180,.10); --ok-line:rgba(125,227,180,.26); --ok-ink:#a8ecce;
+  /* shadows: a dark theme can drop a hard shadow, a light one cannot */
+  --shadow-soft:rgba(0,0,0,.55); --shadow-strong:rgba(0,0,0,.8); --shadow-deep:rgba(0,0,0,.9);
+  --shadow-cover:0 44px 90px -24px rgba(0,0,0,.9);
+  /* quality badges (handoff 8a): only Hi-Res and DSD carry colour; lossless is ink, lossy muted */
+  --q-hires-ink:#8ab6ff; --q-hires-wash:rgba(92,140,255,.16); --q-hires-line:rgba(138,182,255,.32);
+  --q-dsd-ink:#c9a0ff; --q-dsd-wash:rgba(201,160,255,.14); --q-dsd-line:rgba(201,160,255,.30);
+  --q-lossless-num:#e4e7ea; --q-lossless-unit:#c2c8cd; --q-lossless-wash:rgba(255,255,255,.10); --q-lossless-line:rgba(255,255,255,.13);
+  --q-lossy-ink:#a7adb3; --q-lossy-wash:rgba(255,255,255,.06); --q-lossy-line:rgba(255,255,255,.10);
+  --q-radio-ink:#e4e7ea; --q-radio-line:rgba(255,255,255,.26);
+  /* a plain surface a step off the ground (inherited panels that are not glass) */
+  --surface-2:#333333;
+  /* radius / space / rail (spec §3.4) */
+  --r-frame:18px; --r-panel:16px; --r-card:14px; --r-cover:6px; --r-control:12px; --r-pill:999px;
+  /* fluid sizes: mockup values are the upper bound (1440px frame), they scale down with the viewport
+     (rail 76 → 56, screen padding 52 → 16, mini player 98 → 76, display type 70 → 34) */
+  --rail-w-closed: clamp(56px, 4.6vw, 76px); --rail-w-open: clamp(200px, 15vw, 232px); --rail-w: var(--rail-w-closed); --rail-item: clamp(40px, 3vw, 46px); --gap-shelf:22px; --gap-row:2px;
+  --pad-screen: clamp(16px, 3.6vw, 52px); --pad-top: clamp(18px, 3.4vh, 34px);
+  --mini-h: clamp(76px, 10.5vh, 98px);
+  --t-display: clamp(34px, 4.86vw, 70px); --t-h1: clamp(28px, 3.2vw, 46px); --t-h1-lg: clamp(30px, 3.6vw, 52px); --t-h1-xl: clamp(34px, 4.4vw, 64px);
+}
+/* sampled palette ground (spec §4.3).
+   NOTE: @property registration (for smooth crossfade interpolation, §7.1) is
+   deferred to Plan 2 — the legacy gulp-csso minifier cannot parse @property,
+   so it must be injected outside the SCSS→CSSO pipeline when we add palette
+   sampling. Until then these are plain (snap-on-change) custom properties. */
+:root { --art-1:#1a1c1e; --art-2:#141618; }
+
+/* ============================================================
+   Light theme (paper under the cover). The artwork stays where it is — blurred, behind
+   everything — but the veil over it turns to paper, the veils that were white become ink and
+   the ink becomes near-black. A light ground needs a heavier veil than a dark one: white type
+   on a bright cover fails long before dark type on a pale one does, so --art-veil-* carries
+   more weight here than its dark counterpart.
+   ============================================================ */
+@mixin aw-light {
+  /* Daylight — the light theme from the design handoff. Same geometry, same type, same motion
+     as the dark build; only the colour layer turns over. The ground is warm paper, never white,
+     and the shadows are warm with it. Glass stops being a dark wash and becomes a white one.
+     Values are the handoff's, verified for contrast against #faf8f5. */
+  --ground:#faf8f5; --ground-deep:#faf8f5; --card-flat:#fcfbf9; --surface-2:#e9e6e0;
+  /* ink: nothing lighter than #676d74 may carry text (4.5:1 is the floor here) */
+  --ink:#14161a; --ink-1:#14161a; --ink-2:#2c3036; --ink-3:#555c65;
+  --ink-muted:#555c65; --ink-dim:#555c65; --ink-faint:#596069;   /* the floor, measured against the live wash, not bare paper */
+  --ink-25:#2c3036; --ink-35:#3d434a; --ink-45:#5e646c; --ink-55:#5e646c; --ink-65:#596069; --ink-75:#596069;
+  --on-ink:#faf8f5;
+  /* glass, three tiers: the rail and the bars, then pills and chips, then the drawers */
+  --glass-1-fill:rgba(255,255,255,.60); --glass-1-border:rgba(20,22,26,.08);
+  --glass-2-fill:rgba(255,255,255,.82); --glass-2-border:rgba(20,22,26,.10); --glass-2-hover:rgba(255,255,255,.92);
+  --glass-3-fill:rgba(252,251,249,.90); --glass-3-border:rgba(20,22,26,.10);
+  --rail-fill:rgba(255,255,255,.60);
+  --bar-fill:rgba(255,255,255,.60); --bar-solid:rgba(252,251,249,.90); --bar-veil:rgba(255,255,255,.72);
+  --panel-fill:rgba(252,251,249,.90); --panel-deep:rgba(252,251,249,.96); --panel-sheet:rgba(252,251,249,.97); --scrim-page:rgba(24,20,14,.28);
+  --menu-fill:rgba(252,251,249,.88); --menu-bright:1.04;
+  /* on paper no row carries a panel of its own, the playing one included: the bars and the bold
+     title mark it. Only the row under the pointer tints (the handoff's .055) */
+  --row-fill:transparent; --row-hover:rgba(20,22,26,.055);
+  --warn-ink:#8a6a12; --warn-wash:rgba(176,132,26,.12); --warn-line:rgba(176,132,26,.30);
+  /* the tint ladder: hover .055, row .07, active .09, then the seek track and its buffer */
+  --fill-04:rgba(20,22,26,.04); --fill-05:rgba(20,22,26,.05); --fill-06:rgba(20,22,26,.055);
+  --fill-07:rgba(20,22,26,.06); --fill-08:rgba(20,22,26,.065); --fill-09:rgba(20,22,26,.07);
+  --fill-10:rgba(20,22,26,.075); --fill-11:rgba(20,22,26,.08); --fill-12:rgba(20,22,26,.09);
+  --fill-13:rgba(20,22,26,.095); --fill-14:rgba(20,22,26,.11); --fill-16:rgba(20,22,26,.12);
+  --fill-18:rgba(20,22,26,.14); --fill-20:rgba(20,22,26,.16); --fill-30:rgba(20,22,26,.22);
+  --hairline:rgba(20,22,26,.09); --hairline-soft:rgba(20,22,26,.07);
+  --shade-05:rgba(20,22,26,.04); --shade-28:rgba(255,255,255,.60); --shade-40:rgba(255,255,255,.70);
+  --shade-50:rgba(255,255,255,.78); --shade-55:rgba(255,255,255,.82); --shade-60:rgba(255,255,255,.86);
+  --shade-80:rgba(250,248,245,.94); --shade-90:rgba(250,248,245,.97);
+  /* the scrim runs up to paper instead of down to black */
+  /* the cover is allowed further forward than the handoff's .62/.90: the wash carries the
+     record, and the ground stays paper where the text lives */
+  --art-veil-1:rgba(250,248,245,.62); --art-veil-2:rgba(250,248,245,.88); --art-veil-3:rgba(250,248,245,.98);
+  --cover-veil-1:rgba(250,248,245,.64); --cover-veil-2:rgba(250,248,245,.90);
+  --head-tint-1:rgba(250,248,245,.90); --head-tint-2:rgba(250,248,245,.62);
+  /* the cover itself steps back: it is a wash behind the text, not a competitor */
+  --wash-opacity:.72; --wash-saturate:1.55; --icon-invert:1;
+  /* paper first: the cover tints the ground, it does not set it */
+  --art-mix-1:66%; --art-mix-2:80%;
+  /* semantic: the hues darken for a light ground, they do not change meaning */
+  --ok:#1f9b6b; --ok-wash:rgba(31,155,107,.10); --ok-line:rgba(31,155,107,.30); --ok-ink:#15704d;
+  --err:#a8231c; --err-soft:#a8231c; --err-deep:#8e1b1e;
+  --err-wash:rgba(179,38,30,.07); --err-line:rgba(179,38,30,.30); --err-deep-soft:rgba(179,38,30,.10);
+  /* shadows stay warm — a neutral black shadow on paper reads as dirt */
+  --shadow-soft:rgba(24,20,14,.28); --shadow-strong:rgba(24,20,14,.50); --shadow-deep:rgba(24,20,14,.55);
+  --shadow-cover:0 44px 90px -24px rgba(24,20,14,.55);
+  --q-hires-ink:#1d4ed8; --q-hires-wash:rgba(29,78,216,.08); --q-hires-line:rgba(29,78,216,.22);
+  --q-dsd-ink:#6b3fa0; --q-dsd-wash:rgba(107,63,160,.08); --q-dsd-line:rgba(107,63,160,.24);
+  --q-lossless-num:#14161a; --q-lossless-unit:#5e646c; --q-lossless-wash:rgba(255,255,255,.70); --q-lossless-line:rgba(20,22,26,.12);
+  --q-lossy-ink:#5e646c; --q-lossy-wash:rgba(20,22,26,.04); --q-lossy-line:rgba(20,22,26,.10);
+  --q-radio-ink:#14161a; --q-radio-line:rgba(20,22,26,.26);
+  --art-1:#fbf9f6; --art-2:#f6f3ef;
+  --aw-band:#faf8f5;
+}
+:root[data-aw-theme="light"] { @include aw-light; }
+@media (prefers-color-scheme: light) {
+  /* "System" follows the device. Before the script runs there is no attribute yet, and the page
+     stays dark: dark is the default, and a kiosk display that knows no dark mode must not flash
+     paper at every start */
+  :root[data-aw-theme="system"] { @include aw-light; }
+}

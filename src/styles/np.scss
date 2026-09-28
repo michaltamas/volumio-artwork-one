@@ -1,0 +1,302 @@
+/* ============ Now Playing (spec §6.1) — the theme's rules, one to one ============ */
+#np {
+  position: relative; z-index: 1; display: flex; flex-direction: column;
+  height: 100%; min-height: 100%; overflow: hidden; box-sizing: border-box;
+  padding: clamp(20px, 4.9vh, 44px) var(--pad-screen) clamp(16px, 4.2vh, 38px);
+  color: var(--ink-1);
+
+  #np-topbar { display: flex; align-items: center; justify-content: space-between; min-height: 40px;
+    .np-chevron { color: var(--ink-1); cursor: pointer; display: inline-grid; place-items: center; width: 38px; height: 38px; border-radius: 11px; background: var(--fill-12);
+      .material-symbols-rounded { font-size: 21px; } &:hover { background: var(--fill-18); } } }
+  .np-menu-btn { display: none; }
+  .np-topbar-left { display: flex; align-items: center; gap: 14px; min-width: 0; }
+  .np-zone { font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-25); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 40vw;
+    .np-zone-out { color: var(--ink-dim); } }
+  #np-badge-slot { display: flex; align-items: center; justify-content: flex-end; gap: 16px; min-width: 0; }
+  .np-badge { display: inline-flex; align-items: center; gap: 10px; height: 36px; padding: 0 14px; border-radius: 18px; background: var(--fill-10); border: 1px solid var(--fill-13); color: var(--ink-1); font-size: 11px; letter-spacing: .08em; max-width: 48vw; overflow: hidden; }
+  .np-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); }
+
+  /* container-type: size, so #np-cover can express "the largest square that fits both the
+     available height and half the available width" directly via cqh/cqw — align-items: stretch
+     alone gave a definite height to derive from but then never re-shrank it after max-width
+     clamped the derived width in a "boxy" (near-square) window, cropping the cover; flex-start
+     never gave a definite size to derive from at all, so the box fell back to the raw image's
+     intrinsic pixel size (tiny). Query units solve both at once, no JS measurement needed. */
+  #np-hero { display: flex; align-items: flex-start; gap: clamp(20px, 3.9vw, 56px); margin-top: clamp(14px, 4vh, 36px); flex: 1 1 0; min-height: 0; container-type: size; }
+  #np-cover { flex: none; width: min(100cqh, 50cqw); height: min(100cqh, 50cqw); aspect-ratio: 1 / 1; border-radius: 11px;
+    img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 11px; box-shadow: var(--shadow-cover); } }
+  #np-meta { min-width: 0; padding-top: 14px; flex: 1; display: flex; flex-direction: column; min-height: 0; }   /* the theme's fluid clamp for this never applied (csso dropped it): 14px is what shipped */
+  .np-eyebrow { font-size: 11px; letter-spacing: .2em; color: var(--ink-35); margin-bottom: clamp(8px, 1.8vh, 16px); }
+  .np-title { font-family: var(--font-ui); font-size: var(--t-display); line-height: .98; letter-spacing: -.035em; font-weight: 800; color: var(--ink); margin: 0; text-wrap: pretty; }
+  .np-byline { display: contents; }
+  .np-artist { font-size: clamp(17px, 1.6vw, 23px); font-weight: 400; color: var(--ink-2); margin-top: clamp(10px, 2.4vh, 22px); }
+  .np-album { font-size: clamp(14px, 1.25vw, 18px); font-weight: 400; color: var(--ink-muted); margin-top: 5px; }
+  #np-chip-slot { margin-top: clamp(14px, 3.5vh, 32px); }
+
+  .np-quality { display: flex; align-items: center; gap: 12px; }
+  .np-chip { display: inline-flex; align-items: center; gap: 7px; height: 38px; padding: 0 15px; border-radius: var(--r-pill); background: var(--glass-2-fill); border: 1px solid var(--glass-2-border); }
+  .np-chip-num { font-size: 13px; font-weight: 700; letter-spacing: .04em; color: var(--ink); }
+  .np-chip-num--rate { margin-left: 6px; }
+  .np-chip-unit { font-size: 11px; letter-spacing: .14em; color: var(--ink-3); }
+  .np-chip-unit--bit { text-transform: uppercase; }
+  .np-chip-val { font-size: 13px; font-weight: 700; color: var(--ink); }
+  .np-format { font-size: 11px; letter-spacing: .14em; color: var(--ink-muted); text-transform: uppercase; }
+  .np-signalpath { margin-top: 26px; display: flex; align-items: center; gap: 10px; text-transform: uppercase; font-size: 11px; letter-spacing: .14em; color: var(--ink-3); }
+  .np-arrow { color: var(--ink-faint); }
+  .np-node-final { color: var(--ink); }
+
+  /* the column's face switch (handoff 6a) */
+  .np-seg { display: inline-flex; align-self: flex-start; padding: 3px; border-radius: 999px; margin-bottom: 22px; background: var(--fill-10); border: 1px solid var(--fill-13);
+    button { border: 0; background: transparent; border-radius: 999px; padding: 8px 16px; font-family: var(--font-ui); font-size: 14px; line-height: 20px; font-weight: 500; color: var(--ink-3); cursor: pointer;
+      &:hover:not(.active):not(:disabled) { color: var(--ink); } &.active { background: var(--ink-1); color: var(--ground); font-weight: 700; }
+      &:disabled { opacity: .4; cursor: default; } &:focus-visible { outline: 2px solid var(--ink-1); outline-offset: 2px; } } }
+  --lyr-near: var(--ink-muted); --lyr-mid: var(--ink-dim); --lyr-far: var(--ink-faint);
+  .np-lsheet { display: none; }
+  .np-lyrics-host { display: contents; }
+  &.np--lyrics #np-hero, &.np--info #np-hero { align-items: stretch; }
+  &.np--info #np-meta { display: flex; flex-direction: column; min-height: 0; }
+  &.np--info .np-about { flex: 1 1 auto; }
+  .np-meta--lyrics { align-self: stretch; }
+  .np-library { margin-top: 12px; display: flex; align-items: center; gap: 10px; font-size: 11px; letter-spacing: .14em; color: var(--ink-3); text-transform: uppercase; }
+  /* ---- the Info face (12B–12D) ---- */
+  @at-root body#artwork #np.np--info {
+    .np-byline { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin-top: 12px; }
+    .np-artist { flex-basis: 100%; font-size: 21px; font-weight: 600; color: var(--ink); margin: 0; }
+    .np-album { font-size: 16px; font-weight: 400; color: var(--ink-2); margin: 0; }
+    #np-chip-slot { margin: 0; display: inline-flex; }
+    .np-chip { height: 28px; padding: 0 11px; gap: 7px; .np-chip-num { font-size: 11px; } .np-chip-unit { font-size: 10px; } }
+    @media (max-width: 1100px) {
+      .np-eyebrow { display: none; }
+      .np-title { font-size: 28px; letter-spacing: -.02em; line-height: 1.1; }
+      .np-byline { gap: 0; margin-top: 6px; align-items: baseline; }
+      .np-artist { flex-basis: auto; font-size: 16px; font-weight: 400; color: var(--ink-2); &::after { content: '·'; margin: 0 8px; color: var(--ink-dim); } }
+      .np-album { font-size: 16px; }
+      #np-chip-slot { display: none; }
+    }
+    @media (max-width: 840px) {
+      .np-title { font-size: 24px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .np-artist { font-size: 15px; &::after { content: none; } }
+      .np-album { display: none; }
+    }
+  }
+  .np-about { min-height: 0; overflow-y: auto; scrollbar-width: none; max-width: 680px; &::-webkit-scrollbar { display: none; } }
+  .np-about__rule { height: 1px; background: var(--fill-10); margin: 26px 0 22px; flex: none; }
+  .np-about__row { display: grid; grid-template-columns: 48px minmax(0, 1fr) auto; gap: 16px; align-items: start; &.is-link { cursor: pointer; } }
+  .np-about__row--album { align-items: center; margin-top: 14px; }
+  .np-about__img { width: 48px; height: 48px; border-radius: 11px; object-fit: cover; display: block; background: var(--fill-08); }
+  .np-about__img--round { border-radius: 50%; object-position: 10% 5%; }
+  .np-about__body { min-width: 0; }
+  .np-about__head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .np-about__name { font-size: 16px; font-weight: 700; color: var(--ink); }
+  .np-about__sub { font-size: 13px; color: var(--ink-muted); }
+  .np-about__row--album .np-about__sub { display: block; margin-top: 2px; }
+  .np-about__text { margin: 6px 0 0; font-size: 14px; line-height: 1.55; color: var(--ink-2); display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; text-wrap: pretty; }
+  .np-about__text--album { display: none; }
+  .np-about__src { display: inline-block; margin-top: 6px; font-size: 10px; letter-spacing: .16em; color: var(--ink-dim); text-decoration: none; &:hover { color: var(--ink-3); } }
+  .np-about__go { display: flex; align-items: center; gap: 4px; height: 36px; padding: 0 8px 0 14px; border-radius: 999px; background: var(--fill-10); border: 1px solid var(--fill-13); color: var(--ink); cursor: pointer; font-family: var(--font-ui);
+    > span:first-child { font-size: 13px; font-weight: 600; } .material-symbols-rounded { font-size: 19px; color: var(--ink-3); } &:hover { background: var(--fill-14); } }
+  @media (min-width: 1800px) {
+    .np-about__row { grid-template-columns: 56px minmax(0, 1fr) auto; gap: 18px; }
+    .np-about__img { width: 56px; height: 56px; }
+    .np-about__body { max-width: 62ch; }
+    .np-about__head { display: block; }
+    .np-about__name { font-size: 17px; }
+    .np-about__sub { display: block; margin-top: 2px; }
+    .np-about__text { margin-top: 10px; font-size: 15px; -webkit-line-clamp: 5; }
+    .np-about__text--album { display: -webkit-box; -webkit-line-clamp: 3; }
+    .np-about__row--album { align-items: start; }
+    .np-about__src { margin-top: 8px; }
+    .np-about__go { height: 40px; padding: 0 10px 0 16px; > span:first-child { font-size: 14px; } .material-symbols-rounded { font-size: 20px; } }
+  }
+  @media (max-width: 1100px) {
+    .np-about { -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 36px), transparent); mask-image: linear-gradient(to bottom, #000 calc(100% - 36px), transparent); }
+    .np-about__rule { margin: 14px 0 0; background: transparent; }
+    .np-about__row { grid-template-columns: 44px minmax(0, 1fr) 24px; gap: 14px; align-items: center; min-height: 64px; }
+    .np-about__row--album { margin-top: 0; }
+    .np-about__img { width: 44px; height: 44px; }
+    .np-about__head { display: block; }
+    .np-about__name { font-size: 15px; font-weight: 600; }
+    .np-about__sub { display: block; margin-top: 1px; }
+    .np-about__body { display: contents; }
+    .np-about__body > .np-about__head, .np-about__row--album .np-about__body > .np-about__name, .np-about__row--album .np-about__body > .np-about__sub { grid-column: 2; }
+    .np-about__row--album .np-about__body > .np-about__name { align-self: end; }
+    .np-about__row--album .np-about__body > .np-about__sub { align-self: start; margin-top: 0; }
+    .np-about__text { grid-column: 2 / -1; margin: 0 0 14px; -webkit-line-clamp: 3; }
+    .np-about__row--album { position: relative; &::before { content: ''; position: absolute; left: 58px; right: 0; top: 0; height: 1px; background: var(--fill-08); } }
+    .np-about__src { display: none; }
+    .np-about__img, .np-about__body > .np-about__head, .np-about__go { grid-row: 1; }
+    .np-about__row--artist .np-about__text { grid-row: 2; }
+    .np-about__go { grid-column: 3; align-self: center; height: auto; padding: 0; border: 0; background: transparent; > span:first-child { display: none; } .material-symbols-rounded { font-size: 22px; } }
+  }
+  @media (max-width: 840px) {
+    .np-about__row { min-height: 52px; grid-template-columns: minmax(0, 1fr) 24px; gap: 0; border-bottom: 1px solid var(--fill-08); }
+    .np-about__row--album { border-bottom: 0; &::before { left: 0; } }
+    .np-about__img, .np-about__text, .np-about__row .np-about__sub, .np-about__row--album .np-about__body > .np-about__sub { display: none; }
+    .np-about__body > .np-about__head, .np-about__row--album .np-about__body > .np-about__name { grid-column: 1; align-self: center; }
+    .np-about__go { grid-column: 2; }
+  }
+  /* the Lyrics face: a compact head */
+  .np-meta--lyrics {
+    .np-title { font-size: 52px; letter-spacing: -.032em; line-height: 1.02; margin-top: 0; }
+    .np-byline { display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px; margin-top: 12px; }
+    .np-format { display: none; }
+  }
+  .np-lyrics { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; margin-top: 28px; }
+  .np-lyrics__col { position: relative; flex: 1 1 0; min-height: 0; overflow: hidden; }
+  .np-lyrics__col--synced { mask-image: linear-gradient(transparent 0, #000 58px, #000 calc(100% - 58px), transparent 100%); -webkit-mask-image: linear-gradient(transparent 0, #000 58px, #000 calc(100% - 58px), transparent 100%); }
+  .np-lyrics__stack { display: flex; flex-direction: column; gap: 14px; will-change: transform; transition: transform .28s cubic-bezier(.2, .7, .2, 1); &.no-tween { transition: none; } }
+  .np-lyrics__line {
+    display: flex; align-items: flex-start; gap: 16px; font-size: 24px; font-weight: 500; line-height: 1.4; color: var(--lyr-far); cursor: pointer; border-radius: 8px; transition: background-color .12s ease;
+    .np-lyrics__mark { flex: none; width: 3px; align-self: stretch; border-radius: 2px; margin: 4px 0; background: transparent; }
+    &.is-near, &.is-muted { color: var(--lyr-near); }
+    &.is-dim { color: var(--lyr-mid); }
+    &.is-faint { color: var(--lyr-far); }
+    &.is-now { font-size: 26px; font-weight: 600; line-height: 1.38; color: var(--ink); .np-lyrics__mark { background: var(--ink-1); } .np-lyrics__text { animation: aw-lyr-in .28s cubic-bezier(.2, .7, .2, 1); } }
+    &.is-now ~ .np-lyrics__line { .np-lyrics__mark { width: 3px; } }
+    .np-lyrics__mark { width: 0; }
+    &.is-now .np-lyrics__mark { width: 3px; }
+    &:active { background: var(--fill-07); }
+  }
+  .np-lyrics__col--plain { overflow-y: auto; scrollbar-width: none; &::-webkit-scrollbar { display: none; } }
+  .np-lyrics__eyebrow { font-size: 11px; letter-spacing: .16em; color: var(--ink-dim); margin-bottom: 14px; }
+  .np-lyrics__plain { display: flex; flex-direction: column; gap: 10px; padding-bottom: 24px; }
+  .np-lyrics__line.is-plain { color: var(--ink-2); cursor: default; &:active { background: transparent; } }
+  .np-lyrics__empty { font-size: 24px; font-weight: 500; line-height: 1.4; color: var(--ink-dim); }
+  .np-lyrics__skeleton { display: flex; flex-direction: column; gap: 18px; padding-top: 6px; animation: aw-lyr-pulse 1.4s ease-in-out infinite;
+    i { display: block; height: 18px; border-radius: 4px; background: var(--fill-10); width: 62%; &:nth-child(2) { width: 78%; } &:nth-child(3) { width: 70%; } &:nth-child(4) { width: 54%; } &:nth-child(5) { width: 66%; } } }
+  .np-lyrics__eyebrow--synced { flex: none; margin-bottom: 12px; }
+
+  #np-footer { margin-top: auto; padding-top: clamp(14px, 4.8vh, 44px); }
+  #np-seek { margin-bottom: clamp(10px, 2vh, 18px); }
+  #np-footer-row { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-top: 4px; flex-wrap: wrap; row-gap: 12px; }
+  /* the row is 50px tall and the play disc overhangs it, sitting 7px high, as the theme lays it out */
+  /* the row is 50px tall; each button carries 8px side margins and the play disc overhangs a
+     55px slot, sitting 7px high — the geometry the theme ended up with, kept to the pixel */
+  #np-transport { display: flex; align-items: center; justify-content: flex-start; gap: clamp(20px, 2.6vw, 36px); height: 50px;
+    #playerButtons { gap: clamp(20px, 2.6vw, 36px); height: 50px; > button { margin: 0 8px; } > .playPause { margin: 0 calc(63px - clamp(56px, 5.3vw, 76px)) 0 8px; } }
+    .btn-link { color: var(--ink-2); padding: 0; height: 34.84px; .material-symbols-rounded { font-size: 28px; } &:hover { color: var(--ink); } }   /* the line boxes the theme's inline glyphs made */
+    #prev-button, #next-button { height: 43.56px; .material-symbols-rounded { font-size: 36px; color: var(--ink); } }
+    .np-fav { color: var(--ink-1); }
+    .np-fav.active { color: var(--ink); }
+    .playPause { width: clamp(56px, 5.3vw, 76px); height: clamp(56px, 5.3vw, 76px); padding: 0; color: var(--ground); position: relative; top: -7px; flex: none; margin: 0 calc(63px - clamp(56px, 5.3vw, 76px)) 0 8px;
+      .material-symbols-rounded { font-size: 42px; } &:hover { color: var(--ground); } }
+  }
+  #np-footer-right { display: flex; align-items: center; gap: clamp(16px, 2.2vw, 30px); margin-left: auto; flex: none; min-width: 0; }
+  #np-upnext { display: flex; align-items: center; gap: 13px; flex: none; }
+  .np-upnext-label { font-size: 11px; letter-spacing: .16em; color: var(--ink-muted); white-space: nowrap; background: transparent; border: 0; padding: 0; cursor: pointer; font-family: var(--font-mono);
+    &:hover { color: var(--ink); } &:focus-visible { outline: 2px solid var(--ink-1); outline-offset: 4px; border-radius: 4px; } }
+  .np-upnext-films { display: flex; gap: 13px; }
+  .np-upnext-film { display: block; padding: 0; margin: 0; border: 0; background: transparent; border-radius: 11px; cursor: pointer; transition: transform .15s ease;
+    img { display: block; width: 44px; height: 44px; border-radius: 11px; object-fit: cover; transition: opacity .15s ease; }
+    &:nth-child(1) img { opacity: 1; } &:nth-child(2) img { opacity: .6; } &:nth-child(3) img { opacity: .34; }
+    &:hover { transform: translateY(-2px); img { opacity: 1 !important; } } &:focus-visible { outline: 2px solid var(--ink-1); outline-offset: 2px; } }
+  .np-queue { min-width: 44px; height: 44px; border-radius: 12px; padding: 0 14px; background: var(--fill-12); border: 0; color: var(--ink-1); display: inline-flex; align-items: center; justify-content: center; gap: 9px; cursor: pointer;
+    .material-symbols-rounded { font-size: 22px; } .np-queue__count { font-size: 12px; font-weight: 700; }
+    &:hover { background: var(--glass-2-hover); } &.active { background: var(--ink); color: var(--on-ink); } }
+  .np-volume { display: flex; align-items: center;
+    .volume-slider { gap: 10px; input[type=range] { width: clamp(90px, 11vw, 150px); }
+      input[type=range]::-webkit-slider-runnable-track { height: 5px; } input[type=range]::-webkit-slider-thumb { width: 13px; height: 13px; margin-top: -4px; opacity: 1; box-shadow: 0 0 0 3px var(--fill-14), 0 2px 6px var(--shadow-soft); }
+      input[type=range]::-moz-range-thumb { width: 13px; height: 13px; opacity: 1; }
+      .button-mute { width: 30px; height: 30px; .material-symbols-rounded { font-size: 23px; } } } }
+
+  /* the seek bar here: 8px track, 20px handle, the timecodes under it */
+  #np-seek .artwork-seek { display: grid; grid-template-columns: 1fr auto 1fr; grid-template-areas: "track track track" "elapsed remaining duration"; row-gap: 12px; column-gap: 0; }
+  #np-seek .artwork-seek__hit { grid-area: track; width: 100%; height: 36px; }
+  #np-seek .seek-track { height: 8px; border-radius: 4px; background: var(--fill-14); }
+  #np-seek .seek-fill { background: linear-gradient(90deg, var(--ink-25), var(--ink)); }
+  #np-seek .seek-handle { width: 20px; height: 20px; margin: -10px 0 0 -10px; box-shadow: 0 0 0 4px var(--fill-14), 0 0 18px rgba(255, 255, 255, .45), 0 3px 8px var(--shadow-soft); }
+  #np-seek .seek-time { font-size: 12px; }
+  #np-seek .seek-elapsed { grid-area: elapsed; justify-self: start; color: var(--ink-1); }
+  #np-seek .seek-remaining { display: block; grid-area: remaining; justify-self: center; }
+  #np-seek .seek-duration { grid-area: duration; justify-self: end; margin-left: 0; }
+
+  .np-m-actions, .np-m-bar { display: none; }
+}
+@keyframes aw-lyr-in { from { opacity: .4; } to { opacity: 1; } }
+@keyframes aw-lyr-pulse { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+html.aw-is-light body#artwork #np { --lyr-near: #5e646c; --lyr-mid: #676d74; --lyr-far: #8b9098; }
+html.aw-is-light body#artwork #np .np-lyrics__line:active { background: rgba(20, 22, 26, .07); }
+/* the Lyrics face's head: the title alone (not on the phone, where the words are a panel) */
+@media not all and (max-width: 700px) and (orientation: portrait) {
+  body#artwork #np .np-meta--lyrics .np-byline { display: none; }
+  body#artwork #np .np-meta--lyrics #np-chip-slot { display: inline-flex; align-self: center; margin: 0; }
+  body#artwork #np .np-meta--lyrics .np-chip { height: 30px; padding: 0 12px; gap: 7px; .np-chip-num { font-size: 12px; } .np-chip-unit { font-size: 10px; } }
+}
+html.aw-is-light body#artwork #np .np-about__go { background: rgba(255, 255, 255, .7); border-color: rgba(20, 22, 26, .12); }
+html.aw-is-light body#artwork #np .np-about__rule { background: rgba(20, 22, 26, .09); }
+/* below this the seg control has no room to earn its keep: Cover is the only face on offer
+   (Lyrics stays reachable through the phone's own tile once that layout kicks in) */
+@media (max-width: 1100px) { body#artwork #np .np-seg { display: none; } }
+@media (max-width: 1080px) { body#artwork #np .np-upnext-films { display: none; } }
+@media (max-width: 900px) { body#artwork #np .np-upnext-label { display: none; } }
+/* tall or narrow: the cover above the text (a landscape window merely resized boxy — not
+   actually tall — keeps the cover beside the text instead; only real portrait shapes stack) */
+@media (max-aspect-ratio: 3/4), (max-width: 760px) {
+  body#artwork #np { height: auto; min-height: 100%; overflow: visible; }
+  body#artwork #np #np-hero { flex-direction: column; align-items: flex-start; flex: 1 0 auto; }
+  body#artwork #np #np-cover { height: auto; width: min(100%, 36vh); max-width: none; }
+  body#artwork #np #np-meta { padding-top: 0; }
+  body#artwork #np .np-title { font-size: clamp(26px, 7.5vw, 54px); }
+  body#artwork #np .np-upnext-films, body#artwork #np .np-upnext-label { display: none; }
+}
+@media (max-height: 520px) and (orientation: landscape) {
+  body#artwork #np { height: auto; min-height: 100%; overflow: visible; }
+  body#artwork #np #np-hero { flex: none; }
+  body#artwork #np #np-cover { height: auto; width: min(46vh, 40%); }
+  body#artwork #np #np-footer { padding-top: 18px; }
+  body#artwork #np .np-seg { display: none; }   /* no headroom for the switch in a short window: Cover only */
+  /* below this the title tracks the window's height, not its width — it keeps shrinking as the window gets shorter still */
+  body#artwork #np .np-title { font-size: clamp(20px, 6.5vh, 48px); }
+}
+
+/* Now Playing opens as a sheet sliding up from the mini player and slides back down on the chevron */
+@keyframes aw-np-in { from { transform: translateY(100%); } to { transform: none; } }
+@keyframes aw-np-out { from { transform: none; } to { transform: translateY(100%); } }
+body#artwork #np { animation: aw-np-in .42s cubic-bezier(.2, .7, .2, 1) both; }
+body#artwork #np.aw-np-out { animation: aw-np-out .38s cubic-bezier(.4, 0, .6, 1) forwards; pointer-events: none; overflow: hidden; }
+body#artwork #np.aw-np-out > .art-stack { position: absolute; z-index: -1; }   /* the leaving sheet carries its wash over the page it uncovers */
+/* pulled down by a finger (phone): the entry animation must let go of the transform, and the sheet carries its wash as when leaving */
+body#artwork #np.aw-np-drag { animation: none; overflow: hidden; box-shadow: 0 -20px 50px -20px var(--shadow-deep); }
+body#artwork #np.aw-np-drag > .art-stack { position: absolute; z-index: -1; }
+@media (prefers-reduced-motion: reduce) { body#artwork #np, body#artwork #np.aw-np-out { animation: none; } }
+
+/* something outside the player drives it (AirPlay, the analog input, a group's leader): a pill in
+   the signal path's place saying why the controls are off */
+body#artwork #np .np-external {
+  margin-top: 22px; display: inline-flex; align-items: flex-start; gap: 12px; max-width: 460px; text-align: left; padding: 12px 18px 12px 14px; border-radius: 16px;
+  background: var(--glass-2-fill); border: 1px solid var(--glass-2-border);
+  > .material-symbols-rounded { flex: none; font-size: 22px; color: var(--ink-1); margin-top: 1px; }
+  &__text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+  &__title { font-size: 14px; font-weight: 600; color: var(--ink); }
+  &__sub { font-size: 13px; color: var(--ink-3); a { color: var(--ink-1); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; } }
+}
+
+/* nothing to show: where to find music, and the last tracks played */
+body#artwork #np.np--empty {
+  .np-empty { flex: 1 1 auto; min-height: 0; display: flex; align-items: center; justify-content: center; gap: clamp(32px, 6vw, 96px); padding: clamp(16px, 4vh, 40px) 0; overflow-y: auto; }
+  .np-empty__intro { flex: 0 1 500px; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; }
+  .np-empty__icon { width: 64px; height: 64px; border-radius: 18px; display: grid; place-items: center; background: var(--fill-10); border: 1px solid var(--fill-13); margin-bottom: 22px;
+    .material-symbols-rounded { font-size: 30px; color: var(--ink-2); } }
+  .np-empty__title { margin: 0; font-family: var(--font-ui); font-size: clamp(30px, 3vw, 44px); line-height: 1.02; letter-spacing: -.03em; font-weight: 800; color: var(--ink); }
+  .np-empty__text { margin: 12px 0 0; font-size: 15px; line-height: 1.45; color: var(--ink-3); text-wrap: pretty; }
+  .np-empty__actions { margin-top: 26px; display: flex; flex-wrap: wrap; gap: 10px; }
+  .np-empty__recent { flex: 0 1 460px; min-width: 0; }
+  .np-empty__eyebrow { font-size: 11px; letter-spacing: .2em; color: var(--ink-35); margin: 0 0 10px; }
+  .np-empty__list { display: flex; flex-direction: column; margin: 0 -12px; }
+  .np-empty__row { display: flex; align-items: center; gap: 14px; width: 100%; padding: 8px 12px; border: 0; border-radius: 12px; background: transparent; color: var(--ink-1); text-align: left; cursor: pointer;
+    &:hover { background: var(--fill-06); .np-empty__play { opacity: 1; } } }
+  .np-empty__art { position: relative; flex: none; width: 48px; height: 48px; border-radius: 8px; overflow: hidden; display: grid; place-items: center; background: var(--fill-08);
+    img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    > .material-symbols-rounded { font-size: 22px; color: var(--ink-dim); } }
+  .np-empty__play { position: absolute; inset: 0; display: grid; place-items: center; font-size: 26px !important; color: #fff !important; background: rgba(0, 0, 0, .45); opacity: 0; transition: opacity .15s; }
+  .np-empty__meta { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+  .np-empty__name { font-size: 15px; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .np-empty__by { font-size: 13px; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .np-empty__dur { flex: none; font-size: 12px; color: var(--ink-muted); }
+}
+@media (max-width: 900px) {
+  body#artwork #np.np--empty {
+    .np-empty { flex-direction: column; align-items: stretch; justify-content: flex-start; gap: 36px; }
+    .np-empty__intro, .np-empty__recent { flex: none; }
+  }
+}

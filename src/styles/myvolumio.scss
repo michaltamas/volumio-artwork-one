@@ -1,0 +1,562 @@
+/* ============================================================
+   MyVolumio (the frame's pages under the theme's dress). Bootstrap-era markup: the frame's
+   base rules the theme builds on come first — scoped with :where() so they keep the frame's
+   own specificity — then the theme's sheet, verbatim.
+   ============================================================ */
+:where(body#artwork [class*="aw-state-myvolumio-"]) {
+  /* --- Bootstrap 3 + Volumio's base (the frame's own values) --- */
+  h1, h2, h3, h4 { font-family: inherit; font-weight: 500; line-height: 1.1; color: inherit; }
+  h1, h2, h3 { margin-top: 20px; margin-bottom: 10px; } h4 { margin-top: 10px; margin-bottom: 10px; }
+  h1 { font-size: 36px; } h2 { font-size: 30px; } h3 { font-size: 24px; } h4 { font-size: 18px; }
+  p { margin: 0 0 10px; } a { cursor: pointer; text-decoration: none; }
+  label { display: inline-block; max-width: 100%; margin-bottom: 5px; font-weight: 700; }
+  table { font-size: 18px; margin: 0; border-collapse: collapse; border-spacing: 0; }
+  .btn { display: inline-block; margin-bottom: 0; font-family: inherit; font-weight: 400; text-align: center; vertical-align: middle; touch-action: manipulation; cursor: pointer; background-image: none; border: 1px solid transparent; white-space: nowrap; padding: 6px 12px; font-size: 14px; line-height: 1.42857143; border-radius: 4px; user-select: none; text-decoration: none;
+    &[disabled], &.disabled { cursor: not-allowed; opacity: .65; } }
+  .btn { outline: none !important; font-size: 16px; border-radius: 50px; }
+  .btn:focus { color: #fff; }
+  .btn-sm { padding: 5px 10px; font-size: 12px; line-height: 1.5; border-radius: 3px; }
+  .btn-lg { padding: 10px 16px; font-size: 18px; line-height: 1.3333333; border-radius: 6px; }
+  .btn-block { display: block; width: 100%; }
+  .btn-success { color: #fff; background-color: #5cb85c; border-color: #4cae4c; }
+  .btn-default { color: var(--ink); background-color: #7a848e; border-color: #ccc; }
+  .btn-danger { color: var(--ink); background-color: #df4649; border-color: #df4649; }
+  .btn-outline { border: 2px solid #54c688; box-shadow: 0 0 1px transparent; }
+  .pull-right { float: right !important; }
+  .panel { margin-bottom: 20px; border: 1px solid transparent; border-radius: 4px; }
+  .panel-body { padding: 15px; &::before, &::after { content: ' '; display: table; } &::after { clear: both; } }
+  .panel-body a { color: #fff; font-weight: 700; }
+  .panel-heading { padding: 10px 15px; border-bottom: 1px solid transparent; }
+  .panel .panel-heading { border-bottom: solid 1px #54c688; }
+  .panel-title { margin-top: 0; margin-bottom: 0; font-size: 16px; }
+  .panel .panel-heading .panel-title { color: var(--ink); font-size: 18px; text-transform: capitalize; }
+  .panel-footer { padding: 10px 15px; }
+  .well { min-height: 20px; padding: 19px; margin-bottom: 20px; border-radius: 4px; }
+  .lead { margin-bottom: 20px; font-size: 16px; font-weight: 300; line-height: 1.4; }
+  @media (min-width: 768px) { .lead { font-size: 21px; } }
+  p.lead { text-align: center; }
+  .table { width: 100%; max-width: 100%; margin-bottom: 20px; border-collapse: collapse;
+    > tbody > tr > td, > tbody > tr > th { padding: 8px; line-height: 1.42857; vertical-align: top; border-top: 1px solid #7c7c7c; }
+    > tbody > tr > th { text-align: left; } }
+  @media (max-width: 767px) {
+    table.tableSmall th { font-size: 12px; }
+    table.tableSmall tr td { font-size: 13px; padding: 5px 2px !important; }
+    table.tableSmall button.btn { padding: 5px 8px; margin-top: 2px; margin-bottom: 2px; } }
+  .form-control { display: block; width: 100%; height: 34px; padding: 6px 12px; font-size: 14px; line-height: 1.42857143; font-family: inherit; background-image: none; border: 1px solid #ccc; border-radius: 4px; }
+  .form-group { margin-bottom: 15px; }
+  .input-group { position: relative; display: table; border-collapse: separate; }
+  .input-group-addon { padding: 6px 12px; font-size: 14px; font-weight: 400; line-height: 1; color: #54c688; text-align: center; background-color: #242424; border: 1px solid #54c688; white-space: nowrap; width: 1%; vertical-align: middle; display: table-cell; }
+  .help-block { display: block; margin-top: 5px; margin-bottom: 10px; }
+  .row { margin-left: -15px; margin-right: -15px; &::before, &::after { content: ' '; display: table; } &::after { clear: both; } }
+  .container { &::before, &::after { content: ' '; display: table; } &::after { clear: both; } }
+  [class*="col-"] { position: relative; min-height: 1px; padding-left: 15px; padding-right: 15px; }
+  .text-center { text-align: center; }
+  .hidden, .hide { display: none !important; }
+  .show { display: block !important; }
+  .invisible { visibility: hidden; }
+  .img-circle { border-radius: 50%; }
+  .img-responsive { display: block; max-width: 100%; height: auto; }
+  #change-subscription .badge { padding: 8px; }   /* the frame's vendor sheet carries no .badge base */
+  .label { display: inline; padding: .2em .6em .3em; font-size: 75%; font-weight: 700; line-height: 1; text-align: center; white-space: nowrap; vertical-align: baseline; border-radius: .25em; }
+  .glyphicon, .fa { position: relative; top: 1px; display: inline-block; font-style: normal; font-weight: 400; line-height: 1;
+    .material-symbols-rounded { font-size: 1em; display: block; width: 1em; height: 1em; line-height: 1; overflow: visible; } }
+  .fa-4x { font-size: 4em; }
+  @media (min-width: 768px) and (max-width: 991px) { .hidden-sm { display: none !important; } }
+  @media (max-width: 767px) { .hidden-xs { display: none !important; } }
+
+  /* --- the frame's own MyVolumio rules the theme leaves standing --- */
+  .boxHeader { margin-top: 20px; .title { margin-right: 12px; h2 { margin: 0; } } }
+  .title h2 { display: inline-block; }
+  .my-volumio__info-card { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; margin-bottom: 24px; padding: 16px; }
+  .my-volumio__info-card__description { margin: 0 28px 0 0; font-size: 13px; letter-spacing: 0; line-height: 20px; }
+  .my-volumio__fake-checkbox { position: relative; display: inline-block; width: 20px; height: 20px; margin-right: 8px; border-radius: 4px; cursor: pointer;
+    &__tick { display: none; position: absolute; top: 5px; left: 4px; width: 10px; height: 10px; } }
+  .my-volumio__checkbox:checked ~ .my-volumio__fake-checkbox .my-volumio__fake-checkbox__tick { display: block; img { display: block; } }
+  .my-volumio__text-input { font-size: 16px; }
+  .my-volumio__btn-primary.disabled { pointer-events: none; }
+  .my-volumio__toggle-header { text-align: center; h2, h3, h4 { margin-top: 0; margin-bottom: 8px; } .toggle-header__space { margin-bottom: 16px; } }
+  .my-volumio__toggle { .toggle__labels { display: inline-flex; border-radius: 4px; overflow: hidden; } .toggle__label-text { margin: 0; padding: 8px 24px; font-weight: normal; cursor: pointer; } }
+  .my-volumio__plan-grid { max-width: 944px; margin: auto; }
+  .plan__item { position: relative; flex: 0 0 calc(33% - 16px); width: 100%; margin-bottom: 24px; &:not(:last-child) { margin-right: 24px; } }
+  .plan__card { border-radius: 12px; font-weight: 400; cursor: pointer;
+    .plan__title { padding: 10px; font-size: 20px; line-height: 20px; text-transform: uppercase; }
+    .plan__pricing { padding: 10px 24px; }
+    .plan__trial { margin-bottom: 8px; font-size: 16px; font-weight: 800; }
+    .plan__price { margin-bottom: 4px; font-size: 40px; line-height: 40px; }
+    .plan__fake-radio { flex: 0 0 24px; width: 24px; height: 24px; border-radius: 50%; text-align: center; .plan__fake-radio__tick { display: none; } }
+    .plan__features { padding: 16px; }
+    .plan__feature:not(:last-child) { margin-bottom: 8px; } }
+  .plan__checkbox:checked ~ .plan__card .plan__fake-radio { display: flex; align-items: center; justify-content: center; .plan__fake-radio__tick { display: block; } }
+  .collapse__panel { .collapse__panel__header { padding: 6px 2px; cursor: pointer; .collapse__indicator { transition: transform .2s ease-out 0s; } }
+    .collapse__panel__content { display: none; padding: 4px 0 0; }
+    .collapse__checkbox:checked ~ .collapse__panel__header .collapse__indicator { transform: rotate(45deg); }
+    .collapse__checkbox:checked ~ .collapse__panel__content { display: block; } }
+  .my-volumio__form-group { margin-bottom: 24px; }
+  .my-volumio__border-round { border-radius: 4px; }
+  .d-flex { display: flex; } .d-block { display: block; } .d-inline-flex { display: inline-flex; }
+  .align-items-start { align-items: flex-start; } .align-items-center { align-items: center; }
+  .justify-content-between { justify-content: space-between; } .justify-content-end { justify-content: flex-end; }
+  .flex-spacer { flex: 1 1 100%; } .flex-shrink-0 { flex-shrink: 0; } .flex-grow-1 { flex-grow: 1; }
+  .mb-2 { margin-bottom: 8px; } .mb-4 { margin-bottom: 16px; } .mb-6 { margin-bottom: 24px; } .mb-10 { margin-bottom: 40px; } .mb-16 { margin-bottom: 64px; }
+  .mr-2 { margin-right: 8px; } .mr-4 { margin-right: 16px; }
+  .focus__helper { position: relative; &:after { position: absolute; display: none; content: ''; top: -3px; left: -3px; width: calc(100% + 6px); height: calc(100% + 6px); border: 1px dotted rgba(255, 255, 255, .6); border-radius: 4px; pointer-events: none; z-index: -1; }
+    &.round:after { border-radius: 13px; } &:focus { outline: none; &:after { display: block; } } }
+  @media (min-width: 768px) {
+    .my-volumio__panel { margin-left: 20px; margin-right: 20px; }
+    .my-volumio__toggle-header { display: flex; justify-content: space-between; text-align: left; .toggle-header__space { margin-bottom: 0; } }
+    .my-volumio__row-gutter > div[class*="col-"] { &:first-child:not(:last-child) { padding-right: 12px; } &:last-child:not(:first-child) { padding-left: 12px; } }
+    .my-volumio__plan-grid { display: flex; align-items: flex-start; justify-content: center; }
+    .omb_row-sm-offset-3 div:first-child[class*="col-"] { margin-left: 25%; }
+    .omb_login .omb_forgotPwd { text-align: right; margin-top: 10px; }
+  }
+  .omb_login .omb_authTitle { text-align: center; line-height: 300%; }
+  .omb_login .omb_loginForm .help-block { color: red; }
+  a#myvolumio-info { margin-top: 20px; font-size: 18px; }
+  a.btn.btn-outline.pull-right { margin-top: 18px; }
+  .plan-box, .myvolumio-current-plan-card .plans-table {
+    .panel { text-align: center; margin-top: 0 !important; }
+    .panel-body { padding: 0; text-align: center; }
+    .panel-footer { min-height: 5em; }
+    .the-price { min-height: 10em; padding: 20px; margin: 0; h1 { line-height: 1em; padding: 0; margin: 0; } }
+    .btn-label { position: relative; left: -12px; display: inline-block; padding: 6px 12px; background: rgba(0, 0, 0, .15); border-radius: 3px 0 0 3px; }
+    .btn-labeled { padding-top: 0; padding-bottom: 0; }
+    .btn { margin-bottom: 10px; } }
+  .myvolumio-current-plan-card .plans-table .the-price { min-height: 7em; }
+  .trial-text { text-transform: uppercase; font-weight: bold; }
+  td.myvolumio-feature { font-size: 10pt; padding: 6px; }
+  .avatar-image-box { .avatar-image { background-color: #fff; width: 100%; height: auto; display: block; padding-top: 100%; background-position: center; background-repeat: no-repeat; background-size: cover; }
+    .avatar-letter img { width: 100%; height: auto; } }
+}
+
+.aw-myv-logout { display: none; }   /* the phone profile's logout; the phone sheet shows it */
+
+/* --- the theme's sheet, verbatim (artwork-settings.scss) --- */
+body#artwork .myvolumio-card-container { background: transparent; border: 0; box-shadow: none; }
+
+/* ============================================================
+   MyVolumio account (mockup 2f-account) — Volumio's profile page restyled.
+   Scoped by the per-state wrapper class (aw-state-<state>) — CSSO-safe. Real blocks only:
+   avatar / name / email / Edit, Current plan card, devices table.
+   ============================================================ */
+body#artwork .aw-state-myvolumio-profile .box {
+  position: relative; padding: clamp(24px, 4.4vh, 40px) var(--pad-screen) 60px; background: transparent; border: 0; box-shadow: none;
+  /* Volumio wraps the profile and the device table in dark .panel-body boxes; the design is flat */
+  .panel, .panel-body, .panel-heading { background: transparent; border: 0; box-shadow: none; }
+
+  /* top row: mono eyebrow + Log out pill (mockup) */
+  .boxHeader { background: transparent; border: 0; padding: 0;
+    .title h2 { margin: 0; background: transparent; padding: 0; font-family: var(--font-mono); font-size: 11px;
+      letter-spacing: .2em; text-transform: uppercase; color: var(--ink-35); font-weight: 400; line-height: 36px; } }
+  #authLoginPlugin .panel-heading .btn-danger {
+    position: absolute; top: 40px; right: 52px; margin: 0;
+    display: inline-flex; align-items: center; gap: 9px; height: 36px; padding: 0 16px; border-radius: 18px;
+    background: transparent; border: 1px solid var(--fill-16); color: var(--ink-2); font-size: 14px; font-weight: 500; box-shadow: none;
+    .glyphicon { color: var(--ink-3); font-size: 15px; top: 0; }
+    &:hover { background: var(--fill-08); color: var(--ink); }
+  }
+  #authLoginPlugin.panel, #device-selector-container.panel { background: transparent; border: 0; box-shadow: none; margin: 0; }
+  #authLoginPlugin > .panel-heading { padding: 0; border: 0; background: transparent;
+    .panel-title { display: none; } }
+  #authLoginPlugin > .panel-body { padding: 0; }
+
+  /* profile: 196px avatar tile + name/email/actions, plan card on the right */
+  .my-profile { display: grid; grid-template-columns: 196px 1fr; gap: 44px; margin: 34px 0 0; align-items: start;
+    > [class*="col-"] { width: auto; float: none; padding: 0; } }
+  .avatar-image-box {
+    width: 196px; height: 196px; border-radius: var(--r-cover); display: grid; place-items: center;
+    background: linear-gradient(150deg, #8b7fc4, #5f5590); box-shadow: 0 34px 70px -24px var(--shadow-strong);
+    .avatar-letter { font-family: var(--font-ui); font-size: 104px; font-weight: 800; letter-spacing: -.04em; line-height: 1; color: var(--ink); }
+  }
+  .my-profile > div > .row { display: grid; grid-template-columns: 1fr 420px; gap: 44px; margin: 0;
+    > [class*="col-"] { width: auto; float: none; padding: 0; } }
+  .user-data { padding-top: 8px;
+    .user-title { margin: 0; font-family: var(--font-ui); font-size: 56px; font-weight: 800; letter-spacing: -.03em; line-height: 1.02; color: var(--ink); border: 0; padding: 0; }
+    .user-username { margin: 10px 0 0; font-size: 15px; color: var(--ink-dim); }
+    .user-details { margin: 18px 0 0; font-size: 16px; color: var(--ink-2); .glyphicon { color: var(--ink-muted); margin-right: 8px; } }
+    .btn { display: inline-flex; align-items: center; gap: 9px; height: 48px; padding: 0 22px; border-radius: 24px; margin-top: 22px;
+      background: var(--ink); color: var(--on-ink); border: 0; font-size: 15px; font-weight: 700; box-shadow: none;
+      .glyphicon, .fa { top: 0; color: var(--on-ink); } &:hover { background: var(--ink-1); color: var(--on-ink); } }
+  }
+
+  /* current plan card */
+  .myvolumio-current-plan-card .panel.panel-primary {
+    border-radius: 16px; padding: 24px 26px; background: var(--fill-06); border: 1px solid var(--fill-10); box-shadow: none; margin: 0;
+    .panel-heading { padding: 0; background: transparent; border: 0;
+      .panel-title { font-family: var(--font-mono); font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-muted); font-weight: 400; text-align: left;
+        .glyphicon { display: none; } } }
+    .panel-body { padding: 0; margin-top: 22px; background: transparent; font-family: var(--font-ui); font-size: 52px; font-weight: 800; letter-spacing: -.03em; line-height: 1; color: var(--ink); text-align: left; }
+    .panel-footer { padding: 0; margin-top: 22px; background: transparent; border: 0; border-top: 1px solid var(--fill-10); padding-top: 22px;
+      .btn { width: 100%; height: 48px; border-radius: 24px; background: var(--ink); color: var(--on-ink); border: 0; font-size: 15px; font-weight: 700; box-shadow: none;
+        display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+        .btn-label { background: transparent; color: var(--on-ink); padding: 0; position: static; } .glyphicon { top: 0; }
+        &:hover { background: var(--ink-1); } } }
+  }
+
+  /* activated devices */
+  #device-selector-container > .panel-heading { padding: 0 0 14px; margin-top: 46px; background: transparent; border: 0; border-bottom: 1px solid var(--fill-10);
+    .panel-title { font-family: var(--font-mono); font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-35); font-weight: 400; .fa { display: none; } } }
+  #device-selector-container > .panel-body { padding: 0; }
+  #device-selector-container table.table {
+    border-collapse: separate; border-spacing: 0 6px; margin: 4px 0 0; background: transparent;
+    th { border: 0; padding: 16px 14px 6px; font-family: var(--font-mono); font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-dim); font-weight: 400; }
+    td { border: 0; padding: 14px; background: var(--fill-06); font-size: 15px; color: var(--ink-1); vertical-align: middle;
+      &:first-child { border-radius: 12px 0 0 12px; font-weight: 600; } &:last-child { border-radius: 0 12px 12px 0; text-align: right; } }
+    .btn { width: 36px; height: 36px; padding: 0; border-radius: 50%; background: transparent; border: 1px solid var(--fill-16); color: var(--ink-3); box-shadow: none;
+      display: inline-grid; place-items: center; .fa, .glyphicon { top: 0; } &:hover { background: var(--fill-08); color: var(--ink); } }
+  }
+  /* the same 44×26 switch as the settings rows */
+  #device-selector-container .bootstrap-switch {
+    position: relative; width: 50px !important; height: 32px; border-radius: 13px; /* mockup: 44×26 + 3px padding, content-box → 50×32; radius stays 13 (not a full pill) */ border: 0; background: var(--fill-16); overflow: visible; box-shadow: none; margin-right: 44px;
+    /* the plugin binds its click/keyboard handlers on the inner label: keep it as an
+       invisible full-size hit layer; the pill itself is painted by ::before/::after */
+    .bootstrap-switch-container { position: absolute; inset: 0; width: 100% !important; margin: 0 !important; z-index: 1; overflow: visible; background: transparent; } /* visible: the focus ring sits 2px outside */
+    .bootstrap-switch-handle-on, .bootstrap-switch-handle-off { display: none !important; } /* vendor css: inline-block !important */
+    .bootstrap-switch-label { display: block; width: 100% !important; height: 100%; padding: 0; margin: 0; cursor: pointer;
+      background: transparent !important; border: 0; box-shadow: none; color: transparent; }
+    /* the real checkbox carries keyboard focus: show the ring only for :focus-visible */
+    input[type="checkbox"] { position: absolute !important; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 1; visibility: visible; z-index: 2;
+      appearance: none; -webkit-appearance: none; background: transparent; border: 0; border-radius: 16px; pointer-events: none;
+      &:focus-visible { outline: 2px solid var(--ink-1); outline-offset: 2px; } }
+    &::before { content: ''; position: absolute; top: 6px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: var(--ground); transition: left .15s ease; }
+    &::after { content: 'Off'; position: absolute; left: 62px; top: 50%; transform: translateY(-50%); font-size: 14px; color: var(--ink-dim); }
+    &.bootstrap-switch-on { background: var(--ink); &::before { left: 27px; } &::after { content: 'On'; color: var(--ink-1); } }
+  }
+}
+
+/* the core profile SCSS reverses the column placement (measured: the avatar column
+   landed in the 1fr track and the text column in the 196px one) — pin every cell */
+body#artwork .aw-state-myvolumio-profile .box {
+  .my-profile { direction: ltr;
+    > :first-child { grid-column: 1; grid-row: 1; order: 0; }
+    > :last-child  { grid-column: 2; grid-row: 1; order: 1; } }
+  .my-profile > div > .row { direction: ltr;
+    .user-data   { grid-column: 1; order: 0; }
+    .plans-table { grid-column: 2; order: 1; } }
+}
+/* measured: auto-placement put the two cells in different rows; the core pricing
+   table gives .the-price a fixed 364px box */
+body#artwork .aw-state-myvolumio-profile .box {
+  .my-profile > div > .row { .user-data, .plans-table { grid-row: 1; } }
+  .myvolumio-current-plan-card .the-price { height: auto; min-height: 0; padding: 0; margin: 0; line-height: 1; font-size: inherit; background: transparent; box-shadow: none; /* core pricing css draws a grey frame with box-shadow */ border: 0; }
+}
+/* avatar initial: ng-letter-avatar draws a 50px canvas image; render the real
+   initial (data-initial, additive attribute on the core template) crisply instead */
+body#artwork .aw-state-myvolumio-profile .box .avatar-letter {
+  width: 100%; height: 100%; display: grid; place-items: center;
+  img, ng-letter-avatar { display: none; }
+  &::before { content: attr(data-initial); text-transform: uppercase; font-family: var(--font-ui);
+    font-size: 104px; font-weight: 800; letter-spacing: -.04em; line-height: 1; color: var(--ink); }
+}
+/* measured: the core pricing-table styles still win on the card surface and paint the
+   footer divider pure white — pin both */
+body#artwork .aw-state-myvolumio-profile .box .myvolumio-current-plan-card .panel.panel-primary {
+  background: var(--fill-06) !important; border: 1px solid var(--fill-10) !important;
+  .panel-footer { border-top-color: var(--fill-10) !important; }
+}
+
+/* ============================================================
+   MyVolumio — Edit profile (theme template): page head, 196px avatar tile, settings rows
+   (label · 300px control), key/value card, pills. Same tokens as the profile page.
+   ============================================================ */
+@keyframes aw-spin { to { transform: rotate(360deg); } }
+body#artwork .aw-state-myvolumio-edit-profile .box { padding: 0; background: transparent; border: 0; box-shadow: none; }
+body#artwork .aw-pe {
+  padding: clamp(24px, 4.4vh, 40px) var(--pad-screen) 60px; color: var(--ink-1);
+  /* .aw-head is fixed (see head.scss); its own spacer reserves the bar's height, this adds the
+     extra breathing room this page wants above its title */
+  &__title { margin: 26px 0 0; font-family: var(--font-ui); font-size: var(--t-h1); font-weight: 800; letter-spacing: -.03em; line-height: 1; color: var(--ink); }
+  &__grid { display: grid; grid-template-columns: 196px 1fr; gap: 44px; margin-top: 34px; align-items: start; }
+  &__avatar { display: flex; flex-direction: column; gap: 12px;
+    .avatar-image-box { width: 196px; height: 196px; border-radius: var(--r-cover); display: grid; place-items: center; overflow: hidden;
+      background: linear-gradient(150deg, #8b7fc4, #5f5590); box-shadow: 0 34px 70px -24px var(--shadow-strong);
+      .avatar-image { width: 196px; height: 196px; border-radius: 0; background-size: cover; background-position: center; }
+      .avatar-letter { font-family: var(--font-ui); font-size: 104px; font-weight: 800; letter-spacing: -.04em; line-height: 1; color: var(--ink);
+        &::before { content: attr(data-initial); } ng-letter-avatar { display: none; } } }
+    .aw-btn { width: 100%; justify-content: center; white-space: nowrap; padding: 0 12px; gap: 8px; } }
+  &__file { position: relative; overflow: hidden; margin: 0; font-weight: 600; cursor: pointer;
+    input[type="file"] { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; } }
+  &__form { min-width: 0; }
+  &__eyebrow { font-size: 11px; letter-spacing: .18em; color: var(--ink-35); padding-bottom: 12px; border-bottom: 1px solid var(--fill-10); }
+  &__note { display: flex; align-items: center; gap: 9px; margin: 14px 0 0; font-size: 13px; color: var(--ink-dim); }
+  &__note-dot { width: 5px; height: 5px; background: rgba(255, 255, 255, .5); flex: none; }
+  /* settings row: label · 300px control */
+  &__row { display: grid; grid-template-columns: 1fr minmax(180px, 300px); align-items: center; gap: 24px; padding: 18px 0; margin: 0; border-bottom: 1px solid var(--fill-05); font-weight: 400; cursor: default; }
+  &__label { font-size: 16px; font-weight: 600; color: var(--ink-1); }
+  &__row input.form-control { height: 42px; border-radius: 11px; background: var(--fill-08); border: 1px solid var(--fill-13); color: var(--ink); font-size: 15px; box-shadow: none; padding: 0 14px;
+    &:focus { border-color: var(--fill-30); box-shadow: none; outline: none; }
+    &::placeholder { color: var(--ink-dim); } }
+  &__actions { display: flex; justify-content: flex-end; margin-top: 18px; }
+  &__section { margin-top: 44px; }
+  &__kv { margin-top: 18px; }
+  &__sub-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 18px; }
+  &__link { font-size: 13px; font-weight: 500; color: var(--ink-3); text-decoration: none; border-bottom: 1px solid rgba(255, 255, 255, .25); &:hover { color: var(--ink); text-decoration: none; } }
+  &__spacer { flex: 1; }
+  &__danger { display: flex; justify-content: flex-end; padding-top: 26px; border-top: 1px solid var(--fill-10); }
+  /* pills: same metrics as the settings mixin (outline 42 / primary 40, danger in the error tone) */
+  .aw-btn { height: 42px; padding: 0 20px; font-size: 13px; font-weight: 500; color: var(--ink-2); background: transparent; border: 1px solid var(--fill-18);
+    .material-symbols-rounded { font-size: 20px; } &:hover { background: var(--fill-08); color: var(--ink); } }
+  .aw-btn--primary { height: 40px; border: 0; background: var(--ink); color: var(--on-ink); font-weight: 700; &:hover { background: var(--ink-1); color: var(--on-ink); } }
+  .aw-btn--danger { color: var(--err); border-color: var(--err-line);
+    .material-symbols-rounded { color: var(--err); } &:hover { background: var(--err-wash); color: var(--err); } }
+  .aw-spin { animation: aw-spin 1s linear infinite; }
+  &--login { .aw-pe__note { margin: 34px 0 18px; font-size: 15px; color: var(--ink-muted); } }
+}
+
+/* ============================================================
+   MyVolumio access (login / signup) — Volumio's page in the theme's idiom: eyebrow, 46/800
+   title, two cards with a pill each, social buttons as outline pills.
+   ============================================================ */
+body#artwork .aw-state-myvolumio-access .box {
+  position: relative; padding: clamp(24px, 4.4vh, 40px) var(--pad-screen) 60px; background: transparent; border: 0; box-shadow: none; color: var(--ink-1);
+  .panel, .panel-body, .panel-heading { background: transparent; border: 0; box-shadow: none; padding: 0; margin: 0; }
+  .boxHeader { background: transparent; border: 0; padding: 0; display: flex; align-items: center; justify-content: space-between;
+    .title { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+    .title h2 { margin: 0; background: transparent; padding: 0; font-family: var(--font-mono); font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-35); font-weight: 400; line-height: 36px; }
+    #myvolumio-info { float: none; display: inline-flex; align-items: center; gap: 9px; height: 36px; padding: 0 16px; border-radius: 18px; margin: 0;
+      background: transparent; border: 1px solid var(--fill-16); color: var(--ink-2); font-size: 14px; font-weight: 500; box-shadow: none; text-decoration: none;
+      .fa { color: var(--ink-3); } &:hover { background: var(--fill-08); color: var(--ink); } } }
+  #authLoginPlugin > .panel-heading { display: none; }
+  .omb_login { margin-top: 34px; }
+  .omb_authTitle { margin: 0 0 22px; font-family: var(--font-ui); font-size: var(--t-h1); font-weight: 800; letter-spacing: -.03em; line-height: 1; color: var(--ink); text-align: left; }
+  .omb_socialButtons { display: flex; gap: 10px; margin: 0 0 22px; > [class*="col-"] { width: auto; float: none; padding: 0; margin: 0; }
+    .btn { display: inline-flex; align-items: center; gap: 9px; height: 42px; padding: 0 18px; border-radius: 21px; margin: 0; background: transparent; border: 1px solid var(--fill-18); color: var(--ink-2); font-size: 13px; font-weight: 500; box-shadow: none; text-shadow: none;
+      &:hover { background: var(--fill-08); color: var(--ink); } } }
+  .omb_loginOr { display: flex; align-items: center; gap: 12px; margin: 0 0 22px; > [class*="col-"] { width: auto; float: none; padding: 0; margin: 0; }
+    .omb_hrOr { display: none; } .omb_spanOr { position: static; background: transparent; padding: 0; font-family: var(--font-mono); font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-dim); } }
+  /* the two choices: cards side by side */
+  .omb_login + .row, #authLoginPlugin .panel-body > .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 16px; margin: 0;
+    > [class*="col-"] { width: auto; float: none; padding: 0; margin: 0 !important; } }
+  .well { margin: 0; padding: 22px 24px; border-radius: 16px; background: var(--fill-06); border: 1px solid var(--fill-10); box-shadow: none;
+    .lead { margin: 0 0 16px; font-size: 16px; font-weight: 500; color: var(--ink-2); }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 9px; width: 100%; height: 44px; border-radius: 22px; margin: 0; box-shadow: none; font-size: 14px; font-weight: 700;
+      .glyphicon { top: 0; } }
+    .btn-success { background: var(--ink); color: var(--on-ink); border: 0; .glyphicon { color: var(--on-ink); } &:hover { background: var(--ink-1); color: var(--on-ink); } }
+    .btn-primary, .btn-info, .btn-default { background: transparent; color: var(--ink-2); border: 1px solid var(--fill-18); font-weight: 600; &:hover { background: var(--fill-08); color: var(--ink); } } }
+}
+
+/* ============================================================
+   MyVolumio login / signup / password recovery — Volumio's pages in the theme's idiom
+   (same as Access): mono eyebrow + outline pill, 46/800 title, a 480px form column,
+   inputs like the settings inputs, white primary pill, outline secondary pills.
+   ============================================================ */
+body#artwork .aw-state-myvolumio-login .box, body#artwork .aw-state-myvolumio-signup .box, body#artwork .aw-state-myvolumio-recover-password .box {
+  position: relative; padding: clamp(24px, 4.4vh, 40px) var(--pad-screen) 60px; background: transparent; border: 0; box-shadow: none; color: var(--ink-1);
+  .panel, .panel-body, .panel-heading, .well { background: transparent; border: 0; box-shadow: none; padding: 0; margin: 0; }
+  .boxHeader { background: transparent; border: 0; padding: 0; margin: 0 0 28px;
+    .title { display: flex; align-items: center; justify-content: space-between; }
+    .title h2 { margin: 0; background: transparent; padding: 0; font-family: var(--font-mono); font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-35); font-weight: 400; line-height: 36px; } }
+  #authLoginPlugin > .panel-heading { display: none; }
+  /* outline pills (What is MyVolumio, Signup ⇄ Login) */
+  #myvolumio-info, .btn-outline { float: none; display: inline-flex; align-items: center; gap: 9px; height: 36px; padding: 0 16px; border-radius: 18px; margin: 0;
+    background: transparent; border: 1px solid var(--fill-16); color: var(--ink-2); font-size: 14px; font-weight: 500; box-shadow: none; text-decoration: none; cursor: pointer;
+    .fa { color: var(--ink-3); margin: 0; } &:hover { background: var(--fill-08); color: var(--ink); } }
+  /* the form column */
+  .row { margin: 0; }
+  [class*="col-"] { float: none; width: auto; padding: 0; margin-left: 0 !important; }
+  .omb_login { max-width: 480px; margin: 0 auto; display: flex; flex-direction: column; }
+  .omb_login > .btn-outline, .omb_login > .d-flex { align-self: flex-end; order: -1; margin-bottom: 18px; }
+  .omb_authTitle { margin: 0 0 22px; font-family: var(--font-ui); font-size: var(--t-h1); font-weight: 800; letter-spacing: -.03em; line-height: 1; color: var(--ink); text-align: left; }
+  .omb_socialButtons { display: flex; gap: 10px; margin: 0 0 18px;
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 42px; padding: 0 16px; border-radius: 21px; margin: 0; background: transparent; border: 1px solid var(--fill-18); color: var(--ink-2); font-size: 13px; font-weight: 500; box-shadow: none; text-shadow: none; &:hover { background: var(--fill-08); } } }
+  .omb_loginOr { display: flex; align-items: center; margin: 0 0 18px; .omb_hrOr { display: none; } .omb_spanOr { position: static; background: transparent; padding: 0; font-family: var(--font-mono); font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-dim); } }
+  .input-group { display: block; width: 100%; .input-group-addon { display: none; } .form-control { float: none; position: relative; } } /* Bootstrap floats the input: the group had no height */
+  .help-block { display: block; height: 12px; margin: 0; overflow: hidden; }
+  .form-group, .my-volumio__form-group { margin: 0 0 12px; }
+  .row::before, .row::after { display: none; } /* Bootstrap clearfix pseudo-elements become grid items */
+  .my-volumio__row-gutter { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 0 12px; }
+  input.form-control, .my-volumio__text-input { height: 44px; border-radius: 11px !important; background: var(--fill-08); border: 1px solid var(--fill-13); color: var(--ink); font-size: 15px; box-shadow: none; padding: 0 14px; width: 100%;
+    &:focus { border-color: var(--fill-30); box-shadow: none; outline: none; } &::placeholder { color: var(--ink-dim); } }
+  /* primary action */
+  input[type="submit"].btn, .btn-success, .my-volumio__btn-primary { display: flex; align-items: center; justify-content: center; width: 100%; height: 46px; margin: 8px 0 0; border-radius: 23px !important; border: 0;
+    background: var(--ink); color: var(--on-ink); font-size: 15px; font-weight: 700; box-shadow: none; text-shadow: none; &:hover { background: var(--ink-1); color: var(--on-ink); } &.disabled { opacity: .6; } }
+  .omb_forgotPwd { margin: 14px 0 0; text-align: right; a { font-size: 13px; font-weight: 500; color: var(--ink-3); border-bottom: 1px solid rgba(255, 255, 255, .25); text-decoration: none; &:hover { color: var(--ink); } } }
+  .checkbox.hidden { display: none; }
+  /* signup: intro card, consent checkboxes */
+  .my-volumio__info-card { margin: 0 0 18px; padding: 16px 18px; border-radius: 14px; background: var(--fill-06); border: 1px solid var(--fill-10); font-size: 14px; line-height: 1.5; color: var(--ink-3);
+    a { color: var(--ink); font-weight: 600; cursor: pointer; text-decoration: none; border-bottom: 1px solid var(--fill-30); } }
+  .mb-2, .mb-10 { margin-bottom: 10px; }
+  .d-flex { display: flex; } .align-items-start { align-items: flex-start; gap: 10px; }
+  .button-checkbox { flex: none; }
+  .my-volumio__fake-checkbox { width: 20px; height: 20px; margin: 1px 0 0; border-radius: 6px; border: 1px solid var(--fill-30); background: transparent; display: grid; place-items: center; cursor: pointer;
+    .my-volumio__fake-checkbox__tick { display: none; img { width: 12px; filter: invert(1); } } }
+  .my-volumio__checkbox:checked + .my-volumio__fake-checkbox { background: var(--ink); border-color: var(--ink); .my-volumio__fake-checkbox__tick { display: block; } }
+  .align-items-start > div:last-child { font-size: 13px; line-height: 1.5; color: var(--ink-3); .label { background: transparent; padding: 0; font-size: 13px; a { color: var(--ink); font-weight: 600; } } }
+  /* signup step 2: plan choice */
+  .my-volumio__toggle-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 18px;
+    h3 { margin: 0; font-family: var(--font-ui); font-size: 28px; font-weight: 800; letter-spacing: -.02em; color: var(--ink); } }
+  .my-volumio__toggle .toggle__labels { display: flex; gap: 4px; padding: 4px; border-radius: 12px; background: var(--fill-08); border: 1px solid var(--fill-11);
+    .toggle__label-text { height: 32px; padding: 0 14px; border-radius: 8px; display: grid; place-items: center; margin: 0; font-size: 13px; font-weight: 500; color: var(--ink-muted); cursor: pointer; } }
+  #yearly:checked ~ .toggle__labels label[for="yearly"], #monthly:checked ~ .toggle__labels label[for="monthly"] { background: var(--ink); color: var(--on-ink); }
+  .my-volumio__plan-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 14px; max-width: 900px; margin: 0 auto 20px; }
+  .plan__item { margin: 0; cursor: pointer; }
+  .plan__card { height: 100%; padding: 20px 22px; border-radius: 16px; background: var(--fill-06); border: 1px solid var(--fill-10); color: var(--ink-2); }
+  .plan__checkbox:checked + .plan__card { border-color: var(--ink); background: var(--fill-10); }
+  .plan__title { font-size: 17px; font-weight: 700; color: var(--ink); gap: 10px; }
+  .plan__fake-radio { width: 20px; height: 20px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, .35); display: grid; place-items: center; img { width: 12px; display: none; filter: invert(1); } }
+  .plan__checkbox:checked + .plan__card .plan__fake-radio { background: var(--ink); border-color: var(--ink); img { display: block; } }
+  .plan__trial { margin-top: 14px; font-family: var(--font-mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--ok); }
+  .plan__price { margin-top: 6px; font-family: var(--font-ui); font-size: 34px; font-weight: 800; letter-spacing: -.02em; color: var(--ink); }
+  .plan__period { font-size: 13px; color: var(--ink-dim); }
+  .plan__features { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--fill-09); display: flex; flex-direction: column; gap: 8px; }
+  .plan__feature { font-size: 13px; color: var(--ink-3); }
+  .collapse__panel__header { display: flex; align-items: center; gap: 8px; margin: 12px 0 0; font-size: 13px; font-weight: 500; color: var(--ink-3); cursor: pointer; img { filter: invert(1); width: 12px; } }
+  /* recovery: the nested boxes flatten into the same column */
+  .container { width: auto; max-width: 480px; margin: 0 auto; padding: 0; }
+  .text-center { text-align: left; }
+  .text-center h3 .fa-lock { display: none; }
+  .text-center h2 { margin: 0 0 10px; font-family: var(--font-ui); font-size: var(--t-h1); font-weight: 800; letter-spacing: -.03em; line-height: 1; color: var(--ink); }
+  .panel-body > p, .text-center > p { font-size: 14px; color: var(--ink-muted); margin: 0 0 18px; }
+  my-volumio-back-button { display: block; margin: 0 0 18px; a { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 16px; border-radius: 18px; background: transparent; border: 1px solid var(--fill-16); color: var(--ink-2); font-size: 14px !important; font-weight: 500; text-decoration: none;
+    .glyphicon { top: 0; font-size: 13px; color: var(--ink-3); } &:hover { background: var(--fill-08); color: var(--ink); } } }
+  .panel-body > my-volumio-back-button + p { margin: 0 0 22px; }
+}
+
+/* ============================================================
+   MyVolumio plans — the theme's own template (Monthly | Yearly segments on the same model)
+   in the auth pages' idiom: back pill, 46/800 title, the signup plan step's segmented control
+   and glass plan cards.
+   ============================================================ */
+body#artwork .aw-state-myvolumio-plans .box {
+  position: relative; padding: clamp(24px, 4.4vh, 40px) var(--pad-screen) 60px; background: transparent; border: 0; box-shadow: none; color: var(--ink-1);
+  .aw-plans { max-width: 960px; margin: 0 auto; }
+  my-volumio-back-button { display: block; margin: 0 0 18px; a { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 16px; border-radius: 18px; background: transparent; border: 1px solid var(--fill-16); color: var(--ink-2); font-size: 14px !important; font-weight: 500; text-decoration: none;
+    .glyphicon { top: 0; font-size: 13px; color: var(--ink-3); } &:hover { background: var(--fill-08); color: var(--ink); } } }
+  .aw-plans__head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; margin: 0 0 24px; }
+  .aw-plans__title { margin: 0; font-family: var(--font-ui); font-size: var(--t-h1); font-weight: 800; letter-spacing: -.03em; line-height: 1; color: var(--ink); }
+  /* the signup plan step's Monthly/Yearly toggle */
+  .aw-plans__seg { display: inline-flex; gap: 4px; padding: 4px; border-radius: 12px; background: var(--fill-08); border: 1px solid var(--fill-11);
+    button { height: 32px; padding: 0 14px; border: 0; border-radius: 8px; background: transparent; font-size: 13px; font-weight: 500; color: var(--ink-muted); cursor: pointer;
+      &:hover { color: var(--ink); } &:focus-visible { outline: 2px solid var(--ink-1); outline-offset: 2px; }
+      &.is-on { background: var(--ink); color: var(--on-ink); } } }
+  .aw-plans__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 16px; align-items: stretch; }
+}
+
+/* Volumio's plan card (plans, subscribe, change and cancel subscription): a glass card with
+   the price, the trial line, a hairline feature list and full-width pills in the foot */
+body#artwork my-volumio-plan-card { display: block; min-width: 0; }
+body#artwork my-volumio-plan-card .plan-box {
+  height: 100%;
+  .panel { display: flex; flex-direction: column; height: 100%; margin: 0 !important; border-radius: 16px; background: var(--fill-06); border: 1px solid var(--fill-10); box-shadow: none; text-align: left; overflow: hidden; color: var(--ink-2);
+    &:hover { box-shadow: none; } }
+  .panel > .panel-heading { padding: 22px 22px 0; background: transparent; border: 0; color: var(--ink);
+    .panel-title { font-family: var(--font-ui); font-size: 17px; font-weight: 700; letter-spacing: 0; text-transform: none; color: var(--ink); } }
+  .panel-body { flex: 1 1 auto; padding: 0 22px; text-align: left; background: transparent; border: 0; }
+  .the-price { min-height: 0; height: auto; margin: 0; padding: 6px 0 0; background: transparent; box-shadow: none; border: 0; font-size: 13px; color: var(--ink-dim);
+    h1 { margin: 0 0 6px; padding: 0; font-family: var(--font-ui); font-size: 40px; font-weight: 800; letter-spacing: -.02em; line-height: 1.05; color: var(--ink); }
+    span { font-size: 13px !important; color: var(--ink-dim); } /* inline font-size: small */
+    br { display: none; } }
+  .trial-text { margin: 12px 0 0; font-family: var(--font-mono); font-size: 10px; font-weight: 400; letter-spacing: .14em; text-transform: uppercase; color: var(--ok); }
+  table.table { margin: 16px 0 0; background: transparent; border-top: 1px solid var(--fill-09);
+    tr, tr.active { background: transparent; }
+    tr > td, tr.active > td { padding: 10px 0; border: 0; border-bottom: 1px solid var(--fill-06); background: transparent; font-size: 13px; line-height: 1.4; color: var(--ink-3); }
+    tr:last-child > td { border-bottom: 0; } }
+  .panel-footer { min-height: 0; padding: 18px 22px 22px; background: transparent; border: 0; color: var(--ink-2);
+    > div { display: flex; flex-direction: column; gap: 10px; }
+    > div:empty { display: none; } }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 9px; width: 100%; height: 44px; padding: 0 18px; margin: 0; border-radius: 22px; box-shadow: none; text-shadow: none; font-size: 14px; font-weight: 700; white-space: normal; line-height: 1.2;
+    .glyphicon, .fa { top: 0; font-size: 12px; } &[disabled], &.disabled { opacity: .45; } }
+  .btn-label { position: static; left: auto; display: inline-flex; padding: 0; background: transparent; border-radius: 0; }
+  .btn-success, .btn-primary { background: var(--ink); color: var(--on-ink); border: 0; &:hover, &:focus { background: var(--ink-1); color: var(--on-ink); } }
+  .btn-default { background: transparent; color: var(--ink-2); border: 1px solid var(--fill-18); font-weight: 600; &:hover, &:focus { background: var(--fill-08); color: var(--ink); } }
+}
+
+/* ============================================================
+   MyVolumio subscription flow — subscribe, change and cancel subscription, payment
+   success and fail. Volumio's pages, styled in place: back pill, the panel heading as the
+   mono eyebrow, the page's own h3 as the 46/800 title, one 560px column with the card.
+   ============================================================ */
+body#artwork .aw-state-myvolumio-subscribe .box, body#artwork .aw-state-myvolumio-change-subscription .box, body#artwork .aw-state-myvolumio-cancel-subscription .box,
+body#artwork .aw-state-myvolumio-payment-success .box, body#artwork .aw-state-myvolumio-payment-fail .box {
+  position: relative; padding: clamp(24px, 4.4vh, 40px) var(--pad-screen) 60px; background: transparent; border: 0; box-shadow: none; color: var(--ink-1);
+  > .boxHeader { display: none; } /* a second "MyVolumio" label: the panel heading is the eyebrow */
+  /* flatten the page panel; its body and the ng-if wrapper join one column so the back pill
+     can sit above the eyebrow */
+  > .panel { display: flex; flex-direction: column; align-items: stretch; max-width: 560px; margin: 0 auto; padding: 0; background: transparent; border: 0; box-shadow: none; }
+  > .panel > .panel-body, > .panel > .panel-body > div { display: contents; }
+  > .panel > .panel-heading { order: -1; margin: 0 0 12px; padding: 0; background: transparent; border: 0;
+    .panel-title { font-family: var(--font-mono); font-size: 11px; font-weight: 400; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-35); .fa { display: none; } } }
+  my-volumio-back-button { order: -2; align-self: flex-start; display: block; margin: 0 0 22px;
+    a { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 16px; border-radius: 18px; background: transparent; border: 1px solid var(--fill-16); color: var(--ink-2); font-size: 14px !important; font-weight: 500; text-decoration: none;
+      .glyphicon { top: 0; font-size: 13px; color: var(--ink-3); } &:hover { background: var(--fill-08); color: var(--ink); } } }
+  > .panel > .panel-body > h3, > .panel > .panel-body > div > h3 { margin: 0 0 14px !important; /* inline 16px */ font-family: var(--font-ui); font-size: var(--t-h1); font-weight: 800; letter-spacing: -.03em; line-height: 1.02; color: var(--ink); }
+  > .panel > .panel-body > div > p { margin: 0 0 24px; font-size: 14px; line-height: 1.5; color: var(--ink-muted); }
+  > .panel > .panel-body > h4, > .panel > .panel-body > div > h4 { margin: 0 0 12px; font-family: var(--font-ui); font-size: 15px; font-weight: 500; line-height: 1.45; color: var(--ink-3); }
+  > .panel > .panel-body > div > h4.badged-block { margin: 6px 0 20px; font-weight: 600; color: var(--ink-2); /* inline text: "Current plan:" keeps its colon */
+    .badge { margin-left: 8px; vertical-align: 1px; padding: 5px 11px; border-radius: 999px; background: var(--fill-10); color: var(--ink); font-family: var(--font-mono); font-size: 11px; font-weight: 400; letter-spacing: .14em; } }
+  > .panel > .panel-body br { display: none; }
+  /* stand-alone actions (retry, log in, retry payment) */
+  > .panel > .panel-body > .btn, > .panel > .panel-body > div > .btn { align-self: flex-start; display: inline-flex; align-items: center; justify-content: center; height: 46px; padding: 0 24px; margin: 12px 0 0; border-radius: 23px; border: 0;
+    background: var(--ink); color: var(--on-ink); font-size: 15px; font-weight: 700; box-shadow: none; text-shadow: none; &:hover { background: var(--ink-1); color: var(--on-ink); } }
+  my-volumio-plan-card { margin-top: 4px; }
+  /* payment success: the current plan card, same surface as the plan cards */
+  .myvolumio-current-plan-card { margin-top: 10px;
+    .plans-table { width: auto; min-width: 0; margin: 0; padding: 0; }
+    .panel.panel-primary { margin: 0; border-radius: 16px; background: var(--fill-06) !important; border: 1px solid var(--fill-10) !important; box-shadow: none; overflow: hidden; text-align: left; }
+    .panel-heading { padding: 22px 22px 0; background: transparent; border: 0;
+      .panel-title { font-family: var(--font-mono); font-size: 11px; font-weight: 400; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-35); } }
+    .panel-body { padding: 10px 22px 0; background: transparent; text-align: left; }
+    .the-price { min-height: 0; height: auto; margin: 0; padding: 0; background: transparent; box-shadow: none; border: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; text-align: left;
+      h1 { margin: 0; font-family: var(--font-ui); font-size: 40px; font-weight: 800; letter-spacing: -.02em; line-height: 1.05; color: var(--ink); }
+      small { font-size: 13px; color: var(--ink-dim); } }
+    .panel-footer { padding: 18px 22px 22px; background: transparent; border: 0; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 9px; width: 100%; height: 44px; padding: 0 18px; margin: 0; border-radius: 22px; border: 0; background: var(--ink); color: var(--on-ink); font-size: 14px; font-weight: 700; box-shadow: none;
+      .btn-label { position: static; padding: 0; background: transparent; } .glyphicon { top: 0; font-size: 12px; } &:hover { background: var(--ink-1); color: var(--on-ink); } }
+  }
+}
+
+/* the Paddle button inside a plan card: coupon disclosure and field in the theme's idiom */
+body#artwork my-volumio-plan-card paddle-pay-button {
+  display: flex; flex-direction: column; gap: 12px;
+  .collapse__panel { margin: 0; }
+  .collapse__panel__header { display: inline-flex; align-items: center; gap: 8px; margin: 0; font-size: 13px; font-weight: 500; color: var(--ink-3); cursor: pointer;
+    img { width: 12px; margin: 0; filter: brightness(0) invert(1); opacity: .7; } &:hover { color: var(--ink); }
+    border-radius: 8px; &:focus { outline: none; } &:focus-visible { outline: 2px solid var(--ink-1); outline-offset: 3px; }
+    &::after { display: none !important; } /* core .focus__helper: a dotted frame on every focus, mouse included */ }
+  .collapse__panel__content .form-group { margin: 10px 0 0; }
+  input.form-control { height: 44px; border-radius: 11px !important; background: var(--fill-08); border: 1px solid var(--fill-13); color: var(--ink); font-size: 15px; box-shadow: none; padding: 0 14px; width: 100%;
+    &:focus { border-color: var(--fill-30); box-shadow: none; outline: none; } &::placeholder { color: var(--ink-dim); } }
+}
+/* the price's heading keeps the frame's 1em line (React's own body#artwork h1 rule would otherwise outrank the frame's .the-price h1) */
+body#artwork [class*="aw-state-myvolumio-"] .the-price h1 { line-height: 1em; }
+
+/* the screens hand their top padding to the head (artwork-page-head.scss) */
+body#artwork .aw-pe { padding-top: 0; --head-pad: clamp(24px, 4.4vh, 40px); }
+/* settings rows: label above the control when the row is narrow (artwork-fluid.scss) */
+@media (max-width: 640px) {
+  body#artwork .aw-pe__row { grid-template-columns: 1fr !important; row-gap: 10px !important; }
+  body#artwork .aw-pe__grid, body#artwork .my-profile { grid-template-columns: 1fr !important; }
+}
+
+
+/* --- the phone (artwork-fluid.scss) --- */
+body#artwork .myvolumio-card-container.visible-xs { display: none !important; }
+@media (max-width: 700px) and (orientation: portrait) {
+  html body#artwork .aw-state-myvolumio-profile .box, html body#artwork .aw-state-myvolumio-access .box, html body#artwork .aw-state-myvolumio-login .box, html body#artwork .aw-state-myvolumio-signup .box, html body#artwork .aw-state-myvolumio-recover-password .box, html body#artwork .aw-state-myvolumio-plans .box, html body#artwork .aw-state-myvolumio-subscribe .box, html body#artwork .aw-state-myvolumio-change-subscription .box, html body#artwork .aw-state-myvolumio-cancel-subscription .box, html body#artwork .aw-state-myvolumio-payment-success .box, html body#artwork .aw-state-myvolumio-payment-fail .box { padding: calc(var(--phone-top) + 56px) 20px calc(var(--mini-h) + 20px); }
+  body#artwork .aw-state-myvolumio-login .box .omb_socialButtons, body#artwork .aw-state-myvolumio-signup .box .omb_socialButtons { flex-wrap: wrap; }
+  body#artwork .aw-state-myvolumio-profile .box #authLoginPlugin .panel-heading .btn-danger { top: calc(var(--phone-top) + 56px); right: 20px; }
+  body#artwork .aw-state-myvolumio-profile .box .my-profile { grid-template-columns: 1fr !important; gap: 20px; margin-top: 20px; }
+  body#artwork .aw-state-myvolumio-profile .box .my-profile > :last-child { grid-column: 1 !important; grid-row: auto !important; } /* desktop pins it to column 2 */
+  body#artwork .aw-state-myvolumio-profile .box .my-profile > div > .row { grid-template-columns: 1fr !important; gap: 20px; }
+  body#artwork .aw-state-myvolumio-profile .box .my-profile > div > .row .plans-table, body#artwork .aw-state-myvolumio-profile .box .my-profile > div > .row .user-data { grid-column: 1 !important; grid-row: auto !important; }
+  body#artwork .aw-state-myvolumio-profile .box .avatar-image-box { width: 120px; height: 120px; .avatar-letter { font-size: 64px; } }
+  body#artwork .aw-state-myvolumio-profile .box .myvolumio-current-plan-card, body#artwork .aw-state-myvolumio-profile .box .plans-table, body#artwork .aw-state-myvolumio-profile .box .plans-table .panel { width: auto !important; min-width: 0 !important; max-width: 100%; }
+  body#artwork .aw-state-myvolumio-profile .box .myvolumio-current-plan-card .panel.panel-primary .panel-body { font-size: 32px; }
+  body#artwork .aw-state-myvolumio-profile .box .user-data .user-title { font-size: 30px; }
+  body#artwork .aw-state-myvolumio-profile .box .user-data .btn { float: none; display: inline-flex; margin-top: 14px; }
+  body#artwork .aw-pe { padding: var(--phone-top) 20px calc(var(--mini-h) + 20px); }
+  body#artwork .aw-pe__title { margin-top: 18px; }
+  body#artwork .aw-pe__title { font-size: 24px; letter-spacing: -.02em; }
+  body#artwork .aw-pe__grid { margin-top: 20px; gap: 20px; }
+  body#artwork .aw-pe__avatar .avatar-image-box { width: 120px; height: 120px; .avatar-letter { font-size: 64px; } }
+  body#artwork .aw-pe__avatar .aw-btn { width: auto; align-self: flex-start; }
+}
+body#artwork .aw-menu-btn--float { display: none; }
+@media (max-width: 700px) and (orientation: portrait) {
+  body#artwork .aw-menu-btn--float { top: var(--phone-top); }   /* the later rule below wins, as in the frame sheet */
+  body#artwork .aw-menu-btn--float { display: grid; place-items: center; position: fixed; top: calc(14px + var(--sa-t)); left: 20px; z-index: 5; border: 0; background: transparent; padding: 0; color: var(--ink-2); cursor: pointer; height: 44px; width: 32px; .material-symbols-rounded { font-size: 24px; } }
+}
+/* the phone head: measured, the page-head rule outranks the fluid padding there (order) */
+@media (max-width: 700px) and (orientation: portrait) {
+  body#artwork .aw-pe { --head-pad: var(--phone-top); }
+  body#artwork .aw-pe { padding-top: 0; }
+}

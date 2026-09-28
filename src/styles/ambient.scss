@@ -1,0 +1,220 @@
+/* Ambient — the display's resting state (handoff 5a–5g).
+   The frames were drawn at 800×480, 1024×600, 1280×800 and 1920×1080; every size below is the
+   line through those four points, so the screen scales with the panel instead of snapping:
+     cover 250/320/420/560   = 52vh          title 34/44/64/92  ≈ 7.6vh (≥ 28px on 480)
+     pad   48/62/96/140      ≈ 7vw           clock 72/76/88/132 ≈ 12vh  (≥ 72px on 480)
+     gap   40/52/76/104      ≈ 5.4vw         blur  70/80/90/110 ≈ 5.7vw
+   Dark: cover blur at .9, saturate 1.5 under a .44→.62→.84 ground gradient.
+   Light: blur at .34, saturate 1.1 under a .72→.85→.94 paper veil, so a bright sleeve cannot
+   glow on paper. */
+
+body#artwork .aw-amb {
+  --amb-pad: clamp(48px, 7vw, 140px);
+  --amb-gap: clamp(40px, 5.4vw, 104px);
+  --amb-cover: 52vh;
+  --amb-blur: clamp(70px, 5.7vw, 110px);
+  --amb-ink: var(--ink-1);
+  --amb-ink-2: var(--ink-2);
+  --amb-ink-3: var(--ink-3);
+  --amb-veil-0: rgba(6, 8, 10, .44);
+  --amb-veil-1: rgba(6, 8, 10, .62);
+  --amb-veil-2: rgba(6, 8, 10, .84);
+  --amb-bg-opacity: .9;
+  --amb-bg-sat: 1.5;
+  --amb-pill-fill: rgba(255, 255, 255, .10);
+  --amb-pill-line: rgba(255, 255, 255, .13);
+  --amb-track: rgba(255, 255, 255, .14);
+  --amb-cover-shadow: 0 5.5vh 11vh -3vh rgba(0, 0, 0, .85);
+
+  position: fixed; inset: 0; z-index: 900; overflow: hidden;
+  background: var(--ground); color: var(--amb-ink);
+  font-family: var(--font-ui);
+  cursor: none; user-select: none; -webkit-user-select: none;
+  animation: aw-amb-in .8s ease both;
+}
+:root[data-aw-theme="light"] body#artwork .aw-amb, html.aw-is-light body#artwork .aw-amb {
+  --amb-veil-0: rgba(250, 248, 245, .72);
+  --amb-veil-1: rgba(250, 248, 245, .85);
+  --amb-veil-2: rgba(250, 248, 245, .94);
+  --amb-bg-opacity: .34;
+  --amb-bg-sat: 1.1;
+  --amb-pill-fill: rgba(255, 255, 255, .66);
+  --amb-pill-line: rgba(20, 22, 26, .12);
+  --amb-track: rgba(20, 22, 26, .14);
+  --amb-cover-shadow: 0 4.2vh 8.8vh -3.5vh rgba(24, 20, 14, .5);
+}
+
+@keyframes aw-amb-in { from { opacity: 0; } to { opacity: 1; } }
+/* 5g — burn-in defence: the whole composition drifts as one group, ±14/±8 px over a 240 s
+   cycle, about 7 px a minute */
+@keyframes aw-amb-drift { from { transform: translate(-14px, -8px); } to { transform: translate(14px, 8px); } }
+
+/* --- the blurred cover ------------------------------------------------------------------- */
+body#artwork .aw-amb__bg { position: absolute; inset: 0; overflow: hidden; }
+body#artwork .aw-amb__bg-img {
+  position: absolute; width: 155%; height: 155%; left: -27.5%; top: -27.5%; object-fit: cover;
+  filter: blur(var(--amb-blur)) saturate(var(--amb-bg-sat)); opacity: var(--amb-bg-opacity);
+}
+body#artwork .aw-amb__veil { position: absolute; inset: 0; background: linear-gradient(180deg, var(--amb-veil-0) 0%, var(--amb-veil-1) 60%, var(--amb-veil-2) 100%); }
+
+/* --- the composition ---------------------------------------------------------------------- */
+body#artwork .aw-amb__group { position: absolute; inset: 0; animation: aw-amb-drift 240s ease-in-out infinite alternate; }
+@media (prefers-reduced-motion: reduce) { body#artwork .aw-amb__group { animation: none; } }
+
+body#artwork .aw-amb__stage { position: absolute; inset: 0; display: flex; align-items: center; gap: var(--amb-gap); padding: 0 var(--amb-pad); }
+body#artwork .aw-amb__cover {
+  flex: none; width: var(--amb-cover); height: var(--amb-cover); border-radius: var(--r-cover); object-fit: cover;
+  box-shadow: var(--amb-cover-shadow);
+}
+body#artwork .aw-amb__text { display: flex; flex-direction: column; min-width: 0; }
+body#artwork .aw-amb__tag { font-size: clamp(11px, 1.3vh, 14px); letter-spacing: .16em; color: var(--amb-ink-3); margin-bottom: clamp(12px, 1.8vh, 20px); }
+body#artwork .aw-amb__title {
+  font-size: clamp(28px, calc(5.5vh + 1.5vw), 92px); font-weight: 800; letter-spacing: -.032em; line-height: 1.02; text-wrap: pretty; /* 34/44/64/92 across the four frames */
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+body#artwork .aw-amb__artist { font-size: clamp(20px, 3.9vh, 40px); font-weight: 600; letter-spacing: -.01em; margin-top: 2vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+body#artwork .aw-amb__album { font-size: clamp(15px, 2.5vh, 24px); color: var(--amb-ink-2); margin-top: 1.1vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+body#artwork .aw-amb__row { display: flex; align-items: center; gap: clamp(10px, 1.6vh, 18px); margin-top: clamp(20px, 3.7vh, 40px); }
+body#artwork .aw-amb__pill {
+  display: inline-flex; align-items: center; gap: clamp(7px, .9vh, 9px); height: clamp(32px, 4.6vh, 50px); padding: 0 clamp(12px, 1.8vh, 20px);
+  border-radius: 999px; background: var(--amb-pill-fill); border: 1px solid var(--amb-pill-line);
+  &-num { font-size: clamp(12px, 1.6vh, 17px); font-weight: 700; letter-spacing: .04em; color: var(--amb-ink-2); }
+  &-unit { font-size: clamp(10px, 1.2vh, 13px); letter-spacing: .14em; color: var(--amb-ink-3); }
+  &.aw-q--hires { background: var(--q-hires-wash); border-color: var(--q-hires-line); .aw-amb__pill-num, .aw-amb__pill-unit { color: var(--q-hires-ink); } }
+  &.aw-q--dsd { background: var(--q-dsd-wash); border-color: var(--q-dsd-line); .aw-amb__pill-num, .aw-amb__pill-unit { color: var(--q-dsd-ink); } }
+  &.aw-q--lossy { background: var(--q-lossy-wash); border-color: var(--q-lossy-line); .aw-amb__pill-num, .aw-amb__pill-unit { color: var(--q-lossy-ink); } }
+}
+body#artwork .aw-amb__bp { display: flex; align-items: center; gap: 8px; .mono { font-size: clamp(11px, 1.3vh, 14px); letter-spacing: .14em; color: var(--amb-ink); } }
+body#artwork .aw-amb__dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); }
+body#artwork .aw-amb__time { display: flex; align-items: center; gap: 10px; font-size: clamp(11px, 1.5vh, 16px); letter-spacing: .1em; color: var(--amb-ink-2);
+  .aw-amb__slash { color: var(--ink-dim); } .aw-amb__total { color: var(--amb-ink-3); } }
+/* the time sits beside the pill on small panels and on a line of its own from 1200px */
+body#artwork .aw-amb__time--block { display: none; margin-top: clamp(20px, 3.3vh, 40px); }
+@media (min-width: 1200px) {
+  body#artwork .aw-amb__time--inline { display: none; }
+  body#artwork .aw-amb__time--block { display: flex; }
+}
+body#artwork .aw-amb__line { display: none; font-size: clamp(11px, 1.3vh, 14px); letter-spacing: .14em; color: var(--amb-ink-2); margin-top: clamp(16px, 3vh, 24px); white-space: nowrap; }
+
+body#artwork .aw-amb__clock {
+  position: absolute; top: clamp(26px, 6.5vh, 74px); right: clamp(36px, 5vw, 96px);
+  font-size: clamp(72px, 12vh, 132px); line-height: 1; letter-spacing: -.02em; color: var(--amb-ink); font-variant-numeric: tabular-nums;
+}
+body#artwork .aw-amb__ampm { font-size: .25em; letter-spacing: .14em; margin-left: .3em; vertical-align: .2em; color: var(--amb-ink-3); }
+body#artwork .aw-amb__name { font-size: clamp(11px, 1.3vh, 14px); letter-spacing: .16em; color: var(--amb-ink-3); }
+body#artwork .aw-amb__name--corner { position: absolute; left: var(--amb-pad); bottom: clamp(26px, 5.6vh, 62px); }
+
+/* --- stopped / empty queue: clock and name on plain ground --------------------------------- */
+body#artwork .aw-amb__idle { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: clamp(20px, 5.4vh, 40px); }
+body#artwork .aw-amb__clock--idle { position: static; font-size: clamp(96px, 25vh, 260px); line-height: .9; letter-spacing: -.03em; }
+body#artwork .aw-amb__idle .aw-amb__name { font-size: clamp(12px, 1.4vh, 15px); letter-spacing: .18em; color: var(--ink-dim); }
+
+/* --- paused: the tag above the title, the hairline in the muted ink ---------------------- */
+body#artwork .aw-amb.is-paused .aw-amb__seek { background: rgba(255, 255, 255, .10); }
+body#artwork .aw-amb.is-paused .aw-amb__seek-fill { background: var(--amb-ink-3); }
+
+/* --- night: one scrim, the metadata folded into a line, no shadow under the cover --------- */
+body#artwork .aw-amb__night { position: absolute; inset: 0; background: rgba(4, 6, 8, .55); pointer-events: none; }
+body#artwork .aw-amb.is-night {
+  .aw-amb__album, .aw-amb__row, .aw-amb__time--block, .aw-amb__name--corner { display: none; }
+  .aw-amb__line { display: block; }
+  .aw-amb__cover { box-shadow: none; }
+  .aw-amb__seek { background: rgba(255, 255, 255, .06); }
+  .aw-amb__seek-fill { background: rgba(242, 243, 245, .5); }
+}
+
+/* --- cover-led, after the community's mockup (1612×1000): the cover fills three quarters of
+   the height on the left, the player's name top-left and a small clock top-right on one
+   baseline, the text centred beside the cover with what comes next under a rule, and the seek
+   bar across the whole width beneath the cover with the times at its ends. Everything in vh/vw
+   of that frame: cover 750 = 75vh, top 118 = 11.8vh, sides 68 = 4.2vw, gap 57 = 3.5vw. ----- */
+body#artwork .aw-amb--cover {
+  --amb-x: clamp(28px, 4.2vw, 96px);
+  --amb-top: 11.8vh;
+  --amb-cover: 75vh;
+  --amb-gap: clamp(24px, 3.5vw, 64px);
+  .aw-amb__stage { inset: auto; left: var(--amb-x); right: var(--amb-x); top: var(--amb-top); height: var(--amb-cover); padding: 0; align-items: center; }
+  .aw-amb__cover { width: var(--amb-cover); height: var(--amb-cover); box-shadow: 0 3vh 8vh -2vh rgba(0, 0, 0, .7); }
+  .aw-amb__text { flex: 1; min-width: 0; }
+  .aw-amb__title { font-size: clamp(24px, 5.6vh, 64px); font-weight: 800; letter-spacing: -.03em; line-height: 1.05; -webkit-line-clamp: 2; }
+  .aw-amb__artist { font-size: clamp(16px, 3vh, 34px); font-weight: 700; color: var(--amb-ink-2); margin-top: 1.6vh; }
+  .aw-amb__album { font-size: clamp(13px, 2.4vh, 26px); color: var(--amb-ink-3); margin-top: .8vh; }
+  .aw-amb__row { margin-top: clamp(16px, 3.6vh, 40px); gap: clamp(8px, 1.4vh, 16px); }
+  .aw-amb__time--inline, .aw-amb__time--block { display: none; }   /* the times are at the seek bar's ends */
+  .aw-amb__bp .mono { color: var(--ok); }
+  .aw-amb__next { margin-top: clamp(20px, 5.5vh, 60px); padding-top: clamp(20px, 4.4vh, 48px); border-top: 1px solid var(--amb-pill-line); }
+  .aw-amb__next-eyebrow { font-size: clamp(10px, 1.5vh, 15px); letter-spacing: .16em; color: var(--amb-ink-3); }
+  .aw-amb__next-title { font-size: clamp(14px, 2.2vh, 24px); color: var(--amb-ink); margin-top: 1vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .aw-amb__name--corner { left: var(--amb-x); bottom: auto; top: clamp(20px, 5.6vh, 60px); font-size: clamp(11px, 1.5vh, 15px); letter-spacing: .2em; }
+  .aw-amb__clock { top: clamp(16px, 4.8vh, 52px); right: var(--amb-x); font-size: clamp(20px, 3vh, 34px); letter-spacing: .02em; }
+  .aw-amb__ampm { font-size: .5em; }
+  .aw-amb__sleep { bottom: auto; top: clamp(16px, 4.8vh, 52px); right: calc(var(--amb-x) + 12vh); }
+  .aw-amb__seek { left: var(--amb-x); right: var(--amb-x); bottom: auto; top: calc(var(--amb-top) + var(--amb-cover) + 4.9vh); height: 6px; border-radius: 3px; overflow: hidden; }
+  .aw-amb__times { position: absolute; left: var(--amb-x); right: var(--amb-x); top: calc(var(--amb-top) + var(--amb-cover) + 4.9vh + 6px + 1.4vh); display: flex; justify-content: space-between; font-size: clamp(11px, 1.7vh, 17px); letter-spacing: .06em; color: var(--amb-ink-2); }
+  &.is-night .aw-amb__next, &.is-night .aw-amb__times { display: none; }
+  /* the bar and its times drift with the composition, so their left edge stays on the cover's */
+  .aw-amb__seek, .aw-amb__times { animation: aw-amb-drift 240s ease-in-out infinite alternate; }
+  @media (prefers-reduced-motion: reduce) { .aw-amb__seek, .aw-amb__times { animation: none; } }
+}
+body#artwork .aw-amb__times { display: none; }
+body#artwork .aw-amb__next { display: none; }
+body#artwork .aw-amb--cover .aw-amb__next { display: block; }
+body#artwork .aw-amb--cover .aw-amb__times { display: flex; }
+body#artwork .aw-amb--cover.is-night .aw-amb__next, body#artwork .aw-amb--cover.is-night .aw-amb__times { display: none; }
+
+/* --- clock-led: the clock large in the middle, the track small beneath it ---------------- */
+body#artwork .aw-amb--clock {
+  --amb-veil-0: rgba(6, 8, 10, .62); --amb-veil-1: rgba(6, 8, 10, .70); --amb-veil-2: rgba(6, 8, 10, .78);
+  --amb-bg-opacity: .62; --amb-bg-sat: 1.4;
+  .aw-amb__stage { flex-direction: column; justify-content: center; align-items: center; gap: clamp(20px, 3.4vh, 40px); padding-top: clamp(96px, 34vh, 380px); }
+  .aw-amb__clock { top: auto; right: auto; left: 50%; transform: translateX(-50%); top: 50%; margin-top: calc(-30vh - clamp(20px, 3.4vh, 40px) / 2 - 7vh); font-size: clamp(120px, 30vh, 320px); line-height: .9; letter-spacing: -.03em; }
+  .aw-amb__stage { position: absolute; inset: 0; display: flex; flex-direction: row; justify-content: center; align-items: center; padding: 30vh 0 0; }
+  .aw-amb__cover { width: 16vh; height: 16vh; box-shadow: 0 20px 40px -16px rgba(0, 0, 0, .8); }
+  .aw-amb__text { gap: .8vh; }
+  .aw-amb__title { font-size: clamp(22px, 4.7vh, 48px); font-weight: 700; letter-spacing: -.02em; -webkit-line-clamp: 2; }
+  .aw-amb__artist { font-size: clamp(15px, 2.8vh, 28px); font-weight: 400; color: var(--amb-ink-2); margin-top: 0; }
+  .aw-amb__album, .aw-amb__row, .aw-amb__time--block, .aw-amb__name--corner, .aw-amb__tag { display: none; }
+  .aw-amb__line { display: block; margin-top: .4vh; color: var(--amb-ink-3); }
+}
+:root[data-aw-theme="light"] body#artwork .aw-amb--clock, html.aw-is-light body#artwork .aw-amb--clock {
+  --amb-veil-0: rgba(250, 248, 245, .78); --amb-veil-1: rgba(250, 248, 245, .86); --amb-veil-2: rgba(250, 248, 245, .92); --amb-bg-opacity: .34;
+}
+
+/* --- full-bleed: the cover as it is; the text on a fixed dark gradient, in both themes ------ */
+body#artwork .aw-amb--bleed {
+  --amb-ink: #fff; --amb-ink-2: #f2f3f5; --amb-ink-3: #f2f3f5;
+  .aw-amb__bg-img { inset: 0; width: 100%; height: 100%; left: 0; top: 0; filter: none; opacity: 1; }
+  .aw-amb__veil { top: auto; height: 60%; background: linear-gradient(180deg, rgba(6, 8, 10, 0) 0%, rgba(6, 8, 10, .72) 55%, rgba(6, 8, 10, .94) 100%); }
+  .aw-amb__stage { align-items: flex-end; padding: 0 clamp(40px, 5.5vw, 110px) clamp(40px, 8.7vh, 94px); }
+  .aw-amb__cover, .aw-amb__album, .aw-amb__row, .aw-amb__time--block, .aw-amb__name--corner, .aw-amb__tag { display: none; }
+  .aw-amb__title { font-size: clamp(30px, 8.7vh, 100px); }
+  .aw-amb__artist { font-size: clamp(18px, 3.7vh, 40px); margin-top: 1.6vh; }
+  .aw-amb__line { display: block; color: var(--amb-ink); margin-top: 2.4vh; }
+  .aw-amb__clock { color: #fff; text-shadow: 0 2px 24px rgba(0, 0, 0, .7); font-size: clamp(64px, 10.7vh, 120px); top: clamp(26px, 5vh, 60px); right: clamp(36px, 4vw, 80px); }
+  .aw-amb__seek { background: rgba(255, 255, 255, .2); }
+  .aw-amb__seek-fill { background: #fff; }
+  /* the seek bar inset above the bottom edge with the times at its ends, as on the cover-led
+     layout; the text block ends above it, and its mono line no longer carries the time */
+  --amb-x: clamp(28px, 5.5vw, 110px);
+  .aw-amb__stage { padding-bottom: clamp(80px, 15vh, 170px); }
+  .aw-amb__line-time { display: none; }
+  .aw-amb__seek { left: var(--amb-x); right: var(--amb-x); bottom: clamp(40px, 7.6vh, 84px); height: 6px; border-radius: 3px; overflow: hidden; animation: aw-amb-drift 240s ease-in-out infinite alternate; }
+  .aw-amb__times { display: flex; position: absolute; left: var(--amb-x); right: var(--amb-x); bottom: clamp(16px, 3.6vh, 40px); justify-content: space-between; font-size: clamp(11px, 1.7vh, 17px); letter-spacing: .06em; color: #fff; text-shadow: 0 1px 12px rgba(0, 0, 0, .6); animation: aw-amb-drift 240s ease-in-out infinite alternate; }
+  @media (prefers-reduced-motion: reduce) { .aw-amb__seek, .aw-amb__times { animation: none; } }
+  &.is-night .aw-amb__times { display: none; }
+}
+
+/* --- the seek hairline: flush to the bottom edge, outside the drift ---------------------- */
+body#artwork .aw-amb__seek { position: absolute; left: 0; right: 0; bottom: 0; height: 4px; background: var(--amb-track); } /* 4px: 2px was lost at three metres */
+body#artwork .aw-amb__seek-fill { height: 100%; background: var(--amb-ink); transition: width 1s linear; }
+
+/* --- a track change: the cover and the text cross-fade instead of snapping -------------- */
+body#artwork .aw-amb__cover, body#artwork .aw-amb__text { transition: opacity .25s ease; }
+body#artwork .aw-amb.is-swapping .aw-amb__cover, body#artwork .aw-amb.is-swapping .aw-amb__text { opacity: 0; }
+
+/* the sleep timer's tag, bottom right (5e) */
+body#artwork .aw-amb__sleep { position: absolute; right: clamp(36px, 5vw, 96px); bottom: clamp(26px, 5.6vh, 62px); display: inline-flex; align-items: center; gap: 8px; height: clamp(32px, 4.6vh, 44px); padding: 0 13px; border-radius: 999px;
+  background: var(--amb-pill-fill); border: 1px solid var(--amb-pill-line);
+  .material-symbols-rounded { font-size: clamp(17px, 2.2vh, 22px); color: var(--amb-ink-3); } .mono { font-size: clamp(11px, 1.3vh, 14px); letter-spacing: .14em; color: var(--amb-ink); } }
+body#artwork .aw-amb.is-night .aw-amb__sleep { display: none; }

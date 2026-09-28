@@ -1,0 +1,54 @@
+/* Artwork rail (spec §5.1): fixed glass over the cover; icons only, or icons with labels (html.aw-rail-open). */
+#main-menu {
+  position: fixed; top: 0; left: 0; bottom: 0;
+  width: var(--rail-w); z-index: 3;
+  display: flex; flex-direction: column; align-items: center;
+  padding: clamp(12px, 2.4vh, 22px) 0;
+  background: var(--rail-fill);
+  -webkit-backdrop-filter: blur(var(--glass-1-blur)); backdrop-filter: blur(var(--glass-1-blur));
+  border-right: 1px solid var(--glass-1-border);
+  overflow: hidden; transition: width .22s ease;
+
+  .brand-row { display: flex; align-items: center; gap: 12px; flex: none; margin-bottom: clamp(10px, 2vh, 18px); }
+  .brand {
+    width: clamp(30px, 2.5vw, 36px); height: clamp(30px, 2.5vw, 36px); flex: none;
+    border-radius: 9px; border: 1.5px solid var(--ink-1);
+    display: grid; place-items: center;
+    font-family: var(--font-ui); font-size: 15px; font-weight: 800; color: var(--ink-1); cursor: pointer;
+    &:focus-visible { outline: 2px solid var(--ink-1); outline-offset: 2px; }
+  }
+  .main-menu-list, .main-menu-bottom { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 100%; }
+  .main-menu-list { flex: 1 1 auto; }
+  .main-menu-bottom { flex: none; margin-top: auto; }
+  li { width: 100%; display: flex; justify-content: center; }
+  a {
+    display: grid; place-items: center; width: var(--rail-item); height: var(--rail-item);
+    border-radius: 13px; cursor: pointer; color: var(--ink-65);
+    transition: background .18s, color .18s;
+    .material-symbols-rounded { font-size: clamp(20px, 1.6vw, 23px); }
+    &:hover { background: var(--fill-08); color: var(--ink-2); }
+    &.active { background: var(--fill-14); color: var(--ink-1); }
+    &:focus-visible { outline: 2px solid var(--ink-1); outline-offset: 2px; }
+  }
+  .rail__label { display: none; }
+  .rail__toggle { margin-top: 6px; }
+}
+@supports not (backdrop-filter: blur(1px)) { body#artwork #main-menu { background: var(--bar-solid); } }
+
+/* labels: the rail widens (the page, the head and the mini player follow --rail-w); the icons keep
+   their x — the column inset is the collapsed rail's own margin around an item — and each label
+   runs after its icon in the same pill. Never on the phone, where the rail is the menu sheet. */
+@media not all and (max-width: 700px) and (orientation: portrait) {
+  html.aw-rail-open { --rail-w: var(--rail-w-open); }
+  html.aw-rail-open #main-menu {
+    align-items: stretch; padding-left: calc((var(--rail-w-closed) - var(--rail-item)) / 2); padding-right: calc((var(--rail-w-closed) - var(--rail-item)) / 2);
+    .brand-row { padding-left: calc((var(--rail-item) - clamp(30px, 2.5vw, 36px)) / 2); }
+    li { justify-content: flex-start; }
+    a { display: grid; grid-template-columns: var(--rail-item) minmax(0, 1fr); place-items: center start; width: 100%; padding-right: 12px;
+      .material-symbols-rounded { justify-self: center; } }
+    .rail__label { display: block; min-width: 0; font-family: var(--font-ui); font-size: 14px; font-weight: 500; letter-spacing: -.005em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .rail__label--brand { font-size: 16px; font-weight: 800; letter-spacing: -.02em; color: var(--ink-1); }
+    a.active .rail__label { font-weight: 600; }
+  }
+}
+@media (prefers-reduced-motion: reduce) { #main-menu { transition: none; } }

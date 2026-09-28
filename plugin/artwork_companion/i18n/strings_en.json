@@ -1,0 +1,8 @@
+{
+  "ARTWORK_COMPANION": {
+    "TITLE": "Artwork One Companion",
+    "SECTION": "Artwork One",
+    "WHERE": "Where the settings are",
+    "WHERE_DOC": "This plugin keeps the Artwork One theme and ambient display settings on the player, so they reach every screen. Change them in Settings → Appearance while Artwork One is the active interface."
+  }
+}

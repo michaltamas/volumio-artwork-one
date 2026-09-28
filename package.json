@@ -1,0 +1,42 @@
+{
+  "name": "volumio-artwork-one",
+  "private": true,
+  "version": "3.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "oxlint",
+    "preview": "vite preview",
+    "package": "scripts/package.sh"
+  },
+  "dependencies": {
+    "firebase": "^12.19.0",
+    "hls.js": "^1.7.3",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "react-router-dom": "^7.18.4",
+    "sass": "^1.105.0",
+    "socket.io-client": "^1.7.4",
+    "zustand": "^5.0.15"
+  },
+  "devDependencies": {
+    "@types/node": "^24.13.3",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.7",
+    "@vitejs/plugin-react": "^6.1.1",
+    "oxlint": "^1.81.0",
+    "typescript": "~6.0.2",
+    "vite": "^8.3.0"
+  },
+  "description": "Artwork One: a cover-led interface for Volumio",
+  "license": "MIT",
+  "author": "Michal Tamas",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/michaltamas/volumio-artwork-one.git"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

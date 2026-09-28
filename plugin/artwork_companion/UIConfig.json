@@ -1,0 +1,22 @@
+{
+  "page": { "label": "TRANSLATE.ARTWORK_COMPANION.TITLE" },
+  "sections": [
+    {
+      "id": "section_about",
+      "element": "section",
+      "label": "TRANSLATE.ARTWORK_COMPANION.SECTION",
+      "icon": "fa-paint-brush",
+      "content": [
+        {
+          "id": "about",
+          "element": "input",
+          "type": "text",
+          "label": "TRANSLATE.ARTWORK_COMPANION.WHERE",
+          "doc": "TRANSLATE.ARTWORK_COMPANION.WHERE_DOC",
+          "value": "Settings → Appearance",
+          "attributes": [{ "readonly": true }]
+        }
+      ]
+    }
+  ]
+}

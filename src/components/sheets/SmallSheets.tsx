@@ -1,0 +1,103 @@
+/** Volumio's small modals in the theme's dress: confirm, got it, password, the plugin installer, the updater, the NAS password. */
+import { useEffect, useState } from 'react';
+import Icon from '../Icon';
+import { on, emit } from '../../core/socket';
+import { useModal } from '../../core/store/modal';
+import { Progress } from '../settings/controls';
+
+export function ConfirmSheet() {
+  const data = useModal(s => s.data) || {};
+  const done = (ok: boolean) => { useModal.getState().close(); if (data.resolve) { data.resolve(ok); } };
+  return (
+    <>
+      <div className={'modal-header' + (data.danger ? ' aw-modal--danger' : '')}><h3 className="modal-title"><i className="fa fa-info-circle"><Icon name="info" /></i> {data.title}</h3></div>
+      <div className="modal-body">{data.message}</div>
+      <div className="modal-footer"><button type="button" className="btn btn-warning" onClick={() => done(false)}>No</button><button type="button" className="btn btn-info" onClick={() => done(true)}>Yes</button></div>
+    </>
+  );
+}
+export function GenericModalSheet() {
+  const data = useModal(s => s.data) || {};
+  const click = (b: any) => { if (b.emit) { emit(b.emit, b.payload); } useModal.getState().close(); };
+  return (
+    <>
+      <div className="modal-header"><h3 className="modal-title"><i className="fa fa-info-circle"><Icon name="info" /></i> {data.title}</h3></div>
+      <div className="modal-body" dangerouslySetInnerHTML={{ __html: String(data.message || '') }} />
+      <div className="modal-footer">{(data.buttons || []).map((b: any, i: number) => <button key={i} type="button" className={b.class || 'btn btn-info'} onClick={() => click(b)}>{b.name}</button>)}</div>
+    </>
+  );
+}
+export function GotItSheet() {
+  const data = useModal(s => s.data) || {};
+  return (
+    <>
+      {data.title ? <div className="modal-header"><h3 className="modal-title"><i className="fa fa-info-circle"><Icon name="info" /></i> {data.title}</h3></div> : null}
+      <div className="modal-body" dangerouslySetInnerHTML={{ __html: String(data.message || '') }} />
+      <div className="modal-footer"><button type="button" className="btn btn-info" onClick={() => { useModal.getState().close(); if (data.onClose) { data.onClose(); } }}><span>Got it</span></button></div>
+    </>
+  );
+}
+export function PasswordSheet() {
+  const data = useModal(s => s.data) || {};
+  const [pw, setPw] = useState(''); const [err, setErr] = useState(false);
+  useEffect(() => on('checkPassword', (ok: any) => { if (ok) { useModal.getState().close(); if (data.resolve) { data.resolve(true); } } else { setErr(true); } }), [data]);
+  const cancel = () => { useModal.getState().close(); if (data.resolve) { data.resolve(false); } };
+  return (
+    <>
+      <div className="modal-header"><h3 className="modal-title"><span>Enter password</span></h3></div>
+      <div className="modal-body">
+        {data.message ? <div>{data.message}<br /><br /></div> : null}
+        <form className="form" onSubmit={(e) => { e.preventDefault(); if (pw) { setErr(false); emit('checkPassword', { password: pw, pluginName: data.pluginName }); } }}><input placeholder="Password" type="password" className="form-control" value={pw} onChange={(e) => setPw(e.target.value)} required /></form>
+        {err ? <div><span>Invalid password</span></div> : null}
+      </div>
+      <div className="modal-footer"><button type="button" className="btn btn-warning" onClick={cancel}>Cancel</button><button type="button" className="btn btn-info" onClick={() => { if (pw) { setErr(false); emit('checkPassword', { password: pw, pluginName: data.pluginName }); } }}>Ok</button></div>
+    </>
+  );
+}
+export function InstallerSheet() {
+  const initial = useModal(s => s.data);
+  const [data, setData] = useState<any>(initial);
+  const [log, setLog] = useState(false);
+  useEffect(() => on('installPluginStatus', (d: any) => { setData(d); window.setTimeout(() => { const el = document.getElementById('advancedLogWrapper'); if (el) { el.scrollTop = el.scrollHeight; } }, 300); }), []);
+  const d = data || {};
+  return (
+    <>
+      <div className="modal-header"><h3 className="modal-title">{d.title}</h3></div>
+      {data ? (
+        <div className="modal-body">
+          <p dangerouslySetInnerHTML={{ __html: String(d.message || '') }} />
+          <div>{d.progress !== 100 ? <Progress value={Number(d.progress) || 0} /> : null}</div>
+          {d.advancedLog ? <div>{d.progress !== 100 ? <a onClick={() => setLog(v => !v)}><span>{log ? '- Hide details' : '+ Show details'}</span></a> : null}<div id="advancedLogWrapper" style={{ display: log ? 'block' : 'none' }}><p dangerouslySetInnerHTML={{ __html: String(d.advancedLog) }} /></div></div> : null}
+        </div>
+      ) : null}
+      <div className="modal-footer">{(d.buttons || []).map((b: any, i: number) => <button key={i} type="button" className={b.class} onClick={() => { if (b.emit) { emit(b.emit, b.payload); } useModal.getState().close(); }}>{b.name}</button>)}</div>
+    </>
+  );
+}
+export function UpdaterSheet() {
+  const data = useModal(s => s.data) || {};
+  return (
+    <>
+      <div className="modal-header"><h3 className="modal-title"><i className="fa fa-refresh"><Icon name="refresh" /></i> {data.title}</h3></div>
+      <div className="modal-body"><div><h4>{data.description}</h4><Progress value={Number(data.progress) || 0} /></div></div>
+      <div className="modal-footer" />
+    </>
+  );
+}
+export function NasPasswordSheet() {
+  const data = useModal(s => s.data) || {};
+  const [user, setUser] = useState(String(data.username || '')); const [pw, setPw] = useState(String(data.password || '')); const [type, setType] = useState('password');
+  const save = () => { emit('editShare', { id: data.id, name: data.name, username: user, password: pw }); useModal.getState().close(); };
+  return (
+    <>
+      <div className="modal-header"><h3 className="modal-title"><i className="fa fa-info-circle"><Icon name="info" /></i> {data.title}</h3></div>
+      <div className="modal-body">{data.message}<br />
+        <form className="form" onSubmit={(e) => { e.preventDefault(); save(); }}>
+          <div className="form-group"><label className="control-label"><span>Username</span></label><input type="text" className="form-control" value={user} onChange={(e) => setUser(e.target.value)} required /></div>
+          <div className="form-group"><label className="control-label"><span>Password</span></label><div className="input-group"><span className="input-group-addon clickable" onClick={() => setType(type === 'password' ? 'text' : 'password')}><Icon name={type === 'password' ? 'visibility' : 'visibility_off'} /></span><input type={type} className="form-control" value={pw} onChange={(e) => setPw(e.target.value)} required /></div></div>
+        </form>
+      </div>
+      <div className="modal-footer"><button type="button" className="btn btn-warning" onClick={() => useModal.getState().close()}><span>Cancel</span></button><button type="button" className="btn btn-info" onClick={save}><span>Save</span></button></div>
+    </>
+  );
+}

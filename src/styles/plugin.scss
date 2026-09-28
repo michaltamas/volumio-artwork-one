@@ -1,0 +1,232 @@
+/* Settings / plugin config pages (the centre column of the shell), the plugins page, Volumio's core sections. The
+   form controls are one definition (the theme's mixin), applied to the pages, the modals and the device table. */
+@mixin aw-form-controls {
+  .ui-select-container.ui-select-bootstrap { position: relative; width: 100%; height: 44px; border-radius: 11px; color: var(--ink-1); background: var(--fill-08); border: 1px solid var(--fill-13); box-shadow: none !important;
+    &:focus-within { border-color: var(--fill-30); }
+    select { width: 100%; height: 42px; line-height: 42px; padding: 0 40px 0 14px; background: transparent; border: 0; color: var(--ink); font-size: 15px; font-weight: 500; font-family: var(--font-ui); appearance: none; -webkit-appearance: none; outline: 0; cursor: pointer; option { color: #14161a; } }
+    .caret { border: 0; width: auto; height: auto; margin: 0; position: absolute; right: 14px; top: 0; bottom: 0; display: grid; place-items: center; line-height: 1; pointer-events: none;
+      &::before { content: ''; display: block; width: 20px; height: 20px; background: no-repeat center / 20px 20px url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M6.75 8.75 L10 11.25 L13.25 8.75' fill='none' stroke='%23a7adb3' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); } } }
+  .bootstrap-switch { position: relative; display: inline-block; width: 50px !important; height: 32px; border-radius: 13px; border: 0; background: var(--fill-16); overflow: visible; margin-right: 44px; cursor: pointer; vertical-align: middle;
+    input[type="checkbox"] { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; z-index: 2; cursor: pointer; appearance: none; -webkit-appearance: none; }
+    &::before { content: ''; position: absolute; top: 6px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: var(--ground); transition: left .15s ease; }
+    &::after { content: 'Off'; position: absolute; left: 62px; top: 50%; transform: translateY(-50%); font-size: 14px; color: var(--ink-dim); white-space: nowrap; }
+    &.bootstrap-switch-on { background: var(--ink); &::before { left: 27px; } &::after { content: 'On'; color: var(--ink-2); } } }
+  input[type="checkbox"].custom-checkbox { appearance: none; -webkit-appearance: none; position: relative; width: 50px; height: 32px; border-radius: 13px; border: 0; margin: 0; background: var(--fill-16); cursor: pointer; vertical-align: middle;
+    &::before { content: ''; position: absolute; top: 6px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: var(--ground); transition: left .15s ease; }
+    &:checked { background: var(--ink); &::before { left: 27px; } } }
+  .aw-segment { display: flex; align-items: center; gap: 6px; height: 52px; padding: 4px; border-radius: 11px; background: var(--fill-06); border: 1px solid var(--fill-10);
+    &__opt { flex: 1; height: 100%; border-radius: 8px; display: grid; place-items: center; font-size: 14px; color: var(--ink-muted); background: transparent; border: 0; padding: 0 10px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: var(--font-ui);
+      &:hover { color: var(--ink-1); } &.active { background: var(--ink); color: var(--on-ink); font-weight: 700; } &:focus-visible { outline: 2px solid var(--ink-1); outline-offset: 2px; } } }
+  input.form-control, textarea.form-control { display: block; width: 100%; height: 42px; border-radius: 11px; background: var(--fill-08); border: 1px solid var(--fill-13); color: var(--ink); font-size: 15px; box-shadow: none; padding: 0 14px; outline: 0; font-family: var(--font-ui);
+    &:focus { border-color: var(--fill-30); box-shadow: none; } &::placeholder { color: var(--ink-dim); } }
+  textarea.form-control { height: auto; padding: 10px 14px; }
+  .btn { height: 42px; padding: 0 20px; border-radius: 21px; border: 1px solid var(--fill-18); background: transparent; color: var(--ink-2); font-size: 13px; font-weight: 500; box-shadow: none; line-height: 40px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; font-family: var(--font-ui); text-decoration: none;
+    &:hover { background: var(--fill-08); color: var(--ink); }
+    /* the base's 13px FontAwesome glyph in a pill: 11px wide */
+    .material-symbols-rounded { font-size: 13px; width: 11px; display: inline-block; text-align: center; overflow: visible; vertical-align: middle; } }
+  /* a plugin's own button element (it carries plugin-attributes) stays the outline pill */
+  .btn.btn-info:not([plugin-attributes]), .btn.btn-primary, .btn.btn-success { background: var(--ink); color: var(--on-ink); border: 0; height: 40px; line-height: 40px; font-weight: 700; &:hover { background: var(--ink-1); color: var(--on-ink); } }
+  .btn.btn-danger { color: var(--err); border-color: var(--err-line); background: transparent; &:hover { background: var(--err-wash); color: var(--err); } }
+  .btn.btn-link { border: 0; background: transparent; height: auto; line-height: normal; padding: 0 8px; }
+  .progress { height: 20px; border-radius: 10px; background: var(--fill-10); overflow: hidden; margin: 10px 0; .progress-bar { height: 100%; background: var(--ink); color: var(--on-ink); font-size: 11px; line-height: 20px; text-align: center; transition: width .3s ease; } }
+  .alert { padding: 12px 16px; border-radius: 12px; background: var(--fill-06); border: 1px solid var(--fill-10); color: var(--ink-2); margin-bottom: 14px; }
+}
+
+body#artwork .modal-content { @include aw-form-controls; }
+body#artwork #pluginWrapper {
+  @include aw-form-controls;
+  padding: 40px 34px 60px;
+  .box { background: transparent; border: 0; box-shadow: none; padding: 0; }
+  /* the inherited frame's title box: 20px over the header, 12px to the right of the title, a capitalised h2 */
+  .boxHeader { background: transparent; border: 0; padding: 0; margin: 20px 0 0;
+    .title { margin: 0 12px 0 0; }
+    .title h2 { margin: 0; display: inline-block; font-family: var(--font-ui); font-size: 34px; font-weight: 800; letter-spacing: -.025em; color: var(--ink); background: transparent; padding: 0; text-transform: capitalize; a.btn { display: none; } }
+    .title button { display: block; margin-top: 10px; } }
+  .pluginDescription { margin: 10px 0 0; font-size: 13px; color: var(--ink-dim); text-wrap: pretty; }
+  .panel.panel-default { background: transparent; border: 0; box-shadow: none; margin: 0; }
+  .panel-heading { background: transparent; border: 0; padding: 0; margin-top: 34px; padding-bottom: 12px; border-bottom: 1px solid var(--fill-10); }
+  .panel-title { font-family: var(--font-mono); font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-35); font-weight: 400; margin: 0; .fa { display: none; } .section-image { height: 16px; margin-right: 8px; } }
+  .panel-body { padding: 0; }
+  .sectionDescription { margin: 14px 0 0; font-size: 13px; color: var(--ink-dim); font-weight: 400; }
+  .form-group { display: grid; grid-template-columns: auto auto minmax(24px, 1fr) 300px; align-items: center; column-gap: 8px; row-gap: 0;   /* label · info icon · filler · control */ margin: 0; padding: 18px 0; border-bottom: 1px solid var(--fill-05);
+    > label.plugin-label, > .control-doc, > .control-item, > .control-description, > .control-buttons { float: none; width: auto; min-height: 0; padding: 0; margin: 0; }
+    > label.plugin-label { grid-column: 1; grid-row: 1; font-size: 16px; font-weight: 600; color: var(--ink-1); }
+    .control-label { text-transform: capitalize; }   /* the frame capitalises every control label */
+    > .control-doc { grid-column: 2; grid-row: 1; justify-self: start; align-self: center; margin: 0; width: auto; height: auto;
+      a { font-size: 20px; display: inline-block; padding-top: 3px; cursor: pointer; }   /* the base's info link: the body's line height at 20px */
+      .fa { font-size: 14px; color: var(--ink-faint); display: inline-block; width: 12px; height: 14px; line-height: 14px; .material-symbols-rounded { font-size: 14px; display: block; width: 12px; overflow: visible; } } a:hover .material-symbols-rounded { color: var(--ink-3); } }
+    > .control-item { grid-column: 4; grid-row: 1 / 3; display: block; }
+    > .control-description { grid-column: 1 / 4; grid-row: 2; margin: 4px 0 0; font-size: 13px; color: var(--ink-dim); text-wrap: pretty; }
+    > div:not(.control-item):not(.control-doc):not(.control-description) { grid-column: 1 / -1; }
+    .control-item > div, .control-item > div > div { width: 100%; }
+    > .control-buttons { padding-top: 0; } }
+  .row .col-xs-24 > button, .text-right > button { margin-top: 18px; }
+  .control-label { font-size: 16px; font-weight: 600; color: var(--ink-1); }
+  .equalizer { display: inline-block; margin: 10px; &.vertical { margin: 10px 20px; } &.horizontal { margin: 10px 0 20px; width: 180px; } }
+  .equalizer-label { width: 15px; text-align: center; white-space: nowrap; margin-left: -8px; display: block; font-size: 11px; color: var(--ink-dim); }
+  .equalizer.vertical input[type="range"] { writing-mode: vertical-lr; direction: rtl; height: 140px; width: 20px; }
+  .equalizer-bars { display: flex; flex-wrap: wrap; }
+  table.table { width: 100%; border-collapse: collapse; th, td { text-align: left; padding: 8px; border-top: 1px solid var(--fill-08); } }
+  hr { border: 0; border-top: 1px solid var(--fill-08); margin: 20px 0; }
+  .uploadDroppableArea { display: block; padding: 22px; border-radius: 14px; border: 1px dashed var(--fill-16); background: rgba(255, 255, 255, .03); color: var(--ink-3); text-align: center; cursor: pointer; margin-top: 12px; &:hover { background: var(--fill-06); color: var(--ink); } }
+  /* the base's background picker */
+  #backgroundSelector { margin: 0 -15px; &::after { content: ''; display: table; clear: both; }
+    .col-sm-6 { float: left; width: 25%; padding: 0 15px; position: relative; min-height: 1px; }
+    .background { position: relative; }
+    .backgroundName { font-size: 18px; text-align: center; position: absolute; top: 20%; left: 0; width: 100%; span { background-color: rgba(0, 0, 0, .6); padding: 6px 10px; } p { margin: 10px 0 0; } span.current { color: #54C688; } }
+    img { width: 100%; border: solid 1px #999; cursor: pointer; margin-bottom: 30px; display: block; &.current { border: solid 2px #54C688; } } }
+  #backgroundColorSelector { margin: 0 -15px; #colorPalette { padding: 0 15px;
+    > div { position: relative; display: inline-block; margin: 0 15px 10px 0; width: 110px; height: 110px; &.selected { border: solid 2px #54C698; }
+      button { position: absolute; top: 50%; margin-top: -18px; left: 50%; margin-left: -21px; &.customColor { top: 10%; margin-top: 0; } }
+      input { position: absolute; top: 60px; left: 10px; width: 90px; } } } }
+  .pull-right { float: right; } .text-right { text-align: right; } .text-center { text-align: center; } .clearfix::after { content: ''; display: table; clear: both; }
+  .row { display: block; } .row::after { content: ''; display: table; clear: both; }
+  [class*="col-"] { position: relative; min-height: 1px; }
+  .col-xs-12, .col-md-12, .col-sm-12 { float: left; width: 50%; } .col-xs-8, .col-md-8, .col-sm-8 { float: left; width: 33.333%; } .col-md-16 { float: left; width: 66.666%; } .col-xs-24, .col-sm-24 { width: 100%; } .col-md-14 { float: left; width: 58.333%; } .col-md-10 { float: left; width: 41.666%; } .col-sm-offset-6 { margin-left: 25%; }
+  .fa { font-style: normal; display: inline-block; .material-symbols-rounded { font-size: 16px; vertical-align: middle; } }
+  .btn .fa { display: inline-flex; }
+}
+
+/* Plugins page */
+body#artwork .aw-state-volumio-plugin-manager #content {
+  @include aw-form-controls;
+  > .box, .box { padding: 40px 34px 60px; background: transparent; border: 0; box-shadow: none; }
+  .boxHeader { background: transparent; border: 0; padding: 0; margin: 20px 0 0; .title { margin: 0 12px 0 0; } .title h2 { margin: 0; display: inline-block; background: transparent; padding: 0; font-family: var(--font-ui); font-size: 34px; font-weight: 800; letter-spacing: -.025em; color: var(--ink); text-transform: capitalize; .btn, a.btn { display: none; } } }
+  .box > .panel.panel-default { background: transparent; border: 0; box-shadow: none; margin: 0;
+    > .panel-heading { background: transparent; border: 0; padding: 0; margin-top: 34px; padding-bottom: 12px; border-bottom: 1px solid var(--fill-10);
+      .panel-title { font-family: var(--font-mono); font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-35); font-weight: 400; margin: 0; .fa { display: none; } } }
+    > .panel-body { padding: 0; background: transparent; border: 0; box-shadow: none; } }
+  .nav-tabs { display: flex; list-style: none; margin: 18px 0 22px; padding: 0; border-bottom: 1px solid var(--fill-10);
+    > li { margin-bottom: -1px; }   /* the frame's tabs overlap the rule by a pixel */
+    > li > a { display: block; background: transparent; border: 0; border-bottom: 2px solid transparent; border-radius: 0; margin: 0 22px 0 0; padding: 10px 0; font-size: 15px; line-height: 1.42857143; font-weight: 500; color: var(--ink-dim); cursor: pointer; }
+    > li > a:hover { color: var(--ink-1); } > li.active > a { color: var(--ink); font-weight: 600; border-bottom-color: var(--ink); } }
+  /* the inherited grid: the categories beside the cards from 768px, stacked over them below */
+  .row { margin: 0 -15px; } .col-sm-4, .col-sm-20 { padding: 0 15px; min-width: 0; }
+  @media (min-width: 768px) { .row { display: flex; align-items: flex-start; } .col-sm-4 { flex: 0 0 16.6667%; } .col-sm-20 { flex: 0 0 83.3333%; } }
+  .btn.pluginCategoryBtn { height: auto; border: 0; padding: 8px 0; white-space: nowrap; background: transparent; justify-content: flex-start; line-height: 1.4; font-size: 15px; color: var(--ink-3); border-radius: 0; cursor: pointer;
+    &:hover { background: transparent; color: var(--ink); } &.active { color: var(--ink); font-weight: 600; } }
+  .panel-body .panel.panel-default { background: var(--fill-06); border: 1px solid var(--fill-10); border-radius: 14px; padding: 18px 20px; margin: 0 0 12px; box-shadow: none;
+    > .panel-heading { background: transparent; border: 0; padding: 0; margin: 0; .panel-title { font-family: var(--font-ui); font-size: 18px; font-weight: 700; letter-spacing: -.01em; text-transform: none; color: var(--ink); margin: 0;
+      /* the FontAwesome glyph box the card was drawn with: a 16px inline-block of line-height 1 */
+      .fa { color: var(--ink-muted); margin-right: 8px; font-size: 16px; display: inline-block; line-height: 16px; height: 16px; vertical-align: baseline; .material-symbols-rounded { display: inline-block; font-size: 16px; line-height: 16px; width: 16px; height: 16px; vertical-align: top; } } } }
+    > .panel-body { padding: 10px 0 0; background: transparent; border: 0; box-shadow: none; font-size: 14px; color: #999; b, strong { color: var(--ink-2); font-weight: 600; } .row { display: block; margin: 0 -15px; } .row::after { content: ''; display: table; clear: both; } .row > .col-xs-12 { float: left; width: 50%; padding: 0 15px; box-sizing: border-box; } .row > .text-right { text-align: right; } .row.pluginDetailsRow { margin: 6px 0; } } }
+  .panel-body::before, .panel-body::after { content: ' '; display: table; } .panel-body::after { clear: both; }
+  .btn.btn-info { padding: 0 18px; }
+  .btn.btn-info.pull-right ~ .btn.btn-info.pull-right { background: transparent; color: var(--ink-2); border: 1px solid var(--fill-18); height: 42px; line-height: 40px; font-weight: 500; &:hover { background: var(--fill-08); color: var(--ink); } }
+  .btn.btn-danger { padding: 0 18px; }
+  .btn.pull-right { margin-left: 8px; float: right; }
+  .pluginDotStatus { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--ink-faint); margin-right: 8px; &.active { background: var(--ok); } }
+  .text-muted { color: var(--ink-dim); }
+  /* installed tab: the same rounded card row used by the Sources page's "My Music" plugin
+     list (#myMusicPlugins #installed-plugin-lists below) — one shared #installed-plugin-lists
+     component, one shared row design, instead of the frame's old flat green-rule list */
+  #installed-plugin-lists { display: flex; align-items: center; gap: 16px; padding: 16px 20px; border-radius: 14px; background: var(--fill-06); border: 1px solid var(--fill-10); margin: 0 0 10px; font-size: 16px; line-height: 1.42857143;
+    .row, #list-group { display: contents; }
+    [class*="col-"] { width: auto; float: none; padding: 0; min-height: 0; box-sizing: border-box; }
+    /* name + version: 1st slot of the name/switch/status group */
+    > .row > #list-group:first-child > .row > .col-md-8:nth-child(1) { order: 1; flex: 1 1 auto; min-width: 0; font-size: 15px; font-weight: 600; color: var(--ink-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      .fa { display: inline-block; font-size: 16px; line-height: 16px; height: 16px; width: 16px; margin-right: 10px; color: var(--ink-muted); vertical-align: -3px; .material-symbols-rounded { display: inline-block; font-size: 16px; line-height: 16px; } }
+      small.text-muted { margin-left: 8px; font-size: 13px; font-weight: 400; } }
+    /* the enable/disable switch: 2nd slot */
+    > .row > #list-group:first-child > .row > .col-md-8:nth-child(2) { order: 2; flex: none; .bootstrap-switch { margin-right: 0; } }
+    /* active/inactive status: 3rd slot */
+    > .row > #list-group:first-child > .row > .col-md-8:nth-child(3) { order: 3; flex: none; font-size: 13px; color: var(--ink-dim); white-space: nowrap; }
+    /* update / settings / uninstall buttons: the 2nd top-level column (no #list-group id) */
+    > .row > div:nth-child(2) { order: 4; flex: none; display: flex; gap: 8px;
+      .col-md-8 { display: contents; }
+      .btn.pull-right { float: none; margin: 0; }
+      .btn { height: 34px; line-height: 32px; padding: 0 14px; font-size: 13px; }
+      .btn.btn-info { background: transparent; color: var(--ink-2); border: 1px solid var(--fill-18); font-weight: 500; &:hover { background: var(--fill-08); color: var(--ink); } } }
+    .pluginDotStatus { width: 7px; height: 7px; margin-right: 7px; vertical-align: 1px; }
+    .bootstrap-switch::after { display: none; } }
+  /* phone width: the name column's flex:1/min-width:0 above shrinks to 0 (and the icon+name+
+     version vanish entirely, leaving just switch/status/buttons) once the other fixed-size
+     slots alone exceed the row's width — give the name its own full-width line instead */
+  @media (max-width: 640px) {
+    #installed-plugin-lists { flex-wrap: wrap; row-gap: 10px;
+      > .row > #list-group:first-child > .row > .col-md-8:nth-child(1) { flex: 1 1 100%; white-space: normal; }
+      > .row > div:nth-child(2) { margin-left: auto; } }
+  }
+}
+
+/* Volumio's core sections inside settings pages */
+body#artwork #pluginWrapper {
+  #networkStatus > .panel-heading { display: none; }
+  #networkStatus .networkStatus { display: flex; gap: 12px; }
+  #networkStatus .networkStatus > .panel { flex: 1; width: auto; float: none; margin: 0; padding: 20px 22px; border-radius: 16px; box-shadow: none; background: var(--fill-09) !important; border: 1px solid var(--fill-14) !important;
+    > .panel-heading { padding: 0; margin: 0; background: transparent !important; border: 0 !important; .panel-title { margin: 0; font-family: var(--font-ui); font-size: 15px; font-weight: 600; color: var(--ink); text-transform: capitalize; letter-spacing: 0; } }
+    > .panel-body { padding: 0; ul { list-style: none; margin: 18px 0 0; padding: 0; } li { font-family: var(--font-mono); font-size: 13px; color: var(--ink-2); margin-top: 8px; > span { font-family: var(--font-ui); color: var(--ink-dim); } }
+      li:first-child { font-size: 26px; font-weight: 700; letter-spacing: -.01em; margin: 0; > span { display: none; } }
+      .fa.true .material-symbols-rounded { color: var(--ok); } .fa.false .material-symbols-rounded { color: var(--err); } } }
+  #wifiPlugin table.table, #wifiPlugin table.table tbody { display: block; width: 100%; margin: 0; }
+  #wifiPlugin table.table tr { display: grid; grid-template-columns: 26px 1fr 24px; align-items: center; gap: 18px; padding: 13px 12px; border-radius: 11px; border-top: 1px solid var(--fill-05); cursor: pointer;
+    &:first-child { border-top: 0; background: var(--fill-06); } &:hover { background: var(--fill-06); }
+    td { grid-row: 1; padding: 0; border: 0; font-size: 16px; font-weight: 600; color: var(--ink-1); vertical-align: middle; }
+    td.wifiIcon { grid-column: 1; img { width: 20px; height: auto; display: block; } .fa { color: var(--ink-muted); } }
+    td.lockIcon { grid-column: 3; text-align: right; .fa { font-size: 16px; color: var(--ink-muted); } }
+    td:nth-child(3) { grid-column: 2; }
+    td:nth-child(n+4), td.commandCol { display: none; }
+    td.insertPasswordRow { grid-column: 1 / -1; font-weight: 400; font-size: 14px; display: block; text-align: right;
+      label { margin-right: 10px; } input[type=checkbox] { width: auto; }
+      input[type=text], input[type=password] { max-width: 300px; display: inline-block; margin-bottom: 10px; margin-right: -5px; }
+      .securitySelectWrapper { width: 120px; display: inline-block; margin-right: 15px; position: relative; }
+      .showHidePassword { margin-right: 10px; } } }
+  #wifiPlugin .refreshWiFiNetworks { margin-top: 15px; }
+  .networkStatus ul { list-style: none; } .networkStatus li img { width: 20px; margin-bottom: 10px; }
+  #networkDrives .saveAddEditDrive { float: right; } .accordion-toggle { cursor: pointer; }
+  #myMusic > .panel-heading { display: none; }
+  #myMusic > .panel-body { display: grid; grid-template-columns: 1fr auto; column-gap: 26px; align-items: center; padding: 22px 26px !important; border-radius: 16px; margin-top: 4px; background: var(--fill-09) !important; border: 1px solid var(--fill-14) !important;
+    .aw-mystats { display: flex; gap: 20px; grid-column: 1; grid-row: 1 / 3; margin: 0; }
+    .aw-mystats__item { flex: 1; display: flex; flex-direction: column; &:last-child { flex: 1.3; } }
+    .aw-mystats__label { font-family: var(--font-mono); font-size: 10px; letter-spacing: .16em; color: var(--ink-muted); font-weight: 400; text-transform: uppercase; }
+    .aw-mystats__value { font-family: var(--font-ui); font-size: 38px; font-weight: 800; letter-spacing: -.03em; line-height: 1; padding-top: 10px; color: var(--ink); white-space: nowrap; }
+    .btn { grid-column: 2; margin: 0; width: 100%; }
+    .btn + .btn { margin-top: 9px; background: transparent; color: var(--ink-2); border: 1px solid var(--fill-18); height: 42px; line-height: 40px; font-weight: 500; &:hover { background: var(--fill-08); } } }
+  #myMusicPlugins > .panel-body { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0; }
+  #myMusicPlugins #installed-plugin-lists { font-size: 16px; }
+  #wifiPlugin table.table tr, #networkDrives table.table tr { font-size: 18px; }
+  /* the frame's clearfix pseudos would become grid/flex items and eat the first cell and the gaps */
+  #myMusicPlugins > .panel-body::before, #myMusicPlugins > .panel-body::after, #myMusicPlugins #installed-plugin-lists .row::before, #myMusicPlugins #installed-plugin-lists .row::after, #myMusic > .panel-body::before, #myMusic > .panel-body::after { display: none; content: none; }
+  #myMusicPlugins #installed-plugin-lists { display: flex; align-items: center; justify-content: flex-start; gap: 14px; padding: 14px 16px; border-radius: 12px; background: var(--fill-06); min-width: 0; border-bottom: 1px solid var(--fill-06);   /* the frame's own bottom rule, in the card's colour */
+    .row, #list-group { display: contents; } [class*="col-"] { width: auto; float: none; padding: 0; min-height: 0; }
+    > .row > #list-group:first-child > .row > .col-md-16 { order: 1; flex: 1 1 auto; min-width: 0; text-align: left; font-size: 15px; font-weight: 600; color: var(--ink-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; .fa { display: none; } }
+    > .row > #list-group:first-child > .row > .col-md-8 { order: 4; flex: none; .bootstrap-switch { margin-right: 0; } }
+    > .row > #list-group:last-child > .col-md-12:first-child { order: 2; flex: none; font-size: 12px; color: var(--ink-dim); white-space: nowrap; }
+    > .row > #list-group:last-child > .col-md-12:last-child { order: 3; flex: none; .btn { float: none; height: 30px; line-height: 28px; padding: 0 12px; font-size: 12px; background: transparent; color: var(--ink-2); border: 1px solid var(--fill-18); font-weight: 500; } }
+    .pluginDotStatus { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--ink-faint); margin-right: 7px; vertical-align: 1px; &.active { background: var(--ok); } }
+    .bootstrap-switch::after { display: none; } }
+  /* phone width: #myMusic's "auto" button column and #myMusicPlugins's 2-up grid both size
+     themselves from their content's intrinsic (max-content) width, which a narrow card can't
+     actually fit — the button bleeds past the card's own right edge (off-screen, clipped by
+     the page's overflow-x:hidden) and the plugin name collapses to 0 width and vanishes.
+     Stack both to a single column so every child gets the card's full, actual width. */
+  @media (max-width: 640px) {
+    /* real numbers (e.g. a "117:12:19" playtime) don't fit a 4-across nowrap row at any
+       usable font size once the row itself is capped to the card's real width — 2x2 instead,
+       each label directly above its own value (one .aw-mystats__item per stat, not a shared
+       label row over a shared value row, which would pair "Artists" with "Tracks" visually) */
+    #myMusic > .panel-body { grid-template-columns: 1fr; row-gap: 12px;
+      .aw-mystats, .btn { grid-column: 1; }
+      .aw-mystats { display: grid; grid-template-columns: 1fr 1fr; column-gap: 14px; row-gap: 10px; }
+      .aw-mystats__value { font-size: 26px; } }
+    #myMusicPlugins > .panel-body { grid-template-columns: 1fr; }
+    #myMusicPlugins #installed-plugin-lists { flex-wrap: wrap; row-gap: 8px;
+      > .row > #list-group:first-child > .row > .col-md-16 { flex: 1 1 100%; white-space: normal; } }
+  }
+  #networkDrives > .panel-heading .fa-info-circle { display: none; }
+  #networkDrives > .panel-body { padding: 0; }
+  #networkDrives #addNewDrive { float: right; margin-top: -46px; background: transparent; color: var(--ink-2); border: 1px solid var(--fill-18); font-weight: 500; }
+  #networkDrives table.table, #networkDrives table.table tbody { display: block; width: 100%; margin: 0; }
+  #networkDrives table.table tr { display: grid; grid-template-columns: 1fr 210px 150px 44px; align-items: center; gap: 18px; padding: 14px 12px; border-radius: 11px; border-top: 1px solid var(--fill-05);
+    &:first-child { border-top: 0; padding: 22px 12px 11px; border-radius: 0; border-bottom: 1px solid var(--fill-10); }
+    th { font-family: var(--font-mono); font-size: 10px; letter-spacing: .16em; color: var(--ink-dim); font-weight: 400; text-transform: uppercase; padding: 0; border: 0; }
+    td { padding: 0; border: 0; vertical-align: middle; color: var(--ink-1); }
+    td:nth-child(1) { font-size: 16px; font-weight: 600; } td:nth-child(2) { font-family: var(--font-mono); font-size: 12px; color: var(--ink-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    td:nth-child(3) .fa.true .material-symbols-rounded { color: var(--ok); } td:nth-child(3) .fa.false .material-symbols-rounded { color: var(--err); }
+    td:nth-child(4) { font-family: var(--font-mono); font-size: 13px; color: var(--ink-3); }
+    td.commandCol .btn { height: 32px; line-height: 30px; padding: 0 10px; } }
+  @media (max-width: 900px) { #networkDrives table.table tr { grid-template-columns: 1fr 120px 44px; td:nth-child(2) { display: none; } } }
+  #systemVersion > .panel-body { display: block; padding: 20px 22px !important; border-radius: 16px; margin-top: 4px; background: var(--fill-09) !important; border: 1px solid var(--fill-14) !important;
+    .sv-main { display: block; font-size: 16px; font-weight: 600; color: var(--ink-1); }
+    .sv-sub { display: block; margin-top: 10px; font-family: var(--font-mono); font-size: 11px; color: var(--ink-dim); text-transform: uppercase; letter-spacing: .04em; } }
+}

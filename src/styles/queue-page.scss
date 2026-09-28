@@ -1,0 +1,41 @@
+/* The queue page (/queue): the frame's list of what is queued, as the theme dresses it.
+   The frame's own rules that survive under the theme are kept: the cover's 10px side margins,
+   the rollover's 45px box with its 10/15 padding, the title's -5px, the remove button's
+   default-button box. */
+body#artwork #playQueue { background: transparent; padding: 8px 0; }
+body#artwork #playQueue .trackInfoBarButtons {
+  position: sticky; top: 0; z-index: 5; width: 100%; height: 48px; display: flex; align-items: center; justify-content: flex-end; gap: 6px; padding: 0 14px; text-align: right;
+  background: var(--bar-veil); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); border-bottom: 1px solid var(--hairline-soft);
+  button.btn-link { width: 40px; height: 40px; padding: 0; margin: 0; border-radius: var(--r-control); border: 1px solid transparent; background: transparent; display: inline-grid; place-items: center; color: var(--ink-2); font-size: 16px; cursor: pointer;
+    .fa { display: block; width: 16px; height: 16px; font-size: 16px; line-height: 16px; font-style: normal; position: relative;
+      .material-symbols-rounded { display: block; width: 16px; height: 16px; font-size: 16px; line-height: 16px; } }
+    &.active { color: #54c688; }   /* the frame's link hover colour marks the toggles that are on */
+    &:hover { background: var(--fill-08); color: var(--ink-1); } }
+}
+body#artwork #playQueueList { background: transparent; user-select: none; -webkit-user-select: none; cursor: pointer; position: relative; height: auto; padding-top: 8px; }
+body#artwork #playQueueList ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+body#artwork #playQueueList li { display: flex; align-items: center; gap: 14px; scroll-margin-top: 56px; margin: 0; padding: 10px 14px; border-radius: var(--r-panel); background: transparent; border: 0; cursor: pointer; transition: background .15s;
+  &:hover { background: var(--fill-06); } }
+body#artwork #playQueueList .image { position: relative; width: 48px; height: 48px; flex: none; display: block;
+  img { width: 48px; height: 48px; margin: 0 10px; object-fit: cover; border-radius: 7px; display: block; } }
+body#artwork #playQueueList .rollover { position: absolute; top: 0; left: 0; width: 45px; height: 45px; padding: 10px 0 0 15px; box-sizing: border-box; display: grid; place-items: center;
+  background: rgba(6, 9, 12, .45); opacity: 0; border-radius: 7px; transition: opacity .2s, transform .3s; color: var(--ink-1); font-size: 20px; cursor: pointer;
+  .material-symbols-rounded { font-size: 20px; line-height: 1; grid-area: 1 / 1; }
+  .rollover__sort { display: none; } }
+body#artwork #playQueueList li:hover .rollover { opacity: 1; }
+body#artwork #playQueueList li.sorting .rollover { transform: rotate(90deg); .rollover__play { display: none; } .rollover__sort { display: block; } }
+body#artwork #playQueueList .titleArtist { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
+body#artwork #playQueueList .title { margin-top: -5px; font-size: 15px; font-weight: 500; color: var(--ink-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+body#artwork #playQueueList .artist-album { font-size: 13px; color: var(--ink-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+body#artwork #playQueueList .duration { flex: none; margin-right: 10px; font-size: 12px; letter-spacing: .04em; color: var(--ink-faint); }
+body#artwork #playQueueList .commandButtons { flex: none; display: flex; align-items: center; gap: 6px; margin-right: 5px; font-size: 22px;
+  button.btn-link { display: block; padding: 1px 6px; margin: 0; border: 2px outset transparent; border-radius: 0; background: transparent; font-size: 22px; line-height: 1.42857; color: #fff; cursor: pointer; }
+  /* the FontAwesome circle-x glyph is .857em wide and sits a pixel higher than the symbol */
+  .fa { display: inline-block; width: .857em; font-size: 22px; line-height: 22px; height: 22px; color: var(--ink-muted); font-style: normal; position: relative; top: -1px;
+    .material-symbols-rounded { display: inline-block; vertical-align: top; font-size: 22px; line-height: 22px; height: 22px; width: 22px; margin-left: -1.57px; } } }
+body#artwork #playQueueList li.isPlaying { background: var(--fill-10);
+  .title { color: var(--ink); font-weight: 700; }
+  .rollover { opacity: 1; background: transparent; color: #54c688; } }
+@media (max-width: 767px) {
+  body#artwork #playQueue .trackInfoBarButtons button.btn-link { font-size: 24px; }
+}

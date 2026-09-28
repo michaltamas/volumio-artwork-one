@@ -1,0 +1,35 @@
+/* Zones page — device rows in the mockup's table idiom */
+body#artwork .aw-zones { padding: var(--pad-top) var(--pad-screen) 48px; color: var(--ink-1);
+  .aw-listhead { margin: 0 0 18px; }
+  .aw-menu-btn { display: none; }
+  .aw-zones__empty { font-size: 15px; color: var(--ink-muted); margin-top: 12px; }
+  .aw-zones__cols, .aw-zone { display: grid; grid-template-columns: 44px 1fr 300px 220px 200px; align-items: center; gap: 20px; }
+  .aw-zones__cols { padding: 16px 14px 12px; font-size: 10px; letter-spacing: .16em; color: var(--ink-dim); }
+  .aw-zone { padding: 14px; border-radius: 12px; border-top: 1px solid var(--fill-06);
+    &.aw-zone--self { background: var(--fill-06); border-top: 0; }
+    &.aw-zone--child { .aw-zone__icon { margin-left: 22px; background: var(--fill-06); } } }
+  .aw-zone__icon { position: relative; width: 44px; height: 44px; border-radius: 11px; background: var(--fill-10); display: grid; place-items: center; overflow: hidden;
+    .material-symbols-rounded { font-size: 22px; color: var(--ink-2); }
+    img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; } }
+  .aw-zone__name { min-width: 0; }
+  .aw-zone__title { font-size: 16px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .aw-zone__sep { margin: 0 6px; }
+  .aw-zone__sub { font-size: 13px; color: var(--ink-dim); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .aw-zone__np { display: flex; align-items: center; gap: 9px; min-width: 0; font-size: 14px; color: var(--ink-2);
+    .aw-zone__track { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .aw-zone__idle { color: var(--ink-dim); text-transform: capitalize; } }
+  .aw-zone__dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ink-faint); flex: none; &--on { background: var(--ok); } }
+  .aw-zone__vol { display: flex; align-items: center; gap: 12px;
+    input[type="range"] { flex: 1; min-width: 0; height: 13px; margin: 0; padding: 0; cursor: pointer; -webkit-appearance: none; appearance: none; background: transparent;
+      &::-webkit-slider-runnable-track { height: 5px; border-radius: 2.5px; background: linear-gradient(var(--ink), var(--ink)) no-repeat, var(--fill-20); background-size: var(--aw-fill, 0%) 100%; }
+      &::-webkit-slider-thumb { -webkit-appearance: none; width: 13px; height: 13px; margin-top: -4px; border: 0; border-radius: 50%; background: var(--ink); box-shadow: 0 0 0 3px var(--fill-14), 0 2px 6px var(--shadow-soft); }
+      &::-moz-range-track { height: 5px; border-radius: 2.5px; background: var(--fill-20); }
+      &::-moz-range-progress { height: 5px; border-radius: 2.5px; background: var(--ink); }
+      &::-moz-range-thumb { width: 13px; height: 13px; border: 0; border-radius: 50%; background: var(--ink); box-shadow: 0 0 0 3px var(--fill-14), 0 2px 6px var(--shadow-soft); }
+      &:focus { outline: none; } &:focus-visible { outline: 2px solid var(--ink-1); outline-offset: 4px; border-radius: 3px; } }
+    .mono { font-size: 12px; color: var(--ink-muted); width: 28px; text-align: right; } }
+  .aw-zone__act { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+  .aw-zone__btn { height: 34px; padding: 0 15px; border-radius: 17px; border: 1px solid var(--fill-16); background: transparent; color: var(--ink-2); font-size: 13px; font-weight: 500; cursor: pointer; font-family: var(--font-ui);
+    &:hover { background: var(--fill-06); } &:focus-visible { outline: 2px solid var(--ink-1); outline-offset: 2px; } }
+  .aw-zone__group { appearance: none; -webkit-appearance: none; padding-right: 15px; option { color: var(--on-ink); } }
+}
