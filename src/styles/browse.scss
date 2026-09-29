@@ -92,7 +92,9 @@ label.aw-search, label.aw-filter { color: var(--ink-2); }
 body#artwork {
   #browse, #browse .panel, #browse .panel-default, #browse .panel-body, #browse .body-content { background: transparent !important; border: 0 !important; box-shadow: none !important; }
   .music-card .action-btn, .music-card .meta__actions { position: absolute; top: 8px; right: 8px; .material-symbols-rounded { color: var(--ink-1); } }
-  .music-card .meta__favorite { position: absolute; top: 8px; left: 8px; .material-symbols-rounded { color: var(--ink-1); } }
+  /* bottom/right reset: with the base rule's bottom and right still set, the heart stretched over the whole
+     cover and took every click — the play button's and the tile's own */
+  .music-card .meta__favorite { position: absolute; top: 8px; left: 8px; bottom: auto; right: auto; .material-symbols-rounded { color: var(--ink-1); } }
 }
 /* the base .fa glyph slots, in Material: row heart / menu 15px var(--ink-3) */
 body#artwork .music-item .item__number { color: var(--ink-dim); font-family: var(--font-mono); font-size: 13px; }
@@ -635,9 +637,8 @@ body#artwork .music-item.aw-playing.aw-loading .item__number { width: auto !impo
   &::before, &::after, .item__number-dot { display: none !important; } }
 
 /* a service's own genre filter and sort order (Qobuz: New Releases), beside the list's title */
-body#artwork .aw-svcfilters { margin-left: auto; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end;
+body#artwork .aw-svcfilters { margin-left: auto; align-self: center; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end;
   .aw-sort { margin-left: 0; max-width: 320px; }
   .aw-sort__v { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .aw-sort--on { border-color: var(--fill-30); .aw-sort__v { color: var(--ink); } }
   ul.dropdown-menu.buttonsGroup { min-width: 220px; } }
-body#artwork .aw-svcfilters + .aw-sort { margin-left: 10px; }

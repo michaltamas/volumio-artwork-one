@@ -6,6 +6,13 @@ All notable changes to this project are documented here. The format is based on
 
 Versions 1.x and 2.x were published in [volumio-artwork-theme](https://github.com/michaltamas/volumio-artwork-theme).
 
+## [Unreleased]
+
+### Fixed
+
+- On a tile with a favourite heart (Qobuz albums), the heart covered the whole cover: a click anywhere on it — the play button included — added the album to favourites instead of playing or opening it. The heart is back in its corner.
+- Beside a service's *Genres* menu the list's own *Sort* button sat a few pixels higher, and on the phone it dropped to a line of its own. Both are one group on one line now.
+
 ## [3.0.4] - 2026-09-29
 
 ### Added

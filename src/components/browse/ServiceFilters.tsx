@@ -4,6 +4,7 @@
  * and `availableSortings` — [{ label, asc?: { uri, active }, desc?: { uri, active } }]. A choice asks
  * the service for its uri; the service does the filtering and marks what is active.
  */
+import type { ReactNode } from 'react';
 import Dropdown, { type MenuEntry } from '../Dropdown';
 import Icon from '../Icon';
 import { useBrowse } from '../../core/store/browse';
@@ -31,8 +32,10 @@ function readSortings(lists: any[]): Sorting[] {
 }
 
 export function hasServiceSortings(lists: any[] | null): boolean { return readSortings(lists || []).length > 0; }
+export function hasServiceFilters(lists: any[] | null): boolean { return !!readFilter(lists || []) || hasServiceSortings(lists); }
 
-export default function ServiceFilters() {
+// children: the list's own controls that belong on the same line (its A–Z button)
+export default function ServiceFilters({ children }: { children?: ReactNode }) {
   const lists = useBrowse(s => s.lists) || [];
   const refine = useBrowse(s => s.refine);
   const filter = readFilter(lists);
@@ -57,6 +60,7 @@ export default function ServiceFilters() {
         <Dropdown className="hamburgerMenu aw-svcfilter" toggleClass="aw-sort" entries={sortEntries}
           toggle={<><span className="aw-sort__k">Sort</span><span className="aw-sort__v">{current ? current.label : '–'}</span><Icon name="expand_more" /></>} />
       ) : null}
+      {children}
     </div>
   );
 }

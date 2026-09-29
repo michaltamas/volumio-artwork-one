@@ -6,7 +6,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import Icon from '../components/Icon';
-import ServiceFilters, { hasServiceSortings } from '../components/browse/ServiceFilters';
+import ServiceFilters, { hasServiceFilters, hasServiceSortings } from '../components/browse/ServiceFilters';
 import PageHead from '../components/PageHead';
 import Crumbs from '../components/browse/Crumbs';
 import BrowseLanding, { streamingOf } from '../components/browse/BrowseLanding';
@@ -143,6 +143,12 @@ export default function Browse({ dedicated }: { dedicated?: boolean }) {
     artistsPage ? 'browsing-artists' : '', isArtist ? 'browsing-artist' : '', (showAll || filter) ? 'aw-artist-all' : '', isPlainList ? 'browsing-list' : '', isTrackList ? 'aw-tracklist' : ''].filter(Boolean).join(' ');
   const showAlbumBg = !!(info && !hideInfo && info.albumart && (isAlbum || info.type === 'song' || isPlaylist));
 
+  // the list's own order; beside a service's genre menu it joins that group, so both sit on one line
+  const localSort = (
+    <button type="button" className="aw-sort" onClick={() => setSortDesc(v => !v)} title="Sort order">
+      <span className="aw-sort__k">Sort</span><span className="aw-sort__v">{sortDesc ? 'Z–A' : 'A–Z'}</span><Icon name="expand_more" />
+    </button>
+  );
   return (
     <div id="browse" className={cls}>
       {showAlbumBg && artRoot ? createPortal(<div className="aw-albumhead__bg" aria-hidden="true"><img src={albumart(info!.albumart)} alt="" /></div>, artRoot) : null}
@@ -190,12 +196,9 @@ export default function Browse({ dedicated }: { dedicated?: boolean }) {
               <div className="aw-listhead">
                 <h1 className="aw-listhead__title">{listTitle}</h1>
                 {count ? <span className="aw-listhead__count mono">{visibleCount !== null ? visibleCount + ' / ' : ''}{count}</span> : null}
-                <ServiceFilters />
-                {!hasServiceSortings(b.lists) ? (
-                  <button type="button" className="aw-sort" onClick={() => setSortDesc(v => !v)} title="Sort order">
-                    <span className="aw-sort__k">Sort</span><span className="aw-sort__v">{sortDesc ? 'Z–A' : 'A–Z'}</span><Icon name="expand_more" />
-                  </button>
-                ) : null}
+                {hasServiceFilters(b.lists)
+                  ? <ServiceFilters>{!hasServiceSortings(b.lists) ? localSort : null}</ServiceFilters>
+                  : localSort}
               </div>
             ) : null}
 
