@@ -48,7 +48,10 @@ body#artwork #pluginWrapper {
   .panel-title { font-family: var(--font-mono); font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-35); font-weight: 400; margin: 0; .fa { display: none; } .section-image { height: 16px; margin-right: 8px; } }
   .panel-body { padding: 0; }
   .sectionDescription { margin: 14px 0 0; font-size: 13px; color: var(--ink-dim); font-weight: 400; }
-  .form-group { display: grid; grid-template-columns: auto auto minmax(24px, 1fr) 300px; align-items: center; column-gap: 8px; row-gap: 0;   /* label · info icon · filler · control */ margin: 0; padding: 18px 0; border-bottom: 1px solid var(--fill-05);
+  /* the control is 300px wide wherever the page has 500px for the row; in a narrower page (beside the settings
+     menu in a ~730–790px window) it is narrower — by the same amount in every row, so the controls stay in line —
+     instead of pushing the row past the page's edge */
+  .form-group { display: grid; grid-template-columns: auto auto minmax(24px, 1fr) min(300px, calc(100% - 200px)); align-items: center; column-gap: 8px; row-gap: 0;   /* label · info icon · filler · control */ margin: 0; padding: 18px 0; border-bottom: 1px solid var(--fill-05);
     > label.plugin-label, > .control-doc, > .control-item, > .control-description, > .control-buttons { float: none; width: auto; min-height: 0; padding: 0; margin: 0; }
     > label.plugin-label { grid-column: 1; grid-row: 1; font-size: 16px; font-weight: 600; color: var(--ink-1); }
     .control-label { text-transform: capitalize; }   /* the frame capitalises every control label */
@@ -210,6 +213,10 @@ body#artwork #pluginWrapper {
     > .row > #list-group:last-child > .col-md-12:last-child { order: 3; flex: none; .btn { float: none; height: 30px; line-height: 28px; padding: 0 12px; font-size: 12px; background: transparent; color: var(--ink-2); border: 1px solid var(--fill-18); font-weight: 500; } }
     .pluginDotStatus { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--ink-faint); margin-right: 7px; vertical-align: 1px; &.active { background: var(--ok); } }
     .bootstrap-switch::after { display: none; } }
+  /* beside the settings menu (a tablet upright, a narrow window) the page is far narrower than the window:
+     two columns of functionality cards squeezed their names to a few letters — one column by the list's own width */
+  #myMusicPlugins { container-type: inline-size; }
+  @container (max-width: 700px) { #myMusicPlugins > .panel-body { grid-template-columns: 1fr; } }
   /* phone width: #myMusic's "auto" button column and #myMusicPlugins's 2-up grid both size
      themselves from their content's intrinsic (max-content) width, which a narrow card can't
      actually fit — the button bleeds past the card's own right edge (off-screen, clipped by
