@@ -162,7 +162,10 @@
   body#artwork #artwork-home .home-hero-cover img { width: 120px; height: 120px; }
   body#artwork #artwork-home .home-hero-meta { padding-bottom: 0; }
   body#artwork #artwork-home .home-hero-title { font-size: 24px; letter-spacing: -.02em; }
-  body#artwork #artwork-home .home-hero-actions { margin-top: 12px; flex-wrap: wrap; gap: 10px; }
+  /* the artist always under Resume: beside it, a short name stayed on the button's line and a long one
+     dropped under it — two looks for one screen */
+  body#artwork #artwork-home .home-hero-actions { margin-top: 12px; flex-direction: column; align-items: flex-start; gap: 10px; }
+  body#artwork #artwork-home .home-hero-sub { max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   body#artwork #artwork-home .home-resume { height: 40px; padding: 0 18px 0 14px; }
   body#artwork #artwork-home .home-shelf { margin-top: 26px; }
   body#artwork #artwork-home .main__row { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 16px; }
