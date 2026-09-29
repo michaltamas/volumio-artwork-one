@@ -74,7 +74,10 @@ body#artwork {
   .music-card__label { font-size: 15px; font-weight: 500; color: var(--ink-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .music-card__meta { font-size: 13px; line-height: 15px; color: var(--ink-dim); margin: 2px 0 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   @media (hover: hover) { .music-card__wrapper:hover { transform: translateY(-8px); } .music-card__wrapper:hover .music-card__overlay { opacity: 1; } }
-  @media (hover: none) { .music-card__overlay { opacity: 1; background: rgba(6, 9, 12, .28); } .music-card .play-btn { width: 44px; height: 44px; } }
+  /* a touch screen has no hover to bring the play button up: it sat in the middle of every cover unseen and
+     played the album on a tap meant to open it. There a tap on a tile opens it (a track or a station plays,
+     as a tap on the tile always did); playing a whole album is on its page and in the tile's menu */
+  @media (hover: none) { .music-card__overlay { opacity: 1; background: rgba(6, 9, 12, .28); } .music-card .meta__play { display: none; } }
   .music-card.is-artist .music-card__header, .music-card.is-artist .music-card__img, .music-card.is-artist .music-card__overlay { border-radius: 50%; }
   .music-card.is-artist .music-card__info, .music-card.is-artist .music-card__meta, .music-card.is-artist .music-card__label { text-align: center; }
 }

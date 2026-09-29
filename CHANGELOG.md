@@ -15,6 +15,7 @@ Versions 1.x and 2.x were published in [volumio-artwork-theme](https://github.co
 
 ### Fixed
 
+- On a phone or a tablet, a tap in the middle of an album's cover played the album instead of opening it: the play button, which a touch screen never shows, was still there to be hit. A tap on a tile now always opens it; a track or a station plays, as before. Playing a whole album is on its page and in the tile's menu.
 - *Rescan* looks like the secondary button it is again; since 3.0.1 it was drawn like *Update*.
 - On a tile with a favourite heart (Qobuz albums), the heart covered the whole cover: a click anywhere on it — the play button included — added the album to favourites instead of playing or opening it. The heart is back in its corner.
 - Beside a service's *Genres* menu the list's own *Sort* button sat a few pixels higher, and on the phone it dropped to a line of its own. Both are one group on one line now.
