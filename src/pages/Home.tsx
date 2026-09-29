@@ -88,6 +88,8 @@ export default function Home() {
           <Icon name="search" /><span className="aw-search-label">Search everything</span><span className="aw-search-key mono">⌘K</span>
         </div>} />
 
+      {/* on the phone the label is the section's own line, as PINNED and RECENT ALBUMS are; beside the cover it wrapped */}
+      {continueArt && continueTitle ? <div className="home-eyebrow home-eyebrow--row mono">PICK UP WHERE YOU LEFT OFF</div> : null}
       {continueArt && continueTitle ? (
         <div className="home-hero">
           <div className="home-hero-cover"><img src={continueArt} alt={continueTitle} /></div>

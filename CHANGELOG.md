@@ -11,7 +11,7 @@ Versions 1.x and 2.x were published in [volumio-artwork-theme](https://github.co
 ### Changed
 
 - The library card in Settings → Sources: *Update* and *Rescan* sit side by side under the counts, at every width, instead of beside them; while the library is indexed the status takes their row.
-- Home on the phone: the artist is always under *Resume*. It used to stay beside the button when the name was short and the screen wide enough, and drop under it otherwise.
+- Home on the phone: *Pick up where you left off* is a line of its own, as *Pinned* and *Recent albums* are; under it the cover and, beside it, the title, the artist and *Resume*, in that order. The label used to wrap beside the cover, and the artist sat beside the button or under it depending on the name's length.
 
 ### Fixed
 

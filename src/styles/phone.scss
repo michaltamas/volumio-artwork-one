@@ -157,16 +157,18 @@
   body#artwork #artwork-home .home-pins-edit { display: none; }
   body#artwork #artwork-home .home-pin__more { opacity: 1; width: 28px; height: 28px; }
   body#artwork #artwork-home .aw-search { flex: 1; width: auto; margin-left: 0; height: 44px; border-radius: 22px; padding: 0 14px; gap: 9px; background: var(--fill-09); border: 1px solid var(--fill-12); }
-  body#artwork #artwork-home .home-hero { margin-top: 24px; gap: 16px; align-items: center; flex-wrap: nowrap; }
+  /* Continue: the label on a line of its own, then the cover with, beside it, what it is, whose, and Resume */
+  body#artwork #artwork-home .home-eyebrow--row { display: block; margin-top: 24px; font-size: 11px; letter-spacing: .18em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  body#artwork #artwork-home .home-hero-meta .home-eyebrow { display: none; }
+  body#artwork #artwork-home .home-hero { margin-top: 14px; gap: 16px; align-items: center; flex-wrap: nowrap; }
   body#artwork #artwork-home .home-hero-cover { flex: none; }
-  body#artwork #artwork-home .home-hero-cover img { width: 120px; height: 120px; }
+  body#artwork #artwork-home .home-hero-cover img { width: 132px; height: 132px; }   /* the Mobile mockup's: 132, title 20/1.12, Resume 38 high */
   body#artwork #artwork-home .home-hero-meta { padding-bottom: 0; }
-  body#artwork #artwork-home .home-hero-title { font-size: 24px; letter-spacing: -.02em; }
-  /* the artist always under Resume: beside it, a short name stayed on the button's line and a long one
-     dropped under it — two looks for one screen */
-  body#artwork #artwork-home .home-hero-actions { margin-top: 12px; flex-direction: column; align-items: flex-start; gap: 10px; }
-  body#artwork #artwork-home .home-hero-sub { max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  body#artwork #artwork-home .home-resume { height: 40px; padding: 0 18px 0 14px; }
+  body#artwork #artwork-home .home-hero-title { margin-top: 0; font-size: 20px; letter-spacing: -.02em; line-height: 1.12; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+  /* the artist is after the button in the page: shown before it here */
+  body#artwork #artwork-home .home-hero-actions { margin-top: 4px; flex-direction: column-reverse; align-items: flex-start; gap: 12px; }
+  body#artwork #artwork-home .home-hero-sub { font-size: 14px; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  body#artwork #artwork-home .home-resume { height: 38px; padding: 0 18px 0 13px; gap: 8px; font-size: 13px; .material-symbols-rounded { font-size: 20px; } }
   body#artwork #artwork-home .home-shelf { margin-top: 26px; }
   body#artwork #artwork-home .main__row { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 16px; }
   /* --- the queue: a full screen --- */

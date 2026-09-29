@@ -6,6 +6,7 @@ body#artwork #artwork-home {
   .home-hero-cover img { width: 224px; height: 224px; object-fit: cover; border-radius: var(--r-cover); box-shadow: 0 34px 70px -22px var(--shadow-strong); display: block; }
   .home-hero-meta { display: flex; flex-direction: column; padding-bottom: 6px; min-width: 0; }
   .home-eyebrow { font-size: 11px; letter-spacing: .2em; color: var(--ink-3); }
+  .home-eyebrow--row { display: none; }   /* the phone's */
   .home-hero-title { font-family: var(--font-ui); font-size: var(--t-h1-lg); font-weight: 800; letter-spacing: -.03em; line-height: 1.02; margin-top: 12px; color: var(--ink); text-wrap: pretty; }
   .home-hero-actions { display: flex; align-items: center; gap: 16px; margin-top: 22px; }
   .home-resume { display: flex; align-items: center; gap: 9px; height: 46px; padding: 0 24px 0 19px; border-radius: var(--r-pill); background: var(--ink); color: var(--ground); border: 0; cursor: pointer;
