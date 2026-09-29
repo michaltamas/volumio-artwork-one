@@ -8,8 +8,13 @@ Versions 1.x and 2.x were published in [volumio-artwork-theme](https://github.co
 
 ## [Unreleased]
 
+### Changed
+
+- The library card in Settings → Sources: *Update* and *Rescan* sit side by side under the counts, at every width, instead of beside them; while the library is indexed the status takes their row.
+
 ### Fixed
 
+- *Rescan* looks like the secondary button it is again; since 3.0.1 it was drawn like *Update*.
 - On a tile with a favourite heart (Qobuz albums), the heart covered the whole cover: a click anywhere on it — the play button included — added the album to favourites instead of playing or opening it. The heart is back in its corner.
 - Beside a service's *Genres* menu the list's own *Sort* button sat a few pixels higher, and on the phone it dropped to a line of its own. Both are one group on one line now.
 - In a window about 730–790 px wide (a tablet upright), where the settings menu leaves the page little room: the functionality cards in Settings → Sources squeezed their names to a few letters, and a form row could run past the page's edge so the page slid sideways. The cards go one to a row there, and the form's controls are narrower, all by the same amount.
