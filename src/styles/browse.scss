@@ -633,3 +633,11 @@ body#artwork #content.browse, body#artwork #content.search { overflow: hidden; p
    :not(), the phone rules) — while loading they must go whatever block drew them, hence !important. */
 body#artwork .music-item.aw-playing.aw-loading .item__number { width: auto !important; height: auto !important; display: grid !important; place-items: center;
   &::before, &::after, .item__number-dot { display: none !important; } }
+
+/* a service's own genre filter and sort order (Qobuz: New Releases), beside the list's title */
+body#artwork .aw-svcfilters { margin-left: auto; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end;
+  .aw-sort { margin-left: 0; max-width: 320px; }
+  .aw-sort__v { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .aw-sort--on { border-color: var(--fill-30); .aw-sort__v { color: var(--ink); } }
+  ul.dropdown-menu.buttonsGroup { min-width: 220px; } }
+body#artwork .aw-svcfilters + .aw-sort { margin-left: 10px; }

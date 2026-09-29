@@ -61,6 +61,7 @@ interface BrowseStore {
   scroll: Record<string, number>;
   stamp: number;                   // bumps on every answered page, for the scroll restore
   fetch: (item: BrowseItem, back?: boolean) => void;
+  refine: (uri: string) => void;
   open: (item: BrowseItem, fresh?: boolean) => void;
   goBack: () => void;
   backHome: () => void;
@@ -125,6 +126,9 @@ export const useBrowse = create<BrowseStore>((set, get) => ({
     set({ request: item, currentUri: String(item.uri || ''), loading: true, isBrowsing: item.static ? get().isBrowsing : true, scroll });
     emit('browseLibrary', { uri: item.uri });
   },
+  // a service's genre filter or sort order (Qobuz: New Releases): the same page asked for again under
+  // another uri — it replaces the page on the trail, so Back does not step through every change
+  refine: (uri) => { const cur = get().request; if (!uri || !cur) { return; } get().fetch({ ...cur, uri, refine: true } as BrowseItem); },
   open: (item, fresh) => { if (fresh) { set({ trail: [], isSearching: false, searchField: '' }); } get().fetch(item); },
   goBack: () => {
     const trail = get().trail;
@@ -189,6 +193,7 @@ on('pushBrowseLibrary', (data: any) => {
     let trail = st.trail;
     const seen = trail.findIndex(s => s.uri && s.uri === req.uri);
     if (seen > -1) { trail = trail.slice(0, seen); }
+    else if ((req as any).refine && trail.length) { trail = trail.slice(0, -1); }
     patch.trail = [...trail, { ...req, lists, info, prev: data.navigation.prev || null }];
   }
   useBrowse.setState(patch);

@@ -6,6 +6,12 @@ All notable changes to this project are documented here. The format is based on
 
 Versions 1.x and 2.x were published in [volumio-artwork-theme](https://github.com/michaltamas/volumio-artwork-theme).
 
+## [3.0.4] - 2026-09-29
+
+### Added
+
+- **Genre filter and sort order from the music service**, the way Volumio's own interfaces show them. When a service offers them for a page — Qobuz's *New Releases*, for example — a *Genres* menu (tick one or more) and a *Sort* menu sit beside the page's title. The choice replaces the page instead of stacking another step for Back.
+
 ## [3.0.3] - 2026-09-28
 
 ### Fixed
@@ -48,6 +54,7 @@ Artwork One rebuilt from the ground up in React. Same look, same features, a new
 - Built with React and Vite instead of AngularJS: the release is a quarter of the size (1.8 MB instead of 7.8 MB), faster to open, with one stylesheet per part instead of layered theme overrides.
 - The release archive is now `artwork-one.tar.gz`; the installer puts it in the same place as before, so 1.x and 2.x are replaced in place.
 
+[3.0.4]: https://github.com/michaltamas/volumio-artwork-one/releases/tag/v3.0.4
 [3.0.3]: https://github.com/michaltamas/volumio-artwork-one/releases/tag/v3.0.3
 [3.0.2]: https://github.com/michaltamas/volumio-artwork-one/releases/tag/v3.0.2
 [3.0.1]: https://github.com/michaltamas/volumio-artwork-one/releases/tag/v3.0.1

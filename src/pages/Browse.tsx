@@ -6,6 +6,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import Icon from '../components/Icon';
+import ServiceFilters, { hasServiceSortings } from '../components/browse/ServiceFilters';
 import PageHead from '../components/PageHead';
 import Crumbs from '../components/browse/Crumbs';
 import BrowseLanding, { streamingOf } from '../components/browse/BrowseLanding';
@@ -189,9 +190,12 @@ export default function Browse({ dedicated }: { dedicated?: boolean }) {
               <div className="aw-listhead">
                 <h1 className="aw-listhead__title">{listTitle}</h1>
                 {count ? <span className="aw-listhead__count mono">{visibleCount !== null ? visibleCount + ' / ' : ''}{count}</span> : null}
-                <button type="button" className="aw-sort" onClick={() => setSortDesc(v => !v)} title="Sort order">
-                  <span className="aw-sort__k">Sort</span><span className="aw-sort__v">{sortDesc ? 'Z–A' : 'A–Z'}</span><Icon name="expand_more" />
-                </button>
+                <ServiceFilters />
+                {!hasServiceSortings(b.lists) ? (
+                  <button type="button" className="aw-sort" onClick={() => setSortDesc(v => !v)} title="Sort order">
+                    <span className="aw-sort__k">Sort</span><span className="aw-sort__v">{sortDesc ? 'Z–A' : 'A–Z'}</span><Icon name="expand_more" />
+                  </button>
+                ) : null}
               </div>
             ) : null}
 
