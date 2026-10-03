@@ -11,6 +11,7 @@ Versions 1.x and 2.x were published in [volumio-artwork-theme](https://github.co
 ### Changed
 
 - **Much lighter to draw.** The blur under the sticky page head was twelve stacked blur layers, and every scroll blurred the band twelve times — on a phone without a strong GPU that alone took most of the drawing time, and the interface felt sluggish. It is one layer with a gradient mask now: the same look, about a quarter of the drawing work while a list scrolls.
+- Zones has the same fixed head as the library's lists, with the blur under it.
 
 ### Fixed
 

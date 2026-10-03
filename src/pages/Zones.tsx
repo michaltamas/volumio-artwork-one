@@ -1,9 +1,10 @@
 /** Zones (multiroom): the real device list, laid out as rows (44px icon tile · name + host · status · volume · actions). */
 import { useEffect, useRef, useState } from 'react';
 import Icon from '../components/Icon';
+import PageHead from '../components/PageHead';
+import Crumbs from '../components/browse/Crumbs';
 import { useMultiroom, type Zone } from '../core/store/multiroom';
 import { usePlayer } from '../core/store/player';
-import { useUi } from '../core/store/ui';
 import { emit, HOST } from '../core/socket';
 import { useLocalPlayback } from '../core/localPlayback';
 import { LocalPlaybackStatus, LocalPlaybackSwitch } from '../components/LocalPlaybackControl';
@@ -43,8 +44,8 @@ export default function Zones() {
   const switchTo = (d: Device) => { if (d && !d.isChild && !d.isSelf && d.host && d.host !== HOST) { window.location.href = d.host; } };
   return (
     <div id="aw-zones" className="aw-zones">
+      <PageHead variant="list" nav={<Crumbs root="Zones" />} />
       <div className="aw-listhead">
-        <button type="button" className="aw-menu-btn" onClick={() => useUi.getState().toggleMenu()} aria-label="Menu" title="Menu"><Icon name="menu" /></button>
         <h1 className="aw-listhead__title">Zones</h1>
         {devices.length ? <span className="aw-listhead__count mono">{devices.length}</span> : null}
       </div>

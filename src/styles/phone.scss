@@ -278,8 +278,8 @@
 @media (max-width: 700px) and (orientation: portrait) {
   body#artwork #np .np-sleep-tag { display: none; }
   /* --- Zones: device cards (icon · name / now playing / volume / actions) --- */
-  body#artwork .aw-zones { padding: var(--phone-top) 20px calc(var(--mini-h) + 20px); }
-  body#artwork .aw-zones .aw-listhead { gap: 12px; margin: 0 0 6px; align-items: center; min-height: 44px; }
+  body#artwork .aw-zones { --head-pad: var(--phone-top); padding: 0 20px calc(var(--mini-h) + 20px); }
+  body#artwork .aw-zones .aw-listhead { gap: 12px; margin: 14px 0 6px; align-items: center; min-height: 44px; }
   body#artwork .aw-zones .aw-listhead .aw-menu-btn { display: grid; place-items: center; border: 0; background: transparent; padding: 0; color: var(--ink-2); cursor: pointer; height: 44px; width: 32px; .material-symbols-rounded { font-size: 24px; } }
   body#artwork .aw-zones .aw-listhead__title { font-size: 24px; letter-spacing: -.02em; }
   body#artwork .aw-zones .aw-zones__cols { display: none; }

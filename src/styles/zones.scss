@@ -1,6 +1,6 @@
 /* Zones page — device rows in the mockup's table idiom */
-body#artwork .aw-zones { padding: var(--pad-top) var(--pad-screen) 48px; color: var(--ink-1);
-  .aw-listhead { margin: 0 0 18px; }
+body#artwork .aw-zones { padding: 0 var(--pad-screen) 48px; color: var(--ink-1);   /* the fixed head (and its spacer) carries the top */
+  .aw-listhead { margin: 26px 0 18px; }   /* as the library's lists under their head */
   .aw-menu-btn { display: none; }
   .aw-zones__empty { font-size: 15px; color: var(--ink-muted); margin-top: 12px; }
   .aw-zones__cols, .aw-zone { display: grid; grid-template-columns: 44px 1fr 300px 220px 200px; align-items: center; gap: 20px; }
