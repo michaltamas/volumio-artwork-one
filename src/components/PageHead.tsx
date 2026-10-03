@@ -33,7 +33,7 @@ export default function PageHead({ variant, back, backLabel, nav, actions }: { v
   return (
     <>
       <div ref={ref} className={'aw-head' + (variant ? ' aw-head--' + variant : '')}>
-        <div className="aw-hblur" aria-hidden="true">{Array.from({ length: 12 }, (_, i) => <i key={i} />)}</div>
+        <div className="aw-hblur" aria-hidden="true"><i /></div>
         <div className="aw-head__row">
           <button type="button" className="aw-menu-btn" onClick={() => useUi.getState().toggleMenu()} aria-label="Menu" title="Menu"><Icon name="menu" /></button>
           {back ? <button type="button" className="aw-head__back" onClick={back} aria-label={backLabel || 'Back'} title={backLabel || 'Back'}><Icon name="arrow_back" /></button> : null}

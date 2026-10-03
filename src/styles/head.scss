@@ -27,16 +27,13 @@
 @supports (hanging-punctuation: first) and (font: -apple-system-body) {
   .aw-head .aw-hblur { opacity: 0; animation: aw-hblur-in .15s ease .05s forwards; }
 }
+/* the blur under the sticky head, fading out over the first rows: ONE backdrop-filter layer with a gradient mask.
+   It used to be twelve stacked layers (0.25px … 12.5px, each masked a little shorter) for a smoother gradation,
+   and every scroll frame blurred the band twelve times — on a weak phone that alone ate most of the drawing time. */
 .aw-head .aw-hblur { position: absolute; left: 0; right: 0; top: 0; bottom: calc(-1 * var(--head-fade, 40px)); z-index: -1; pointer-events: none;
-  i { position: absolute; left: 0; right: 0; top: 0; bottom: 0; display: block; }
-  $radii: 0.25px 0.35px 0.5px 0.7px 1px 1.4px 2px 2.9px 4.2px 6px 8.6px 12.5px;
-  $stops: 84% 77% 70% 63% 56% 49% 42% 35% 28% 21% 14% 7%;
-  $ends: 100% 93% 86% 79% 72% 65% 58% 51% 44% 37% 30% 23%;
-  @for $i from 1 through 12 {
-    i:nth-child(#{$i}) { $r: nth($radii, $i); $stop: nth($stops, $i); $end: nth($ends, $i);
-      -webkit-backdrop-filter: blur($r); backdrop-filter: blur($r);
-      -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 $stop, transparent $end); mask-image: linear-gradient(to bottom, #000 0%, #000 $stop, transparent $end); }
-  }
+  i { position: absolute; left: 0; right: 0; top: 0; bottom: 0; display: block;
+    -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+    -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 40%, transparent 100%); mask-image: linear-gradient(to bottom, #000 0%, #000 40%, transparent 100%); }
 }
 .aw-head--album { &::after { content: none; } .aw-hblur { display: none; } }
 
@@ -97,3 +94,4 @@ body#artwork .hamburgerMenu ul.dropdown-menu.buttonsGroup, body#artwork .home-pi
   .aw-menu__danger > a, .aw-menu__danger > a .material-symbols-rounded { color: var(--err-soft); }
 }
 body#artwork .home-pin__menu ul.dropdown-menu.buttonsGroup { width: 200px; }
+
