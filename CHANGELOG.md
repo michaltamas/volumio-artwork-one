@@ -10,6 +10,8 @@ Versions 1.x and 2.x were published in [volumio-artwork-theme](https://github.co
 
 ### Fixed
 
+- A plugin's settings page no longer sits black while the player prepares it, or forever when the player sends nothing: it says *Loading settings…*, and after a few seconds without an answer explains that and offers *Try again*.
+- A screen that fails to render no longer takes the whole interface down to a blank page: the rail and the player stay, the screen's place says what went wrong (with the error, to report), and offers Reload and Go back.
 - Web Radio: the field at the top of its pages searches the radio directory (Bayern 3, 1LIVE…) instead of filtering the handful of categories on screen, where a station's name never matched. My Web Radios and Favorite Radios are still filtered, as any list of one's own.
 
 ## [3.0.5] - 2026-09-29

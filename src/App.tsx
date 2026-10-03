@@ -23,6 +23,7 @@ import Toasts from './components/Toasts';
 import UndoToast from './components/UndoToast';
 import AmbientDisplay from './components/AmbientDisplay';
 import ConnectionLost from './components/ConnectionLost';
+import ErrorBoundary from './components/ErrorBoundary';
 import { useEffect, useLayoutEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useBrowse } from './core/store/browse';
@@ -71,7 +72,7 @@ function Shell() {
           {shell ? <div className="aw-settings-nav"><SettingsNav /></div> : null}
           <div id="content" className={covered ? 'playback' : underPage}>
             <div className={'aw-under' + (covered ? ' aw-under--covered' : '')} aria-hidden={covered || undefined}>
-            <Routes location={isNp ? under.current : loc}>
+            <ErrorBoundary name="page"><Routes location={isNp ? under.current : loc}>
               <Route path="/" element={<Navigate to="/home" replace />} />
               <Route path="/home" element={<Home />} />
               <Route path="/browse" element={<Browse />} />
@@ -88,9 +89,9 @@ function Shell() {
               <Route path="/iframe-page" element={<Navigate to="/playback" replace />} />
               <Route path="/myvolumio/*" element={<MyVolumio />} />
               <Route path="*" element={<Navigate to="/home" replace />} />
-            </Routes>
+            </Routes></ErrorBoundary>
             </div>
-            {isNp ? <NowPlaying /> : null}
+            {isNp ? <ErrorBoundary name="now-playing"><NowPlaying /></ErrorBoundary> : null}
           </div>
           {/* only rendered when the shell actually has 3 grid columns (aw-settings-shell--noside
              drops to 2) — mounted anyway, this element has nowhere to go but wraps onto a new

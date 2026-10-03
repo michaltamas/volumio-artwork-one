@@ -1,5 +1,5 @@
 /** A settings page generated from a plugin's UI config: sections of rows (input, switch, select, button), core sections, the save button. */
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import Icon from '../components/Icon';
 import PageHead from '../components/PageHead';
@@ -12,6 +12,7 @@ import { useModal } from '../core/store/modal';
 import { Switch, Select, Segment } from '../components/settings/controls';
 import { CORE } from '../components/settings/CoreSections';
 import AppearanceSlot from '../components/settings/AppearanceSlot';
+import Spinner from '../components/Spinner';
 
 function visible(item: any, section: any): boolean {
   if (item.hidden) { return false; }
@@ -32,14 +33,18 @@ export default function PluginPage({ wizard }: { wizard?: boolean }) {
   const ui = useUiSettings(s => s.settings);
   const [obj, setObj] = useState<any>(null);
   const [show, setShow] = useState(false);
+  const [answered, setAnswered] = useState(false);   // the ask came back empty
+  const takeRef = useRef<(d: any) => void>(() => {});
   const [, bump] = useState(0);
   const rerender = () => bump(n => n + 1);
   useEffect(() => {
     useSettings.setState({ route: { name: 'volumio.plugin', pluginName } });
     setObj(null); setShow(false);
     let alive = true;
+    setAnswered(false);
     const take = (data: any) => {
-      if (!alive || !data) { return; }
+      if (!alive) { return; }
+      if (!data) { setAnswered(true); return; }   // the ask timed out, or the player had nothing for this page
       setObj(data);
       const pp = data.page && data.page.passwordProtection;
       if (!pp || !pp.enabled) { setShow(true); }
@@ -48,6 +53,7 @@ export default function PluginPage({ wizard }: { wizard?: boolean }) {
     // the answer to this page's ask, and afterwards the player's own pushes (after a save) for it
     const off = onUiConfig((page, cfg) => { if (page === null || page === pageKey(pluginName)) { take(cfg); } });
     // the route names the page with a dash; the player wants category/name
+    takeRef.current = take;
     askUiConfig(pageKey(pluginName), wizard).then(take);
     return () => { alive = false; off(); useSettings.setState({ route: { name: '', pluginName: '' } }); };
   }, [pluginName, wizard]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -76,7 +82,24 @@ export default function PluginPage({ wizard }: { wizard?: boolean }) {
     run();
   };
   const isAppearance = pluginName === 'miscellanea-appearance';
-  if (!show || !obj) { return <div className="container-fluid" />; }
+  // nothing yet: say so, instead of a blank screen — the settings may take a moment on a slow player, and a
+  // plugin that fails to build them would otherwise leave the page black for good
+  if (!show || !obj) {
+    return (
+      <div className="container-fluid"><div className="row"><div className="col-xs-24" id="pluginWrapper">
+        <PageHead variant="settings" back={() => nav('/settings')} backLabel="Settings" nav={<Crumbs root="Settings" current="" onHome={() => nav('/settings')} />} />
+        <div className="aw-pluginwait">
+          {answered ? (
+            <>
+              <Icon name="error" />
+              <p className="aw-pluginwait__text">This plugin did not send its settings page. It may still be starting, or it failed to build the page.</p>
+              <button type="button" className="aw-btn aw-btn--primary" onClick={() => { setAnswered(false); askUiConfig(pageKey(pluginName), wizard).then(takeRef.current); }}><span>Try again</span></button>
+            </>
+          ) : (<><Spinner size={24} /><p className="aw-pluginwait__text">Loading settings…</p></>)}
+        </div>
+      </div></div></div>
+    );
+  }
   const page = obj.page || {};
   const showDoc = !!(ui.pluginsDoc && ui.pluginsDoc.showDoc);
   return (

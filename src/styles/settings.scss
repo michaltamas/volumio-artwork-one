@@ -137,3 +137,15 @@ body#artwork #contentWrapper.aw-settings-shell.aw-settings-shell--noside { grid-
   body#artwork #pluginWrapper .form-group > .control-item { grid-column: 1 / -1 !important; grid-row: 2 !important; }
   body#artwork #pluginWrapper .form-group > .control-description { grid-column: 1 / -1 !important; grid-row: 3 !important; }
 }
+
+/* a plugin's settings page while they load, and when they never come */
+body#artwork .aw-pluginwait { display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 60px 20px; text-align: center; color: var(--ink-3);
+  > .material-symbols-rounded { font-size: 32px; color: var(--ink-2); }
+  &__text { margin: 0; max-width: 420px; font-size: 14px; line-height: 1.45; text-wrap: pretty; } }
+/* a screen that failed to render (ErrorBoundary) */
+body#artwork .aw-crash { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 60px 20px; text-align: center; color: var(--ink-2);
+  > .material-symbols-rounded { font-size: 36px; color: var(--err-soft); }
+  &__title { margin: 0; font-family: var(--font-ui); font-size: 20px; font-weight: 600; color: var(--ink); }
+  &__text { margin: 0; max-width: 460px; font-size: 14px; line-height: 1.45; color: var(--ink-3); text-wrap: pretty; }
+  &__detail { margin: 6px 0 0; max-width: min(640px, 100%); padding: 10px 14px; border-radius: 10px; background: var(--fill-08); border: 1px solid var(--fill-12); font-size: 12px; color: var(--ink-2); white-space: pre-wrap; overflow-wrap: anywhere; text-align: left; }
+  &__actions { display: flex; gap: 10px; margin-top: 10px; } }
