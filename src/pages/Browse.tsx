@@ -97,6 +97,10 @@ export default function Browse({ dedicated }: { dedicated?: boolean }) {
   // the head field: on a streaming service's pages it asks the service (Volumio's search, scoped); elsewhere it filters the rows
   const service = useMemo(() => {
     const r: any = request || {}; if (!r.uri) { return null; }
+    // Web Radio's directory is searched, not filtered: its pages list categories, the stations are behind them
+    // (a user's own lists — My Web Radios, Favorite Radios — are short, and filtered as any list)
+    const u = String(r.uri);
+    if (u === 'radio' || (u.indexOf('radio/') === 0 && u !== 'radio/myWebRadio' && u !== 'radio/favourites')) { return b.sources.find(s => s.uri === 'radio') || null; }
     return streamingOf(b.sources).find(s => (s.plugin_name && (s.plugin_name === r.plugin_name || s.plugin_name === r.service)) || (s.service && s.service === r.service) || (s.uri && String(r.uri) === s.uri) || (s.uri && String(r.uri).indexOf(s.uri + '/') === 0) || (s.uri && String(r.uri).indexOf(s.uri + ':') === 0)) || null;
   }, [request, b.sources]);
   const placeholder = service ? 'Search ' + (service.name || service.title || '') : 'Filter ' + String(listTitle || '').toLowerCase();

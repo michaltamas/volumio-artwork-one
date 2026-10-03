@@ -6,6 +6,12 @@ All notable changes to this project are documented here. The format is based on
 
 Versions 1.x and 2.x were published in [volumio-artwork-theme](https://github.com/michaltamas/volumio-artwork-theme).
 
+## [Unreleased]
+
+### Fixed
+
+- Web Radio: the field at the top of its pages searches the radio directory (Bayern 3, 1LIVE…) instead of filtering the handful of categories on screen, where a station's name never matched. My Web Radios and Favorite Radios are still filtered, as any list of one's own.
+
 ## [3.0.5] - 2026-09-29
 
 ### Changed
