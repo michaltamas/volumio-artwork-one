@@ -14,6 +14,8 @@ Versions 1.x and 2.x were published in [volumio-artwork-theme](https://github.co
 - **Tooltips that explain.** Every icon-only control shows its name at once under the mouse — and a line on what it does where the icon is not obvious (*Shuffle: plays the queue in random order*). On a touch screen, a long press shows it.
 - **A title cut short slides across** so the whole of it can be read: under the mouse for the row or tile, and on a touch screen after a long press on the text (a tap still opens or plays). In the library's rows and tiles, and in the mini player.
 - **Search finds tracks in your playlists.** Volumio's search never looked inside them; the theme now does, and lists the matches as *Playlists* among the results — each row a song with the playlist it is in, playable as any other.
+- **Now Playing text size** (Appearance → This screen): Small, Normal, Large or Extra large for the title, the artist and the album — larger for a display of an unusual shape (a 1920×515 strip) where the text reads too small. A choice of each screen.
+- **Hide the volume control** (Appearance → This screen): for a player whose volume is set on the amplifier, the slider and the mute button leave the mini player and Now Playing.
 - **Keep the screen on while playing** (Settings → Appearance → This screen): a phone or tablet does not lock while music plays and the page is open — for following the lyrics, or a screen that is not the player's own. A choice of each browser. The Screen Wake Lock API only works on https, which the player does not serve, so a tiny silent video looping unseen does the holding, the way NoSleep.js does.
 
 ## [3.0.6] - 2026-10-03
@@ -24,6 +26,8 @@ Versions 1.x and 2.x were published in [volumio-artwork-theme](https://github.co
 - Zones has the same fixed head as the library's lists, with the blur under it.
 
 ### Fixed
+
+- Now Playing in a short landscape window (a 1920×515 display): the hero's size containment collapsed it to no height, so a larger text column ran under the seek bar.
 
 - A plugin's settings page no longer sits black while the player prepares it, or forever when the player sends nothing: it says *Loading settings…*, and after a few seconds without an answer explains that and offers *Try again*.
 - A screen that fails to render no longer takes the whole interface down to a blank page: the rail and the player stay, the screen's place says what went wrong (with the error, to report), and offers Reload and Go back.

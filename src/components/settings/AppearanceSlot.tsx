@@ -5,6 +5,7 @@ import { useTheme, type ThemeMode } from '../../core/store/theme';
 import { useCompanion } from '../../core/store/companion';
 import { useAmbient, DELAYS, type AmbientSettings } from '../../core/store/ambient';
 import { useScreenOn } from '../../core/store/screenOn';
+import { useScreenPrefs, type TextSize } from '../../core/store/screenPrefs';
 import { useToasts } from '../../core/store/toast';
 
 const MODES: ThemeMode[] = ['dark', 'light', 'system'];
@@ -16,6 +17,8 @@ export default function AppearanceSlot() {
   const companion = useCompanion();
   const ambient = useAmbient();
   const screenOn = useScreenOn();
+  const prefs = useScreenPrefs();
+  const SIZES: { k: TextSize; l: string }[] = [{ k: 's', l: 'Small' }, { k: 'm', l: 'Normal' }, { k: 'l', l: 'Large' }, { k: 'xl', l: 'Extra large' }];
   const [draft, setDraft] = useState<AmbientSettings>({ ...ambient.settings });
   useEffect(() => { setDraft({ ...ambient.settings }); }, [ambient.settings]);
   const playerTheme = companion.settings.theme || null;
@@ -58,6 +61,20 @@ export default function AppearanceSlot() {
                   <div className="aw-amb-row__hint">This phone or tablet does not lock while music plays and this page is open — for following the lyrics, or a screen that is not the player's own. Remembered in this browser only.</div>
                 </div>
                 <button type="button" className={'aw-switch' + (screenOn.on ? ' on' : '')} role="switch" aria-checked={screenOn.on} aria-label="Keep the screen on while playing" onClick={() => screenOn.set(!screenOn.on)}><span className="aw-switch__knob" /></button>
+              </div>
+              <div className="aw-amb-row">
+                <div className="aw-amb-row__text">
+                  <div className="aw-amb-row__title">Now Playing text size</div>
+                  <div className="aw-amb-row__hint">The title, the artist and the album on Now Playing. Larger for a display of an unusual shape, where the text reads too small; smaller to fit more.</div>
+                </div>
+                <div className="aw-seg mono" role="group" aria-label="Now Playing text size">{SIZES.map(s => <button key={s.k} type="button" className={prefs.textSize === s.k ? 'active' : ''} onClick={() => prefs.setTextSize(s.k)}>{s.l}</button>)}</div>
+              </div>
+              <div className="aw-amb-row">
+                <div className="aw-amb-row__text">
+                  <div className="aw-amb-row__title">Hide the volume control</div>
+                  <div className="aw-amb-row__hint">For a player whose volume is set on the amplifier: the slider and the mute button leave the mini player and Now Playing. The player's volume is unchanged.</div>
+                </div>
+                <button type="button" className={'aw-switch' + (prefs.hideVolume ? ' on' : '')} role="switch" aria-checked={prefs.hideVolume} aria-label="Hide the volume control" onClick={() => prefs.setHideVolume(!prefs.hideVolume)}><span className="aw-switch__knob" /></button>
               </div>
             </div>
           </div>

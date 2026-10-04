@@ -241,7 +241,7 @@ html.aw-is-light body#artwork #np .np-about__rule { background: rgba(20, 22, 26,
 }
 @media (max-height: 520px) and (orientation: landscape) {
   body#artwork #np { height: auto; min-height: 100%; overflow: visible; }
-  body#artwork #np #np-hero { flex: none; }
+  body#artwork #np #np-hero { flex: none; container-type: normal; }   /* size containment collapsed it to 0 here: the page scrolls, the hero is as tall as its text */
   body#artwork #np #np-cover { height: auto; width: min(46vh, 40%); }
   body#artwork #np #np-footer { padding-top: 18px; }
   body#artwork #np .np-seg { display: none; }   /* no headroom for the switch in a short window: Cover only */
@@ -300,3 +300,25 @@ body#artwork #np.np--empty {
     .np-empty__intro, .np-empty__recent { flex: none; }
   }
 }
+
+/* Now Playing's text size, a screen's own choice (Appearance → This screen): the meta column scaled, the cover untouched */
+html[data-aw-text="s"] body#artwork #np .np-title { font-size: calc(var(--t-display) * .85); }
+html[data-aw-text="s"] body#artwork #np .np-artist, html[data-aw-text="s"] body#artwork #np .np-album { font-size: .9em; }
+html[data-aw-text="l"] body#artwork #np .np-title { font-size: calc(var(--t-display) * 1.25); }
+html[data-aw-text="l"] body#artwork #np .np-artist { font-size: clamp(21px, 2vw, 29px); }
+html[data-aw-text="l"] body#artwork #np .np-album { font-size: clamp(17px, 1.55vw, 22px); }
+html[data-aw-text="xl"] body#artwork #np .np-title { font-size: calc(var(--t-display) * 1.55); }
+html[data-aw-text="xl"] body#artwork #np .np-artist { font-size: clamp(25px, 2.5vw, 36px); }
+html[data-aw-text="xl"] body#artwork #np .np-album { font-size: clamp(20px, 1.9vw, 28px); }
+html[data-aw-text="l"] body#artwork #np .np-chip, html[data-aw-text="xl"] body#artwork #np .np-chip { height: 44px; .np-chip-num { font-size: 15px; } .np-chip-unit { font-size: 12px; } }
+html[data-aw-text="l"] body#artwork #np .np-format, html[data-aw-text="xl"] body#artwork #np .np-format, html[data-aw-text="l"] body#artwork #np .np-signalpath, html[data-aw-text="xl"] body#artwork #np .np-signalpath { font-size: 13px; }
+/* the volume control hidden (Appearance → This screen): whoever sets it on the amplifier */
+html.aw-no-volume body#artwork .np-volume, html.aw-no-volume body#artwork .mini-volume { display: none !important; }
+/* larger text on a low screen: the meta column may not fit the hero's height — it scrolls there, under the seek bar never */
+html[data-aw-text="l"] body#artwork #np #np-meta, html[data-aw-text="xl"] body#artwork #np #np-meta { overflow-y: auto; scrollbar-width: none; }
+@media (max-height: 520px) and (orientation: landscape) {
+  html[data-aw-text="s"] body#artwork #np .np-title { font-size: clamp(17px, 5.5vh, 41px); }
+  html[data-aw-text="l"] body#artwork #np .np-title { font-size: clamp(25px, 8.1vh, 60px); }
+  html[data-aw-text="xl"] body#artwork #np .np-title { font-size: clamp(31px, 10vh, 74px); }
+}
+html[data-aw-text="l"] body#artwork #np #np-meta::-webkit-scrollbar, html[data-aw-text="xl"] body#artwork #np #np-meta::-webkit-scrollbar { display: none; }

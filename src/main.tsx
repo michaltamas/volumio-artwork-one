@@ -35,6 +35,7 @@ import { useSettings } from './core/store/settings';
 import { useUiSettings } from './core/store/uiSettings';
 import './core/store/sleep';
 import './core/store/screenOn';
+import './core/store/screenPrefs';
 import './core/tooltips';
 import './core/marquee';
 import { useAmbient } from './core/store/ambient';
