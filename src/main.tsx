@@ -34,6 +34,7 @@ import { useModal } from './core/store/modal';
 import { useSettings } from './core/store/settings';
 import { useUiSettings } from './core/store/uiSettings';
 import './core/store/sleep';
+import './core/store/screenOn';
 import { useAmbient } from './core/store/ambient';
 import './core/store/settings';
 import './core/store/uiSettings';

@@ -6,6 +6,12 @@ All notable changes to this project are documented here. The format is based on
 
 Versions 1.x and 2.x were published in [volumio-artwork-theme](https://github.com/michaltamas/volumio-artwork-theme).
 
+## [Unreleased]
+
+### Added
+
+- **Keep the screen on while playing** (Settings → Appearance → This screen): a phone or tablet does not lock while music plays and the page is open — for following the lyrics, or a screen that is not the player's own. A choice of each browser. The Screen Wake Lock API only works on https, which the player does not serve, so a tiny silent video looping unseen does the holding, the way NoSleep.js does.
+
 ## [3.0.6] - 2026-10-03
 
 ### Changed

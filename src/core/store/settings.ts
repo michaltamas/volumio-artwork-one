@@ -36,7 +36,7 @@ interface SettingsStore {
 }
 
 // the sections this theme adds to Volumio's Appearance page itself
-const THEME_SECTIONS: Record<string, Section[]> = { 'miscellanea/appearance': [{ id: 'aw-theme', label: 'Theme' }, { id: 'aw-ambient', label: 'Ambient display' }] };
+const THEME_SECTIONS: Record<string, Section[]> = { 'miscellanea/appearance': [{ id: 'aw-theme', label: 'Theme' }, { id: 'aw-screen', label: 'Keep the screen on' }, { id: 'aw-ambient', label: 'Ambient display' }] };
 const norm = (v: any) => String(v || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 
 export const useSettings = create<SettingsStore>((_set, get) => ({

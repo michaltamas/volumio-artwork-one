@@ -4,6 +4,7 @@ import Icon from '../Icon';
 import { useTheme, type ThemeMode } from '../../core/store/theme';
 import { useCompanion } from '../../core/store/companion';
 import { useAmbient, DELAYS, type AmbientSettings } from '../../core/store/ambient';
+import { useScreenOn } from '../../core/store/screenOn';
 import { useToasts } from '../../core/store/toast';
 
 const MODES: ThemeMode[] = ['dark', 'light', 'system'];
@@ -14,6 +15,7 @@ export default function AppearanceSlot() {
   const theme = useTheme();
   const companion = useCompanion();
   const ambient = useAmbient();
+  const screenOn = useScreenOn();
   const [draft, setDraft] = useState<AmbientSettings>({ ...ambient.settings });
   useEffect(() => { setDraft({ ...ambient.settings }); }, [ambient.settings]);
   const playerTheme = companion.settings.theme || null;
@@ -46,6 +48,20 @@ export default function AppearanceSlot() {
           )}
         </div>
       </div>
+        <div className="panel panel-default aw-theme-section aw-amb-section" data-section-id="aw-screen">
+          <div className="panel-heading"><h3 className="panel-title">This screen</h3></div>
+          <div className="panel-body">
+            <div className="aw-amb-rows">
+              <div className="aw-amb-row">
+                <div className="aw-amb-row__text">
+                  <div className="aw-amb-row__title">Keep the screen on while playing</div>
+                  <div className="aw-amb-row__hint">This phone or tablet does not lock while music plays and this page is open — for following the lyrics, or a screen that is not the player's own. Remembered in this browser only.</div>
+                </div>
+                <button type="button" className={'aw-switch' + (screenOn.on ? ' on' : '')} role="switch" aria-checked={screenOn.on} aria-label="Keep the screen on while playing" onClick={() => screenOn.set(!screenOn.on)}><span className="aw-switch__knob" /></button>
+              </div>
+            </div>
+          </div>
+        </div>
       <div className="panel panel-default aw-theme-section aw-amb-section" data-section-id="aw-ambient">
         <div className="panel-heading"><h3 className="panel-title">Ambient display</h3></div>
         <div className="panel-body">
