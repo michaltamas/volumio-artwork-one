@@ -8,6 +8,7 @@
  */
 import { create } from 'zustand';
 import { on, emit } from '../socket';
+import { searchPlaylists } from '../playlistSearch';
 import { rest } from '../api';
 
 export interface BrowseItem {
@@ -99,6 +100,7 @@ function oncePerFile(lists: BrowseList[]): BrowseList[] {
 }
 
 let searchTimer: number | null = null;
+let pendingPlaylists: Promise<any> | null = null;   // the playlists' own matches, joined to the player's answer
 let favTimer: number | null = null;
 
 export const useBrowse = create<BrowseStore>((set, get) => ({
@@ -150,7 +152,7 @@ export const useBrowse = create<BrowseStore>((set, get) => ({
     if (searchTimer) { window.clearTimeout(searchTimer); searchTimer = null; }
     if (value && value.length >= 2) {
       set({ isSearching: true });
-      searchTimer = window.setTimeout(() => { emit('search', { type: 'any', value }); }, 600);
+      searchTimer = window.setTimeout(() => { pendingPlaylists = searchPlaylists(value).catch(() => null); emit('search', { type: 'any', value }); }, 600);
     } else if (!value) {
       get().clearSearch();
     }
@@ -185,6 +187,12 @@ on('pushBrowseLibrary', (data: any) => {
   const st = useBrowse.getState();
   const raw: BrowseList[] = data.navigation.lists || [];
   const lists: BrowseList[] = st.request && st.request.uri === 'Last_100' ? oncePerFile(raw) : raw;
+  // a search's answer: the playlists' matches are added as one more list once they are in
+  if (st.isSearching && !st.isBrowsing && pendingPlaylists) {
+    const p = pendingPlaylists; pendingPlaylists = null;
+    // placed after the library's own lists ("Found … Album / Track"), before the services
+    p.then((pl) => { const cur = useBrowse.getState(); if (!pl || !cur.isSearching || cur.lists !== lists) { return; } let at = 0; while (at < lists.length && /^Found /.test(String(lists[at].title || ''))) { at++; } useBrowse.setState({ lists: [...lists.slice(0, at), pl, ...lists.slice(at)], stamp: cur.stamp + 1 }); });
+  }
   const info = data.navigation.info || null;
   const patch: Partial<BrowseStore> = { lists, info, prev: data.navigation.prev || null, loading: false, stamp: st.stamp + 1 };
   const req = st.request;
