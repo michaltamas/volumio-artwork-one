@@ -86,13 +86,13 @@ export default function AppearanceSlot() {
             <div className="aw-amb-row">
               <div className="aw-amb-row__text">
                 <div className="aw-amb-row__title">Ambient after idle</div>
-                <div className="aw-amb-row__hint">Shows the cover and a clock when nobody touches the screen.{companion.available ? <span>&nbsp;Kept on the player, for every screen it drives.</span> : <span>&nbsp;Remembered in this browser only — install the Artwork One Companion (part of the installer) to set it for the player's own display from here.</span>}{!ambient.kiosk ? <span>&nbsp;This browser is not the player's display; add <code>?kiosk=1</code> to the address to try it here.</span> : null}</div>
+                <div className="aw-amb-row__hint">Shows the cover and a clock when nobody touches the screen; Always keeps the display in it, a touch brings the interface back for a minute.{companion.available ? <span>&nbsp;Kept on the player, for every screen it drives.</span> : <span>&nbsp;Remembered in this browser only — install the Artwork One Companion (part of the installer) to set it for the player's own display from here.</span>}{!ambient.kiosk ? <span>&nbsp;This browser is not the player's display; add <code>?kiosk=1</code> to the address to try it here.</span> : null}</div>
               </div>
               <button type="button" className={'aw-switch' + (draft.on ? ' on' : '')} role="switch" aria-checked={draft.on} aria-label="Ambient after idle" onClick={() => setDraft({ ...draft, on: !draft.on })}><span className="aw-switch__knob" /></button>
             </div>
             <div className="aw-amb-row">
               <div className="aw-amb-row__title">Delay</div>
-              <div className="aw-seg mono" role="group" aria-label="Delay">{DELAYS.map(d => <button key={d} type="button" className={draft.delay === d ? 'active' : ''} onClick={() => setDraft({ ...draft, delay: d })}>{d === 0 ? 'NEVER' : (d === 10 ? '10 MIN' : d)}</button>)}</div>
+              <div className="aw-seg mono" role="group" aria-label="Delay">{DELAYS.map(d => <button key={d} type="button" className={draft.delay === d ? 'active' : ''} onClick={() => setDraft({ ...draft, delay: d })}>{d === 0 ? 'NEVER' : d === -1 ? 'ALWAYS' : (d === 10 ? '10 MIN' : d)}</button>)}</div>
             </div>
             <div className="aw-amb-row">
               <div className="aw-amb-row__title">Layout</div>
@@ -102,6 +102,17 @@ export default function AppearanceSlot() {
             <div className="aw-amb-row">
               <div className="aw-amb-row__title">Clock format</div>
               <div className="aw-seg mono" role="group" aria-label="Clock format"><button type="button" className={draft.clock === '24' ? 'active' : ''} onClick={() => setDraft({ ...draft, clock: '24' })}>24 H</button><button type="button" className={draft.clock === '12' ? 'active' : ''} onClick={() => setDraft({ ...draft, clock: '12' })}>12 H</button></div>
+            </div>
+            <div className="aw-amb-row">
+              <div className="aw-amb-row__text">
+                <div className="aw-amb-row__title">Text size on the display</div>
+                <div className="aw-amb-row__hint">Now Playing's title, artist and album on the player's own screen — larger for a display of an unusual shape. Phones and computers keep their own choice, under This screen.</div>
+              </div>
+              <div className="aw-seg mono" role="group" aria-label="Text size on the display">{SIZES.map(s => <button key={s.k} type="button" className={draft.textSize === s.k ? 'active' : ''} onClick={() => setDraft({ ...draft, textSize: s.k })}>{s.l.toUpperCase()}</button>)}</div>
+            </div>
+            <div className="aw-amb-row">
+              <div className="aw-amb-row__text"><div className="aw-amb-row__title">Hide the volume on the display</div><div className="aw-amb-row__hint">For a player whose volume is set on the amplifier.</div></div>
+              <button type="button" className={'aw-switch' + (draft.hideVolume ? ' on' : '')} role="switch" aria-checked={draft.hideVolume} aria-label="Hide the volume on the display" onClick={() => setDraft({ ...draft, hideVolume: !draft.hideVolume })}><span className="aw-switch__knob" /></button>
             </div>
             <div className="aw-amb-row">
               <div className="aw-amb-row__text"><div className="aw-amb-row__title">Night hours</div><div className="aw-amb-row__hint">Dims the ambient screen. Playback is unaffected.</div></div>

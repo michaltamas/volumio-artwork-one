@@ -29,7 +29,8 @@ var fs = require('fs');
 var path = require('path');
 
 var THEMES = ['dark', 'light', 'system'];
-var DELAYS = [0, 1, 2, 5, 10];
+var DELAYS = [-1, 0, 1, 2, 5, 10];   // -1: always in ambient
+var TEXT_SIZES = ['s', 'm', 'l', 'xl'];
 var LAYOUTS = ['cover', 'clock', 'bleed'];
 var CLOCKS = ['24', '12'];
 var EVENT = 'pushArtworkSettings';
@@ -133,6 +134,8 @@ ArtworkCompanion.prototype.cleanAmbient = function (a) {
   if (typeof a.night === 'boolean') { out.night = a.night; }
   if (isTime(a.nightFrom)) { out.nightFrom = a.nightFrom; }
   if (isTime(a.nightTo)) { out.nightTo = a.nightTo; }
+  if (TEXT_SIZES.indexOf(a.textSize) > -1) { out.textSize = a.textSize; }   // the display's own text size and volume
+  if (typeof a.hideVolume === 'boolean') { out.hideVolume = a.hideVolume; }
   return Object.keys(out).length ? out : null;
 };
 

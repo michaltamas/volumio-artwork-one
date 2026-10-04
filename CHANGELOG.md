@@ -17,6 +17,8 @@ Versions 1.x and 2.x were published in [volumio-artwork-theme](https://github.co
 - **Now Playing text size** (Appearance → This screen): Small, Normal, Large or Extra large for the title, the artist and the album — larger for a display of an unusual shape (a 1920×515 strip) where the text reads too small. A choice of each screen.
 - **Hide the volume control** (Appearance → This screen): for a player whose volume is set on the amplifier, the slider and the mute button leave the mini player and Now Playing.
 - **A filter on album and playlist pages**, in the head, as the lists have: it narrows the tracks by title, artist or album. The lists' own filter matches artist and album now too, and on the Playlists list it also finds the songs inside the playlists (*Tracks in playlists*).
+- **Ambient: Always.** Beside the idle delays, the display can rest in the ambient screen all the time — a touch brings the interface back for a minute. For a player watched from the phone, whose own screen is only ever looked at.
+- **The display's own text size and volume**, in the Ambient display section (kept by the companion, as the ambient settings are): the player's own screen takes Now Playing's text size and the hidden volume from there, phones and computers from their own *This screen*.
 - **Keep the screen on while playing** (Settings → Appearance → This screen): a phone or tablet does not lock while music plays and the page is open — for following the lyrics, or a screen that is not the player's own. A choice of each browser. The Screen Wake Lock API only works on https, which the player does not serve, so a tiny silent video looping unseen does the holding, the way NoSleep.js does.
 
 ## [3.0.6] - 2026-10-03

@@ -5,6 +5,7 @@
  * localStorage; applied as attributes on <html> so the stylesheet does the rest.
  */
 import { create } from 'zustand';
+import { KIOSK } from '../kiosk';
 
 export type TextSize = 'm' | 'l' | 'xl' | 's';
 interface ScreenPrefs { textSize: TextSize; hideVolume: boolean; setTextSize: (s: TextSize) => void; setHideVolume: (on: boolean) => void }
@@ -14,6 +15,7 @@ const read = (): { textSize: TextSize; hideVolume: boolean } => {
   try { const o = JSON.parse(localStorage.getItem(KEY) || '{}'); return { textSize: ['s', 'm', 'l', 'xl'].includes(o.textSize) ? o.textSize : 'm', hideVolume: o.hideVolume === true }; } catch { return { textSize: 'm', hideVolume: false }; }
 };
 const apply = (p: { textSize: TextSize; hideVolume: boolean }) => {
+  if (KIOSK) { return; }   // the player's own display takes these from the ambient settings (the companion's), not from its browser
   const h = document.documentElement;
   if (p.textSize === 'm') { h.removeAttribute('data-aw-text'); } else { h.setAttribute('data-aw-text', p.textSize); }
   h.classList.toggle('aw-no-volume', p.hideVolume);
