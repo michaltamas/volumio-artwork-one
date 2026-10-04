@@ -100,3 +100,11 @@ body#artwork .aw-spinner { display: inline-block; flex: none; box-sizing: border
   vertical-align: middle; animation: aw-spinner .8s linear infinite;
   will-change: transform; backface-visibility: hidden; transform-origin: 50% 50%; }   /* its own layer: turns without subpixel shimmer (iOS) */
 @media (prefers-reduced-motion: reduce) { body#artwork .aw-spinner { animation-duration: 2.4s; } }
+
+/* the interface's one tooltip (core/tooltips.ts): title, and why, for the icon that is not obvious */
+body#artwork .aw-tip { position: fixed; left: 0; top: 0; z-index: 1000001; max-width: 260px; padding: 8px 11px; border-radius: 10px; pointer-events: none; opacity: 0; transition: opacity .12s;
+  background: var(--menu-fill); -webkit-backdrop-filter: blur(24px); backdrop-filter: blur(24px); border: 1px solid var(--fill-16); box-shadow: 0 12px 30px -14px var(--shadow-deep); color: var(--ink-1);
+  &.is-on { opacity: 1; }
+  &__title { font-family: var(--font-ui); font-size: 13px; font-weight: 600; color: var(--ink); white-space: nowrap; }
+  &__why { margin-top: 2px; font-size: 12px; line-height: 1.35; color: var(--ink-3); } }
+@media (hover: none) { body#artwork .aw-tip { transition: none; } }
