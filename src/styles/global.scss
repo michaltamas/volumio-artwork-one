@@ -108,3 +108,7 @@ body#artwork .aw-tip { position: fixed; left: 0; top: 0; z-index: 1000001; max-w
   &__title { font-family: var(--font-ui); font-size: 13px; font-weight: 600; color: var(--ink); white-space: nowrap; }
   &__why { margin-top: 2px; font-size: 12px; line-height: 1.35; color: var(--ink-3); } }
 @media (hover: none) { body#artwork .aw-tip { transition: none; } }
+
+/* a cut-short title sliding across once (core/marquee.ts): the ellipsis gives way while it runs */
+body#artwork .aw-marquee { text-overflow: clip !important; }
+body#artwork .aw-marquee__run { display: inline-block; white-space: nowrap; will-change: transform; }
