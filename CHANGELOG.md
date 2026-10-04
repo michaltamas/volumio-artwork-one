@@ -10,6 +10,7 @@ Versions 1.x and 2.x were published in [volumio-artwork-theme](https://github.co
 
 ### Added
 
+- **Plugin updates where you see them.** The Plugins entry in Settings carries the number of installed plugins the store has a newer version of; the Installed tab says so too, with *Check for updates*, and each such plugin gets an *Update to x.y.z* button. The player decides what counts as newer (the beta too, in plugin test mode).
 - **Keep the screen on while playing** (Settings → Appearance → This screen): a phone or tablet does not lock while music plays and the page is open — for following the lyrics, or a screen that is not the player's own. A choice of each browser. The Screen Wake Lock API only works on https, which the player does not serve, so a tiny silent video looping unseen does the holding, the way NoSleep.js does.
 
 ## [3.0.6] - 2026-10-03

@@ -1,5 +1,5 @@
 /** The Plugins page: search (categories, cards) and installed (rows), with the installer modal. */
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../components/Icon';
 import PageHead from '../components/PageHead';
@@ -9,23 +9,28 @@ import { on, emit } from '../core/socket';
 import { useSettings } from '../core/store/settings';
 import { useModal } from '../core/store/modal';
 import { Switch } from '../components/settings/controls';
+import Spinner from '../components/Spinner';
+import { usePlugins } from '../core/store/plugins';
 
 export default function PluginManager() {
   const nav = useNavigate();
   const [tab, setTab] = useState(0);
-  const [installed, setInstalled] = useState<any[]>([]);
-  const [available, setAvailable] = useState<any>(null);
+  const installedCats = usePlugins(s => s.installed);
+  const available = usePlugins(s => s.available);
+  const updates = usePlugins(s => s.updates);
+  const checking = usePlugins(s => s.checking);
   const [category, setCategory] = useState<any>(null);
+  useEffect(() => { if (available && available.categories && !category) { setCategory(available.categories[0]); } }, [available]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     useSettings.setState({ route: { name: 'volumio.plugin-manager', pluginName: '' } });
-    const offs = [
-      on('pushInstalledPlugins', (d: any) => setInstalled(Array.isArray(d) ? d : [])),
-      on('pushAvailablePlugins', (d: any) => { setAvailable(d); setCategory(d && d.categories && d.categories[0]); }),
-      on('openInstallerModal', () => useModal.getState().open('installer', null)),
-    ];
-    emit('getInstalledPlugins'); emit('getAvailablePlugins');
-    return () => { offs.forEach(f => f()); useSettings.setState({ route: { name: '', pluginName: '' } }); };
+    const off = on('openInstallerModal', () => useModal.getState().open('installer', null));
+    usePlugins.getState().refresh();
+    return () => { off(); useSettings.setState({ route: { name: '', pluginName: '' } }); };
   }, []);
+  // the installed rows, flat, each with its update when the store has a newer version
+  // the player pushes a flat list ({ name, category, version, … }); older builds grouped it by category
+  const installed = useMemo(() => installedCats.flatMap((c: any) => Array.isArray(c.plugins) ? c.plugins.map((p: any) => ({ ...p, category: p.category || c.name })) : [c]).map((p: any) => ({ ...p, update: updates.find(u => u.name === p.name) || null })), [installedCats, updates]);
+  const update = (u: { url: string; name: string; prettyName: string; category: string }) => emit('updatePlugin', { url: u.url, name: u.name, prettyName: u.prettyName, category: u.category });
   const uninstall = (pl: any) => { emit('preUninstallPlugin', { name: pl.name, category: pl.category }); const off = on('installPluginStatus', (d: any) => { off(); useModal.getState().open('installer', d); }); };
   return (
     <div className="box">
@@ -36,7 +41,7 @@ export default function PluginManager() {
         <div className="panel-body">
           <ul className="nav nav-tabs">
             <li className={tab === 0 ? 'active' : ''}><a onClick={() => setTab(0)}>Search Plugins</a></li>
-            <li className={tab === 1 ? 'active' : ''}><a onClick={() => setTab(1)}>Installed Plugins</a></li>
+            <li className={tab === 1 ? 'active' : ''}><a onClick={() => setTab(1)}>Installed Plugins{updates.length ? <span className="aw-updates-badge mono" aria-label={updates.length + ' updates'}>{updates.length}</span> : null}</a></li>
           </ul>
           {tab === 0 ? (
             <div className="row">
@@ -65,6 +70,10 @@ export default function PluginManager() {
             </div>
           ) : (
             <div>
+              <div className="aw-updates-bar">
+                <span className="aw-updates-bar__text">{checking ? 'Checking the plugin store…' : updates.length === 0 ? 'Every plugin is up to date.' : updates.length === 1 ? '1 update available.' : updates.length + ' updates available.'}</span>
+                <button type="button" className="aw-btn aw-btn--sm" onClick={() => usePlugins.getState().refresh()} disabled={checking}>{checking ? <Spinner size={14} /> : <Icon name="refresh" />}<span>Check for updates</span></button>
+              </div>
               {installed.map((pl, i) => (
                 <div id="installed-plugin-lists" key={i}>
                   <div className="row">
@@ -74,7 +83,7 @@ export default function PluginManager() {
                       <div className="col-xs-8 col-sm-8 col-md-8"><span className={'pluginDotStatus' + (pl.active ? ' active' : ' inactive')} />{' '}<span>{pl.active ? 'Active' : 'Inactive'}</span></div>
                     </div></div>
                     <div className="col-xs-24 col-sm-24 col-md-8"><div className="row">
-                      <div className="col-xs-8 col-sm-8 col-md-8">{pl.updateAvailable ? <button type="button" className="btn btn-info pull-right" onClick={() => emit('updatePlugin', { url: pl.url, name: pl.name, prettyName: pl.prettyName, category: pl.category })} title="Update"><Icon name="refresh" /> Update</button> : null}</div>
+                      <div className="col-xs-8 col-sm-8 col-md-8">{pl.update ? <button type="button" className="btn btn-info pull-right aw-update-btn" onClick={() => update(pl.update)} title={'Update to ' + pl.update.to}><Icon name="system_update_alt" /> Update{pl.update.to ? <small> to {pl.update.to}</small> : null}</button> : null}</div>
                       <div className="col-xs-8 col-sm-8 col-md-8">{pl.enabled ? <button type="button" className="btn btn-info pull-right" onClick={() => nav('/plugin/' + pl.category + '-' + pl.name + '?isPluginSettings=1')} title="Settings">Settings</button> : null}</div>
                       <div className="col-xs-8 col-sm-8 col-md-8"><button type="button" className="btn btn-danger pull-right" onClick={() => uninstall(pl)} title="Uninstall">Uninstall</button></div>
                     </div></div>
