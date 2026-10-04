@@ -32,7 +32,9 @@ let asking = false;
 function el(): HTMLVideoElement {
   if (video) { return video; }
   video = document.createElement('video');
-  video.muted = true; video.loop = true; video.setAttribute('playsinline', ''); video.setAttribute('muted', ''); video.setAttribute('aria-hidden', 'true');
+  // not `muted`: iOS lets a muted video play unseen, but does not count it as media that keeps the
+  // screen awake. The clip carries a silent audio track; the volume is 0 on top of that.
+  video.loop = true; video.volume = 0; video.setAttribute('playsinline', ''); video.setAttribute('aria-hidden', 'true'); video.preload = 'auto';
   video.style.cssText = 'position:fixed;left:-20px;top:-20px;width:1px;height:1px;opacity:0;pointer-events:none;';
   video.src = SRC;
   document.body.appendChild(video);
@@ -40,6 +42,8 @@ function el(): HTMLVideoElement {
 }
 // within the tap that turns it on: a play the browser allows, so later plays are allowed too
 function prime() { if (api) { return; } const v = el(); v.play().then(() => { if (!wanted()) { v.pause(); } }).catch(() => { /* allowed later, from a tap on the player */ }); }
+// iOS allows media to start only inside a tap: every tap on the page is a chance to (re)start the clip when it should run
+document.addEventListener('touchend', () => { if (!api && wanted() && video && video.paused) { video.play().then(() => useScreenOn.setState({ held: true })).catch(() => {}); } }, { passive: true });
 
 const wanted = () => useScreenOn.getState().on && usePlayer.getState().state.status === 'play' && document.visibilityState === 'visible';
 

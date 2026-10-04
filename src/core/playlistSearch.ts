@@ -1,7 +1,8 @@
 /**
  * Search inside the player's own playlists. Volumio's search looks at the library and the services,
  * never at playlists; their contents are small, so the theme reads them over REST (once, kept until
- * the playlists change) and matches the query against title, artist and album. The matches become
+ * the playlists change) and matches the query against the playlists' names and their songs' title,
+ * artist and album. The matches become
  * one more list, "Playlists", among the search results — each row a song from the playlist it was
  * found in, playable as any other.
  */
@@ -38,6 +39,8 @@ export async function searchPlaylists(query: string): Promise<{ title: string; a
   const lists = await load();
   const items: BrowseItem[] = [];
   const seen = new Set<string>();
+  // a playlist whose own name matches comes first, as the playlist (opens it)
+  lists.forEach((pl) => { if (fold(pl.name).includes(q)) { items.push({ uri: 'playlists/' + pl.name, title: pl.name, name: pl.name, type: 'playlist', service: 'mpd', album: pl.items.length === 1 ? '1 track' : pl.items.length + ' tracks', icon: 'fa fa-list-ol' } as BrowseItem); } });
   lists.forEach((pl) => pl.items.forEach((it) => {
     if (!(fold(it.title).includes(q) || fold(it.artist).includes(q) || fold(it.album).includes(q))) { return; }
     const key = String(it.uri || '') + '|' + pl.name; if (seen.has(key)) { return; } seen.add(key);
