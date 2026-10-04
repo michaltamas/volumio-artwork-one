@@ -27,13 +27,20 @@ export function goCrumb(item: BrowseItem): void {
 // the crumb bar, kept OUT of .aw-headwrap and rendered as its own sibling in Browse.tsx: nested
 // inside the same box as the cover, its sticky containing block would end where that box does —
 // a short hero on a long list — and it would stop sticking well before the list's end
-export function AlbumPageHead() {
+export function AlbumPageHead({ filter, onFilter }: { filter?: string; onFilter?: (v: string) => void }) {
   const info = useBrowse(s => s.info) || {};
   const crumbs = useCrumbs();
   const title = info.title || info.album;
+  const placeholder = 'Filter ' + (isPlaylistInfo(info as BrowseItem) ? 'playlist' : 'album');
   return (
     <PageHead variant="album" back={() => useBrowse.getState().goBack()}
-      nav={<Crumbs trail={crumbs} current={title} onHome={() => useBrowse.getState().backHome()} onCrumb={goCrumb} />} />
+      nav={<Crumbs trail={crumbs} current={title} onHome={() => useBrowse.getState().backHome()} onCrumb={goCrumb} />}
+      actions={onFilter ? (
+        <label className={'aw-filter' + (filter ? ' aw-filter--on' : '')}>
+          <Icon name="search" />
+          <input type="search" value={filter || ''} onChange={(e) => onFilter(e.target.value)} placeholder={placeholder} aria-label={placeholder} spellCheck={false} />
+        </label>
+      ) : undefined} />
   );
 }
 

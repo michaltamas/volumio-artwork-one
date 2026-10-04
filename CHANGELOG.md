@@ -16,6 +16,7 @@ Versions 1.x and 2.x were published in [volumio-artwork-theme](https://github.co
 - **Search finds tracks in your playlists.** Volumio's search never looked inside them; the theme now does, and lists the matches as *Playlists* among the results: a playlist whose name matches (opens it), and each song found, with the playlist it is in, playable as any other.
 - **Now Playing text size** (Appearance → This screen): Small, Normal, Large or Extra large for the title, the artist and the album — larger for a display of an unusual shape (a 1920×515 strip) where the text reads too small. A choice of each screen.
 - **Hide the volume control** (Appearance → This screen): for a player whose volume is set on the amplifier, the slider and the mute button leave the mini player and Now Playing.
+- **A filter on album and playlist pages**, in the head, as the lists have: it narrows the tracks by title, artist or album. The lists' own filter matches artist and album now too, and on the Playlists list it also finds the songs inside the playlists (*Tracks in playlists*).
 - **Keep the screen on while playing** (Settings → Appearance → This screen): a phone or tablet does not lock while music plays and the page is open — for following the lyrics, or a screen that is not the player's own. A choice of each browser. The Screen Wake Lock API only works on https, which the player does not serve, so a tiny silent video looping unseen does the holding, the way NoSleep.js does.
 
 ## [3.0.6] - 2026-10-03

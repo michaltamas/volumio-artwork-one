@@ -38,7 +38,7 @@ export default function BrowseLists({ lists, filter, sortDesc, isArtist, artists
             <div className={asGrid ? 'main__row' : 'main__list'}>
               {items.map((item, ii) => {
                 const key = li + ':' + ii;
-                const hidden = !!q && norm(item.title || item.name).indexOf(q) === -1;
+                const hidden = !!q && !(list as any).awNoFilter && [item.title || item.name, item.artist, item.album].every(f => norm(f).indexOf(q) === -1);
                 const order = rank ? rank[key] : undefined;
                 const u = normUri(item.uri);
                 const playing = !!playingUri && u === playingUri;

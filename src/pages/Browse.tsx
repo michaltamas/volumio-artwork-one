@@ -7,6 +7,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import Icon from '../components/Icon';
 import ServiceFilters, { hasServiceFilters, hasServiceSortings } from '../components/browse/ServiceFilters';
+import { searchPlaylists } from '../core/playlistSearch';
 import PageHead from '../components/PageHead';
 import Crumbs from '../components/browse/Crumbs';
 import BrowseLanding, { streamingOf } from '../components/browse/BrowseLanding';
@@ -104,6 +105,17 @@ export default function Browse({ dedicated }: { dedicated?: boolean }) {
     return streamingOf(b.sources).find(s => (s.plugin_name && (s.plugin_name === r.plugin_name || s.plugin_name === r.service)) || (s.service && s.service === r.service) || (s.uri && String(r.uri) === s.uri) || (s.uri && String(r.uri).indexOf(s.uri + '/') === 0) || (s.uri && String(r.uri).indexOf(s.uri + ':') === 0)) || null;
   }, [request, b.sources]);
   const placeholder = service ? 'Search ' + (service.name || service.title || '') : 'Filter ' + String(listTitle || '').toLowerCase();
+  // the Playlists list: the field also finds the songs inside the playlists (Volumio lists only their names)
+  const [inPlaylists, setInPlaylists] = useState<any>(null);
+  useEffect(() => {
+    const onPlaylists = request && request.uri === 'playlists';
+    const q = filter.trim();
+    if (!onPlaylists || q.length < 2) { setInPlaylists(null); return; }
+    let alive = true;
+    const t = window.setTimeout(() => { searchPlaylists(q).then((pl) => { if (!alive) { return; } setInPlaylists(pl ? { ...pl, title: 'Tracks in playlists', items: pl.items.filter((i: any) => i.type === 'song') } : null); }).catch(() => { if (alive) { setInPlaylists(null); } }); }, 300);
+    return () => { alive = false; window.clearTimeout(t); };
+  }, [filter, request]);
+  const listsShown = inPlaylists && inPlaylists.items.length ? [...lists, { ...inPlaylists, awNoFilter: true }] : lists;
   const headInput = (v: string) => {
     setFilter(v);
     if (!service) { return; }
@@ -119,7 +131,7 @@ export default function Browse({ dedicated }: { dedicated?: boolean }) {
   const visibleCount = useMemo(() => {
     if (!q) { return null; }
     let n = 0;
-    lists.forEach((l, li) => { if (isArtist && artistLists(lists, 'albums').some(x => x.i === li)) { return; } (l.items || []).forEach(it => { if (norm(it.title || it.name).indexOf(q) > -1) { n++; } }); });
+    lists.forEach((l, li) => { if (isArtist && artistLists(lists, 'albums').some(x => x.i === li)) { return; } (l.items || []).forEach(it => { if ([it.title || it.name, it.artist, it.album].some(f => norm(f).indexOf(q) > -1)) { n++; } }); });
     return n;
   }, [q, lists, isArtist]);
   const visibleTracks = useMemo(() => {
@@ -171,7 +183,7 @@ export default function Browse({ dedicated }: { dedicated?: boolean }) {
 
             {!b.isBrowsing ? <BrowseLanding dedicated={dedicated} /> : null}
 
-            {info && !hideInfo && (isAlbum || info.type === 'song' || isPlaylist) ? <AlbumPageHead /> : null}
+            {info && !hideInfo && (isAlbum || info.type === 'song' || isPlaylist) ? <AlbumPageHead filter={filter} onFilter={setFilter} /> : null}
             {info && !hideInfo ? (
               <div className="aw-headwrap">
                 {isArtist ? <ArtistHead filter={filter} onFilter={setFilter} showAll={showAll} onShowAll={() => setShowAll(v => !v)} newest={newest} onToggleOrder={() => setNewest(v => !v)} visibleTracks={visibleTracks} onMenuOpen={onMenuOpen} /> : null}
@@ -210,7 +222,7 @@ export default function Browse({ dedicated }: { dedicated?: boolean }) {
             {isTrackList ? <div className="aw-cols mono aw-cols--fav" aria-hidden="true"><span>#</span><span /><span className="aw-cols__info"><span>TITLE</span><span>ALBUM</span></span><span className="aw-cols__duration">DURATION</span><span /><span /></div> : null}
 
             <div id="browse-page">
-              {(b.isBrowsing || b.isSearching) && b.lists ? <BrowseLists lists={lists} filter={filter} sortDesc={sortDesc} isArtist={isArtist} artistsPage={artistsPage} serviceSearch={!!service} activeMenu={activeMenu} onMenuOpen={onMenuOpen} /> : null}
+              {(b.isBrowsing || b.isSearching) && b.lists ? <BrowseLists lists={listsShown} filter={filter} sortDesc={sortDesc} isArtist={isArtist} artistsPage={artistsPage} serviceSearch={!!service} activeMenu={activeMenu} onMenuOpen={onMenuOpen} /> : null}
             </div>
 
             {isPlainList && letters.length > 1 ? (
