@@ -63,7 +63,7 @@ body#artwork .aw-amb__group { position: absolute; inset: 0; animation: aw-amb-dr
 
 body#artwork .aw-amb__stage { position: absolute; inset: 0; display: flex; align-items: center; gap: var(--amb-gap); padding: 0 var(--amb-pad); }
 body#artwork .aw-amb__cover {
-  flex: none; width: var(--amb-cover); height: var(--amb-cover); border-radius: var(--r-cover); object-fit: cover;
+  flex: none; width: var(--amb-cover); height: var(--amb-cover); border-radius: 11px; object-fit: cover;   /* Now Playing's corners */
   box-shadow: var(--amb-cover-shadow);
 }
 body#artwork .aw-amb__text { display: flex; flex-direction: column; min-width: 0; }

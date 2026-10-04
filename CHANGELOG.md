@@ -27,6 +27,8 @@ Versions 1.x and 2.x were published in [volumio-artwork-theme](https://github.co
 
 ### Fixed
 
+- The ambient screen's cover has Now Playing's corners (11px, not 6).
+
 - Now Playing in a short landscape window (a 1920×515 display): the hero's size containment collapsed it to no height, so a larger text column ran under the seek bar.
 
 - A plugin's settings page no longer sits black while the player prepares it, or forever when the player sends nothing: it says *Loading settings…*, and after a few seconds without an answer explains that and offers *Try again*.
@@ -41,6 +43,7 @@ Versions 1.x and 2.x were published in [volumio-artwork-theme](https://github.co
 - Home on the phone: *Pick up where you left off* is a line of its own, as *Pinned* and *Recent albums* are; under it the cover and, beside it, the title, the artist and *Resume*, in that order. The label used to wrap beside the cover, and the artist sat beside the button or under it depending on the name's length.
 
 ### Fixed
+
 
 - On a phone or a tablet, a tap in the middle of an album's cover played the album instead of opening it: the play button, which a touch screen never shows, was still there to be hit. A tap on a tile now always opens it; a track or a station plays, as before. Playing a whole album is on its page and in the tile's menu.
 - *Rescan* looks like the secondary button it is again; since 3.0.1 it was drawn like *Update*.
@@ -58,17 +61,20 @@ Versions 1.x and 2.x were published in [volumio-artwork-theme](https://github.co
 
 ### Fixed
 
+
 - A display connected to the player (HDMI, the Touch Display plugin) showed *Connection lost* and never connected. It opens the interface at `localhost:3000`, and the interface sent its connection to port 80, where nothing listens on the player itself. It now always connects to the address it was loaded from.
 
 ## [3.0.2] - 2026-09-28
 
 ### Fixed
 
+
 - Last 100 showed a track twice when Volumio had kept it under two addresses (`music-library/…` and `mnt/…`, depending on where it was started), and both rows lit up as playing. Each file is now one row, where it was played last.
 
 ## [3.0.1] - 2026-09-28
 
 ### Fixed
+
 
 - While Volumio indexes the library, the spinning icon its message points to ("the icon on bottom left") is there: at the foot of the side rail, above Zones, and in the phone's menu — *Updating library*, leading to Settings → Sources.
 - Settings → Sources says so too: while the library is indexed, *Scanning your library…* takes the place of Update and Rescan, and the counts — in the card and in the Library panel beside it — grow as files are found.
