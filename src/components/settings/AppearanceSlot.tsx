@@ -91,9 +91,22 @@ export default function AppearanceSlot() {
               <button type="button" className={'aw-switch' + (draft.on ? ' on' : '')} role="switch" aria-checked={draft.on} aria-label="Ambient after idle" onClick={() => setDraft({ ...draft, on: !draft.on })}><span className="aw-switch__knob" /></button>
             </div>
             <div className="aw-amb-row">
-              <div className="aw-amb-row__title">Delay</div>
-              <div className="aw-seg mono" role="group" aria-label="Delay">{DELAYS.map(d => <button key={d} type="button" className={draft.delay === d ? 'active' : ''} onClick={() => setDraft({ ...draft, delay: d })}>{d === 0 ? 'NEVER' : d === -1 ? 'ALWAYS' : (d === 10 ? '10 MIN' : d)}</button>)}</div>
+              <div className="aw-amb-row__text">
+                <div className="aw-amb-row__title">Shown</div>
+                <div className="aw-amb-row__hint">{draft.delay < 0 ? 'The display rests in the ambient screen; a touch brings the interface back for a minute.' : draft.delay === 0 ? 'The ambient screen never comes up on its own.' : 'After a while without a touch.'}</div>
+              </div>
+              <div className="aw-seg mono" role="group" aria-label="When the ambient screen shows">
+                <button type="button" className={draft.delay > 0 ? 'active' : ''} onClick={() => setDraft({ ...draft, delay: draft.delay > 0 ? draft.delay : 2 })}>AFTER IDLE</button>
+                <button type="button" className={draft.delay < 0 ? 'active' : ''} onClick={() => setDraft({ ...draft, delay: -1 })}>ALWAYS</button>
+                <button type="button" className={draft.delay === 0 ? 'active' : ''} onClick={() => setDraft({ ...draft, delay: 0 })}>NEVER</button>
+              </div>
             </div>
+            {draft.delay > 0 ? (
+              <div className="aw-amb-row">
+                <div className="aw-amb-row__title">After</div>
+                <div className="aw-seg mono" role="group" aria-label="Idle time">{DELAYS.filter(d => d > 0).map(d => <button key={d} type="button" className={draft.delay === d ? 'active' : ''} onClick={() => setDraft({ ...draft, delay: d })}>{d === 10 ? '10 MIN' : d}</button>)}</div>
+              </div>
+            ) : null}
             <div className="aw-amb-row">
               <div className="aw-amb-row__title">Layout</div>
               <label className="aw-select"><select value={draft.layout} onChange={(e) => setDraft({ ...draft, layout: e.target.value as any })} aria-label="Layout"><option value="cover">Cover-led</option><option value="clock">Clock-led</option><option value="bleed">Full-bleed</option></select><Icon name="expand_more" /></label>
