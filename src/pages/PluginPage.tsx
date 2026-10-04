@@ -14,6 +14,27 @@ import { CORE } from '../components/settings/CoreSections';
 import AppearanceSlot from '../components/settings/AppearanceSlot';
 import Spinner from '../components/Spinner';
 
+// a plugin's `attributes` on an input are HTML attributes as Volumio's Angular interface spread them:
+// `style` as a CSS string (Now Playing: "margin-bottom: 32px;"), `readonly`, `maxlength`… React wants
+// a style object and its own names, and throws on the string (error #62) — which left the page blank
+function inputAttrs(attrs: any): Record<string, any> {
+  const out: Record<string, any> = {};
+  (Array.isArray(attrs) ? attrs : []).forEach((a: any) => {
+    if (!a || typeof a !== 'object') { return; }
+    Object.keys(a).forEach((k) => {
+      const v = a[k];
+      if (k === 'style') {
+        if (typeof v === 'string') { const o: Record<string, string> = {}; v.split(';').forEach((d) => { const i = d.indexOf(':'); if (i > 0) { o[d.slice(0, i).trim().replace(/-([a-z])/g, (_, c) => c.toUpperCase())] = d.slice(i + 1).trim(); } }); out.style = { ...(out.style || {}), ...o }; }
+        else if (v && typeof v === 'object') { out.style = { ...(out.style || {}), ...v }; }
+        return;
+      }
+      const name: Record<string, string> = { readonly: 'readOnly', maxlength: 'maxLength', minlength: 'minLength', autocomplete: 'autoComplete', tabindex: 'tabIndex', class: 'className', for: 'htmlFor' };
+      out[name[k.toLowerCase()] || k] = v;
+    });
+  });
+  return out;
+}
+
 function visible(item: any, section: any): boolean {
   if (item.hidden) { return false; }
   if (item.visibleIf) {
@@ -132,7 +153,7 @@ export default function PluginPage({ wizard }: { wizard?: boolean }) {
                           <label htmlFor={item.id} className="plugin-label control-label">{item.label}</label>
                           {item.element !== 'equalizer' ? (
                             <div className="control-item"><div>
-                              {item.element === 'input' ? <input id={item.id} type={item.type} className="form-control" value={item.value ?? ''} onChange={(e) => { item.value = item.type === 'number' ? (e.target.value === '' ? '' : Number(e.target.value)) : e.target.value; rerender(); }} {...Object.assign({}, ...((item.attributes || []).map((a: any) => a)))} /> : null}
+                              {item.element === 'input' ? <input id={item.id} type={item.type} className="form-control" value={item.value ?? ''} onChange={(e) => { item.value = item.type === 'number' ? (e.target.value === '' ? '' : Number(e.target.value)) : e.target.value; rerender(); }} {...inputAttrs(item.attributes)} /> : null}
                               {item.element === 'switch' ? <Switch on={item.value === true || item.value === 'true'} onChange={(v) => { item.value = v; rerender(); }} label={item.label} /> : null}
                               {item.element === 'select' ? (
                                 item.options && item.options.length > 1 && item.options.length <= 3

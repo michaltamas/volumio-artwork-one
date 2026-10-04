@@ -27,6 +27,7 @@ Versions 1.x and 2.x were published in [volumio-artwork-theme](https://github.co
 
 ### Fixed
 
+- A plugin's settings page failed ("This screen could not be shown", React error #62) when the plugin put a CSS string in an input's `style` attribute — Now Playing 1.1 does, on the fields that appear once a style is set to *custom*. Such attributes are turned into what React takes (a style object, `readOnly`, `maxLength`…).
 - The ambient screen's cover has Now Playing's corners (11px, not 6).
 
 - Now Playing in a short landscape window (a 1920×515 display): the hero's size containment collapsed it to no height, so a larger text column ran under the seek bar.
