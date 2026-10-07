@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "package": "scripts/package.sh"
+    "package": "scripts/package.sh",
+    "test": "NODE_PATH=node_modules node --test plugin/artwork_one/test/"
   },
   "dependencies": {
     "firebase": "^12.19.0",
@@ -25,8 +26,10 @@
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
     "@vitejs/plugin-react": "^6.1.1",
+    "kew": "^0.7.0",
     "oxlint": "^1.81.0",
     "typescript": "~6.0.2",
+    "v-conf": "^1.4.3",
     "vite": "^8.3.0"
   },
   "description": "Artwork One: a cover-led interface for Volumio",

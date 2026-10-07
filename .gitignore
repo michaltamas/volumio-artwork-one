@@ -26,3 +26,6 @@ dist-ssr
 # release archive
 artwork-one.tar.gz
 .env.development
+
+# plugin build
+build/

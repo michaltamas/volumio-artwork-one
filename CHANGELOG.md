@@ -6,6 +6,12 @@ All notable changes to this project are documented here. The format is based on
 
 Versions 1.x and 2.x were published in [volumio-artwork-theme](https://github.com/michaltamas/volumio-artwork-theme).
 
+## [Unreleased]
+
+### Changed
+
+- **Artwork One is a Volumio plugin** (`user_interface/artwork_one`): the interface under `ui/` and, in the same plugin, the settings the Companion used to keep. On start it registers the interface with Volumio; on stop or uninstall it takes the entry out and, if it was the active interface, switches the player to one of Volumio's own first — nobody is left on a page that no longer exists. Installs with `volumio plugin install`, and is being submitted to Volumio's plugin store. The installer script installs the same plugin and replaces an install made by the older script (`/data/artwork-ui` + the Companion), taking the settings over. The Artwork One Companion plugin is retired.
+
 ## [3.1.0] - 2026-10-05
 
 ### Added

@@ -24,13 +24,16 @@ jobs:
           cache: npm
 
       - name: Check shell scripts
-        run: shellcheck scripts/*.sh plugin/artwork_companion/*.sh
+        run: shellcheck scripts/*.sh plugin/artwork_one/*.sh
 
       - name: Install dependencies
         run: npm ci
 
       - name: Build (type check + Vite)
         run: npm run build
+
+      - name: Plugin tests
+        run: NODE_PATH=node_modules node --test plugin/artwork_one/test/
 
       - name: Package the release archive
         run: scripts/package.sh "$(git describe --tags --always)"
@@ -39,6 +42,13 @@ jobs:
         with:
           name: artwork-one
           path: artwork-one.tar.gz
+          if-no-files-found: error
+
+      # the plugin folder as the Volumio plugin store wants it (copied into a fork of volumio-plugins-sources-bookworm)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: artwork_one-plugin
+          path: build/artwork_one
           if-no-files-found: error
 
   release:

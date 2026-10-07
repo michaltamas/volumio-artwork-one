@@ -35,7 +35,7 @@ Beneath the new look sits everything you already rely on. Every source, every se
 - [Listening in the browser](#listening-in-the-browser)
 - [Building from source](#building-from-source)
 - [How it works](#how-it-works)
-- [The companion plugin](#the-companion-plugin)
+- [The plugin](#the-plugin)
 - [Troubleshooting](#troubleshooting)
 - [Known limitations](#known-limitations)
 - [Credits](#credits)
@@ -86,7 +86,7 @@ Beneath the new look sits everything you already rely on. Every source, every se
 
 **The player's own display**
 - *Ambient*: after a few minutes without a touch, a display the player drives (HDMI, the Touch Display plugin, a TV) shows the cover, the essentials and a clock — cover-led, clock-led or full-bleed — and comes straight back on touch. Night hours dim it; the composition drifts slowly against burn-in.
-- One theme, one set of ambient settings and one shelf of pins for every screen of the player, kept on the player by the [companion plugin](#the-companion-plugin): set them from a phone, the display follows at once.
+- One theme, one set of ambient settings and one shelf of pins for every screen of the player, kept on the player by the [plugin](#the-plugin): set them from a phone, the display follows at once.
 
 **Everywhere**
 - A fluid layout with no fixed breakpoints: it adapts continuously to phones, tablets, desktop browsers and unusual displays on media players.
@@ -122,7 +122,7 @@ Beneath the new look sits everything you already rely on. Every source, every se
 
 The same screens on paper. The cover still bleeds behind everything, but the veil over it runs up to a warm off-white instead of down to black, and the transport turns from a white disc with a dark glyph into an ink disc with a paper one. Pick **Dark**, **Light** or **System** in Settings → Appearance. Until something is picked the theme is dark.
 
-With the [companion plugin](#the-companion-plugin) the choice is the player's: every screen — the phone, the desktop browser, a display on HDMI that nobody can touch — shows the theme picked in Appearance, at once. Without the plugin the choice stays per browser, and a display can still be told with `?theme=light` (or `dark`, `system`) in the address it opens.
+The choice is the player's: every screen — the phone, the desktop browser, a display on HDMI that nobody can touch — shows the theme picked in Appearance, at once. Without the plugin the choice stays per browser, and a display can still be told with `?theme=light` (or `dark`, `system`) in the address it opens.
 
 | | |
 |---|---|
@@ -165,9 +165,9 @@ curl -fsSL https://raw.githubusercontent.com/michaltamas/volumio-artwork-one/mai
 
 To install a particular version, pass `--version`, for example `bash -s -- --version v3.0.0`.
 
-**What the installer does.** It downloads `artwork-one.tar.gz` from the [latest release](https://github.com/michaltamas/volumio-artwork-one/releases/latest), unpacks it to `/data/artwork-ui` and registers it in `/data/thirdPartyUisList.json`, Volumio's list of additional interfaces. With `--activate` it also writes `/data/active_volumio_ui` and restarts Volumio. It changes nothing under `/volumio`. Because everything lives on the data partition, the installation survives Volumio system updates. It also installs the Artwork One Companion plugin to `/data/plugins/miscellanea/artwork_companion` and registers it, restarting Volumio once so it loads; `--no-companion` skips it. You are welcome to read [the script](scripts/install.sh) before running it.
+**What the installer does.** Artwork One is a Volumio plugin. The script downloads `artwork-one.tar.gz` from the [latest release](https://github.com/michaltamas/volumio-artwork-one/releases/latest), puts the plugin in `/data/plugins/user_interface/artwork_one` (the interface under `ui/`), registers it as enabled in Volumio's plugin list and restarts Volumio once; the plugin then registers the interface in Settings → System. With `--activate` it also makes it the active interface. It changes nothing under `/volumio`, and everything lives on the data partition, so it survives system updates. You are welcome to read [the script](scripts/install.sh) before running it. The same plugin is on its way to Volumio's plugin store, where it will install from Settings → Plugins without SSH.
 
-**Upgrading from Artwork One 1.x or 2.x** is the same command. Version 3 goes to the same place under the same name, so the old version is replaced, the interface you selected stays selected, and the companion plugin keeps your theme, ambient settings and pins.
+**Upgrading from an earlier Artwork One** (1.x–3.1, installed to `/data/artwork-ui` with the Companion plugin) is the same command: the plugin takes over the interface entry and the settings — theme, ambient display, pins — and the older files and the Companion are removed.
 
 ## Updating
 
@@ -214,13 +214,15 @@ npm run dev
 To try a build on a player, package it and install it there with the same installer a release uses:
 
 ```bash
-scripts/deploy.sh volumio@volumio.local
+scripts/deploy.sh volumio@volumio.local              # install; select it in Settings yourself
+scripts/deploy.sh volumio@volumio.local --activate   # install and switch to it
 ```
 
-`deploy.sh` uses `ssh` and `scp`; set up key-based login first (`ssh-copy-id volumio@volumio.local`). To produce the release archive from `dist/`:
+`deploy.sh` uses `ssh` and `scp`; set up key-based login first (`ssh-copy-id volumio@volumio.local`). To produce the plugin folder and the release archive from `dist/`:
 
 ```bash
-scripts/package.sh v3.0.0        # writes artwork-one.tar.gz
+scripts/package.sh v3.2.0        # writes build/artwork_one/ (the plugin, for Volumio's store) and artwork-one.tar.gz
+npm test                         # the plugin's own tests (node:test; kew and v-conf as dev dependencies)
 ```
 
 Releases are built by [GitHub Actions](.github/workflows/ci.yml) from the tagged source and attached to the GitHub release automatically.
@@ -236,16 +238,16 @@ Volumio serves its web interface as static files and talks to it over Socket.IO 
 | `src/components/` | Shared pieces: the rail, the mini player, the queue panel, sheets, rows and tiles |
 | `src/styles/` | The stylesheets; `tokens.scss` holds the design tokens — colours, radii, and the fluid type and spacing scales built on `clamp()` — and `phone.scss` the phone layout |
 | `public/` | Fonts, icons and the few static files served as they are |
-| `plugin/artwork_companion/` | The companion plugin |
+| `plugin/artwork_one/` | The Volumio plugin: `index.js` registers the interface and keeps its settings; `scripts/package.sh` puts the build under `ui/` |
 | `scripts/` | Installer, uninstaller, deployment and packaging |
 
-## The companion plugin
+## The plugin
 
-The interface is static files: it has no place on the player to keep anything, so a choice made in one browser never reached another, and a display the player drives on HDMI — which nobody can touch — could not be told anything at all. The **Artwork One Companion** ([`plugin/artwork_companion`](plugin/artwork_companion)) is that place: a small Volumio plugin that keeps the theme, the ambient display settings and the pinned shelf on the player, answers a screen that asks for them, and pushes every change to all connected screens.
+Artwork One is one Volumio plugin, `user_interface/artwork_one` ([`plugin/artwork_one`](plugin/artwork_one)). On start it registers the interface with Volumio (`registerThirdPartyUI`), so it appears under Settings → System → User Interface layout design; on stop or uninstall it takes the entry out again and, if Artwork One was the active interface, switches the player back to one of Volumio's own first. It also keeps what the interface cannot keep for itself — the theme, the ambient display settings and the pins — and pushes every change to all connected screens, so a choice made on the phone is on the living-room display a moment later.
 
-- The installer puts it in `/data/plugins/miscellanea/artwork_companion`, registers it in Volumio's plugin list and restarts Volumio once so it loads; the uninstaller removes it. `--no-companion` skips it, and the interface works without it — the theme and the ambient settings then stay per browser.
-- It has no dependencies of its own: Volumio's modules (`kew`, `v-conf`) are loaded from the player's core tree. Nothing is downloaded, built or sent anywhere.
-- Contract, over Volumio's `callMethod`: `miscellanea/artwork_companion` · `getSettings {}` answers the caller with `pushArtworkSettings`; `setSettings {theme?, ambient?, pins?}` saves and pushes `pushArtworkSettings` to every screen.
+- It has no dependencies of its own: Volumio's modules (`kew`, `v-conf`) are loaded from the player's core tree. `install.sh` downloads, builds and writes nothing.
+- Its page under Settings → Plugins shows whether Artwork One is the active interface, with a *Switch to Artwork One* button; the settings themselves live under Settings → Appearance.
+- Contract, over Volumio's `callMethod`: `user_interface/artwork_one` · `getSettings {}` answers the caller with `pushArtworkSettings`; `setSettings {theme?, ambient?, pins?}` saves and pushes `pushArtworkSettings` to every screen. The answer carries `plugin: "user_interface/artwork_one"`.
 
 ## Troubleshooting
 
