@@ -1,6 +1,6 @@
 {
   "name": "artwork_one",
-  "version": "3.1.0",
+  "version": "3.2.0",
   "description": "Artwork One: a cover-led interface for Volumio. The cover of what plays fills the screen; every control floats above it.",
   "main": "index.js",
   "author": "Michal Tamas",
@@ -18,8 +18,8 @@
     "os": [
       "bookworm"
     ],
-    "details": "A cover-led interface for Volumio: the cover of what plays fills the screen, softly blurred, and every control floats above it on frosted glass. Three faces of Now Playing (cover, info, lyrics), an ambient display for the player's own screen, a labelled rail, Zones, and every Volumio source and setting as before. After enabling, pick Artwork One under Settings \u2192 System \u2192 User Interface layout design (or press Switch on this page).",
-    "changelog": "3.1.0: first store release \u2014 the Artwork One 3.1 interface and its settings (theme, ambient display, pins) in one plugin. Replaces the script install and the Artwork One Companion."
+    "details": "A cover-led interface for Volumio: the cover of what plays fills the screen, softly blurred, and every control floats above it on frosted glass. Three faces of Now Playing (cover, info, lyrics), an ambient display for the player's own screen, a labelled rail, Zones, and every Volumio source and setting as before. After enabling, pick Artwork One under Settings → System → User Interface layout design (or press Switch on this page).",
+    "changelog": "3.2.0: first store release — the Artwork One interface (3.1 with the plugin's fixes) and its settings (theme, ambient display, pins) in one plugin. Replaces the script install and the Artwork One Companion; comes back as the active interface after an update."
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
