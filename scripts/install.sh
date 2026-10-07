@@ -92,7 +92,9 @@ else
   tar -xzf "$TMP/$ASSET" -C "$STAGE"
 fi
 SRC="$STAGE/$PLUGIN_NAME"
-[ -f "$SRC/package.json" ] && [ -f "$SRC/ui/index.html" ] || die "this does not look like an Artwork One plugin build (package.json or ui/index.html missing)"
+if ! { [ -f "$SRC/package.json" ] && [ -f "$SRC/ui/index.html" ]; }; then
+  die "this does not look like an Artwork One plugin build (package.json or ui/index.html missing)"
+fi
 NEW_PV="$(node -p 'require(process.argv[1]).version' "$SRC/package.json" 2>/dev/null || echo "?")"
 
 # 2) the plugin, swapped into place so a browser never loads a half-copied interface
@@ -121,8 +123,12 @@ echo ">> registered the plugin in $PLUGINS_JSON"
 
 # 4) an install made by the older script: its settings come over, the active interface stays Artwork One
 #    (now the plugin's), and the old files go — the plugin itself cleans the interface list on start
-if [ -d "$OLD_PLUGIN_CONF" ] && [ ! -s "$PLUGIN_CONF_DIR/config.json" -o "$(cat "$PLUGIN_CONF_DIR/config.json")" = "{}" ]; then
-  cp "$OLD_PLUGIN_CONF/config.json" "$PLUGIN_CONF_DIR/config.json" 2>/dev/null && echo ">> settings taken over from the Artwork One Companion" || true
+if [ -f "$OLD_PLUGIN_CONF/config.json" ]; then
+  if [ ! -s "$PLUGIN_CONF_DIR/config.json" ] || [ "$(cat "$PLUGIN_CONF_DIR/config.json")" = "{}" ]; then
+    if cp "$OLD_PLUGIN_CONF/config.json" "$PLUGIN_CONF_DIR/config.json" 2>/dev/null; then
+      echo ">> settings taken over from the Artwork One Companion"
+    fi
+  fi
 fi
 if [ -f "$ACTIVE_UI" ] && grep -q "\"uiPath\": *\"$OLD_UI_DIR\"" "$ACTIVE_UI" 2>/dev/null; then
   printf '{"uiPrettyName":"Artwork One","uiName":"artwork","uiPath":"%s/ui"}' "$PLUGIN_DIR" > "$ACTIVE_UI"
