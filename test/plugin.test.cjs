@@ -12,7 +12,7 @@ process.env.ARTWORK_ONE_TEST_ROOT = tmp;
 fs.mkdirSync(path.join(tmp, 'ui'), { recursive: true }); fs.writeFileSync(path.join(tmp, 'ui', 'index.html'), '<!doctype html>');
 fs.mkdirSync(path.join(tmp, 'data', 'configuration', 'miscellanea', 'artwork_companion'), { recursive: true });
 fs.mkdirSync(path.join(tmp, 'volumio'), { recursive: true });
-const Plugin = require('../index.js');
+const Plugin = require('../plugin/artwork_one/index.js');
 
 function fakeVolumio() {
   const calls = [];

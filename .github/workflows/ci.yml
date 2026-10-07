@@ -33,7 +33,7 @@ jobs:
         run: npm run build
 
       - name: Plugin tests
-        run: NODE_PATH=node_modules node --test plugin/artwork_one/test/plugin.test.js
+        run: NODE_PATH=node_modules node --test test/plugin.test.cjs
 
       - name: Package the release archive
         run: scripts/package.sh "$(git describe --tags --always)"

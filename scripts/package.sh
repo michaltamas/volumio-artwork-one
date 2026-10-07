@@ -9,7 +9,7 @@ VERSION="${1:-$(git describe --tags --always 2>/dev/null || echo dev)}"
 [ -f dist/index.html ] || { echo "error: no dist/ - run npm run build first" >&2; exit 1; }
 rm -rf build/artwork_one && mkdir -p build
 cp -a plugin/artwork_one build/artwork_one
-rm -rf build/artwork_one/ui build/artwork_one/test
+rm -rf build/artwork_one/ui
 cp -a dist build/artwork_one/ui
 echo "$VERSION" > build/artwork_one/ui/VERSION
 # no macOS metadata in the archive (GNU tar on the player warns about it)

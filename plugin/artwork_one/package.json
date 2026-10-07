@@ -10,7 +10,7 @@
     "prettyName": "Artwork One",
     "icon": "fa-paint-brush",
     "plugin_type": "user_interface",
-    "boot_priority": 3,
+    "boot_priority": 10,
     "architectures": [
       "amd64",
       "armhf"
@@ -22,7 +22,7 @@
     "changelog": "3.1.0: first store release \u2014 the Artwork One 3.1 interface and its settings (theme, ambient display, pins) in one plugin. Replaces the script install and the Artwork One Companion."
   },
   "scripts": {
-    "test": "node --test test/"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "engines": {
     "node": ">=20",

@@ -222,7 +222,7 @@ scripts/deploy.sh volumio@volumio.local --activate   # install and switch to it
 
 ```bash
 scripts/package.sh v3.2.0        # writes build/artwork_one/ (the plugin, for Volumio's store) and artwork-one.tar.gz
-npm test                         # the plugin's own tests (node:test; kew and v-conf as dev dependencies)
+npm test                         # the plugin's tests, test/plugin.test.cjs (node:test; kew and v-conf as dev dependencies)
 ```
 
 Releases are built by [GitHub Actions](.github/workflows/ci.yml) from the tagged source and attached to the GitHub release automatically.
