@@ -9,7 +9,7 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "package": "scripts/package.sh",
-    "test": "NODE_PATH=node_modules node --test plugin/artwork_one/test/"
+    "test": "NODE_PATH=node_modules node --test plugin/artwork_one/test/plugin.test.js"
   },
   "dependencies": {
     "firebase": "^12.19.0",

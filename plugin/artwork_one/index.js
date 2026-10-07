@@ -24,10 +24,12 @@
  * and its own when it stops — switching the player to another interface first when it is the
  * active one, so nobody is left on a page that no longer exists.
  *
- * The plugin lives under /data, where Volumio's own modules are not on the require path; kew and
- * v-conf are loaded from the core tree by name, so nothing has to be shipped or installed.
+ * kew and v-conf, the only modules, are declared in package.json: Volumio installs them with the
+ * plugin. A copy put in place by hand, without node_modules, gets them from the core tree.
  */
 
+// kew and v-conf are declared in package.json (Volumio installs them with the plugin); the core
+// tree is the fallback for a copy put in place by hand, without node_modules
 function core(name) {
   try { return require(name); } catch (e) { return require('/volumio/node_modules/' + name); }
 }
@@ -82,6 +84,7 @@ ArtworkOne.prototype.onStart = function () {
   try {
     self.takeOverScriptInstall();
     self.registerUI();
+    self.comeBack();
   } catch (e) {
     self.logger.error('[artwork_one] start failed: ' + e);
     return libQ.reject(new Error('Artwork One could not register its interface: ' + e));
@@ -90,15 +93,34 @@ ArtworkOne.prototype.onStart = function () {
   return libQ.resolve();
 };
 
-// Disabled or uninstalled: the interface leaves Volumio's list, and a player showing it is switched
-// to a core interface first (the folder is about to go, or the plugin is off: nothing would answer).
+// Stopped — disabled, uninstalled, or updated (the core stops a plugin before replacing its files
+// and starts it again only with Volumio): the interface leaves Volumio's list, and a player showing
+// it is switched to a core interface first, so nobody is left on a page nothing answers for. That
+// it was the active one is remembered: the next start brings it back.
 ArtworkOne.prototype.onStop = function () {
   var self = this;
   try {
-    if (self.isActive()) { self.switchToCoreUI(); }
+    var active = self.isActive();
+    if (active) { self.switchToCoreUI(); }
+    self.config.set('wasActive', active);
     self.unregisterUI();
   } catch (e) { self.logger.error('[artwork_one] stop: ' + e); }
   return libQ.resolve();
+};
+
+// the player showed Artwork One when the plugin was last stopped (an update, or a disable the user
+// has just undone): it does again, with the Appearance plugin's own switch when that one is up —
+// a toast and a reload for the screens — and by hand when it is not yet (at boot nobody is watching)
+ArtworkOne.prototype.comeBack = function () {
+  if (!this.config.get('wasActive')) { return; }
+  this.config.set('wasActive', false);
+  if (this.isActive()) { return; }
+  try { this.setActiveUI(UI_NAME); } catch (e) { this.logger.warn('[artwork_one] appearance switch: ' + e); }
+  if (!this.isActive()) {
+    this.writeJson(this.paths.ACTIVE_UI, this.uiEntry());
+    process.env.VOLUMIO_ACTIVE_UI_PATH = this.paths.UI_DIR; process.env.VOLUMIO_ACTIVE_UI_NAME = UI_NAME; process.env.VOLUMIO_ACTIVE_UI_PRETTY_NAME = UI_PRETTY_NAME;
+  }
+  this.logger.info('[artwork_one] the player showed Artwork One before the stop: it does again');
 };
 
 // --- the interface in Volumio's list --------------------------------------------------------
@@ -109,11 +131,14 @@ ArtworkOne.prototype.readJson = function (file, fallback) {
   try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch (e) { return fallback; }
 };
 ArtworkOne.prototype.writeJson = function (file, data) {
-  fs.writeFileSync(file, JSON.stringify(data, null, 2));
+  try { fs.writeFileSync(file, JSON.stringify(data, null, 2)); return true; }
+  catch (e) { this.logger.error('[artwork_one] could not write ' + file + ': ' + e); return false; }
 };
 
 ArtworkOne.prototype.registerUI = function () {
-  if (!fs.existsSync(path.join(this.paths.UI_DIR, 'index.html'))) { throw new Error('ui/index.html is missing'); }
+  var hasUi = false;
+  try { hasUi = fs.existsSync(path.join(this.paths.UI_DIR, 'index.html')); } catch (e) { hasUi = false; }
+  if (!hasUi) { throw new Error('ui/index.html is missing'); }
   // Volumio adds by path and keeps every path: ours only once, and nothing else under our name
   var list = this.readJson(this.paths.UI_LIST, []);
   var dir = this.paths.UI_DIR;
@@ -133,7 +158,7 @@ ArtworkOne.prototype.unregisterUI = function () {
   if (kept.length !== list.length) { this.writeJson(this.paths.UI_LIST, kept); this.logger.info('[artwork_one] interface unregistered'); }
 };
 
-// Artwork One 1.x–3.x was put in /data/artwork-ui by a script, with the same uiName: without this the
+// Artwork One 1.x–3.1 was put in /data/artwork-ui by a script, with the same uiName: without this the
 // interface would be listed twice, and the player might still serve the old files. The plugin takes
 // the entry over (the files are left alone: the uninstaller of that install knows about them).
 ArtworkOne.prototype.takeOverScriptInstall = function () {
@@ -145,7 +170,9 @@ ArtworkOne.prototype.takeOverScriptInstall = function () {
   }
   // the old companion's settings come along, once
   var oldConf = this.paths.OLD_CONF;
-  if (!this.config.get('migrated') && fs.existsSync(oldConf)) {
+  var hasOld = false;
+  try { hasOld = !this.config.get('migrated') && fs.existsSync(oldConf); } catch (e) { hasOld = false; }
+  if (hasOld) {
     var old = this.readJson(oldConf, {});
     var self = this;
     ['theme', 'ambient', 'pins'].forEach(function (k) { if (old[k] && old[k].value !== undefined && old[k].value !== '' && !self.config.get(k)) { self.config.set(k, old[k].value); } });
@@ -168,7 +195,8 @@ ArtworkOne.prototype.setActiveUI = function (uiName) {
 
 ArtworkOne.prototype.switchToCoreUI = function () {
   var core = this.readJson(this.paths.CORE_UI_LIST, []);
-  var next = (Array.isArray(core) ? core : []).filter(function (u) { return u && u.uiName !== UI_NAME && u.uiPath && fs.existsSync(u.uiPath); })[0];
+  var exists = function (p) { try { return fs.existsSync(p); } catch (e) { return false; } };
+  var next = (Array.isArray(core) ? core : []).filter(function (u) { return u && u.uiName !== UI_NAME && u.uiPath && exists(u.uiPath); })[0];
   if (!next) { this.logger.warn('[artwork_one] no core interface found to switch to'); return; }
   this.logger.info('[artwork_one] switching the player to ' + next.uiPrettyName);
   this.setActiveUI(next.uiName);
@@ -177,11 +205,16 @@ ArtworkOne.prototype.switchToCoreUI = function () {
 // the button on the plugin's page
 ArtworkOne.prototype.switchTo = function () {
   var self = this;
-  if (self.isActive()) {
-    self.commandRouter.pushToastMessage('info', UI_PRETTY_NAME, self.t('ACTIVE'));
-    return libQ.resolve();
+  try {
+    if (self.isActive()) {
+      self.commandRouter.pushToastMessage('info', UI_PRETTY_NAME, self.t('ACTIVE'));
+      return libQ.resolve();
+    }
+    self.setActiveUI(UI_NAME);   // the entry is there since onStart; Appearance looks it up by name
+  } catch (e) {
+    self.logger.error('[artwork_one] switch: ' + e);
+    self.commandRouter.pushToastMessage('error', UI_PRETTY_NAME, String(e.message || e));
   }
-  self.setActiveUI(UI_NAME);   // the entry is there since onStart; Appearance looks it up by name
   return libQ.resolve();
 };
 

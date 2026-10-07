@@ -78,3 +78,27 @@ test('onStart without ui/index.html rejects instead of throwing (the player keep
   await p.onStart().then(() => {}, () => { failed = true; });
   assert.equal(failed, true);
 });
+
+test('stopped while active, the next start brings the interface back (an update, or an undone disable)', async () => {
+  const { ctx, calls } = fakeVolumio();
+  const p = new Plugin(ctx);
+  p.onVolumioStart();
+  await p.onStart();
+  fs.writeFileSync(p.paths.ACTIVE_UI, JSON.stringify(p.uiEntry()));
+  fs.writeFileSync(p.paths.CORE_UI_LIST, JSON.stringify([{ uiPrettyName: 'Manifest', uiName: 'manifest', uiPath: tmp }]));
+  await p.onStop();
+  // the fake Appearance plugin did nothing, so the file still says Manifest... (as the core wrote it)
+  fs.writeFileSync(p.paths.ACTIVE_UI, JSON.stringify({ uiPrettyName: 'Manifest', uiName: 'manifest', uiPath: tmp }));
+  assert.equal(p.config.get('wasActive'), true);
+  calls.length = 0;
+  await p.onStart();
+  assert.ok(calls.some(c => c[0] === 'exec' && c[3] === 'setVolumio3UI' && c[4].volumio3_ui.value === 'artwork'), 'asked Appearance to switch');
+  assert.equal(JSON.parse(fs.readFileSync(p.paths.ACTIVE_UI, 'utf8')).uiName, 'artwork', 'and did it by hand when Appearance could not');
+  assert.equal(p.config.get('wasActive'), false);
+  // a stop while another interface was active changes nothing on the next start
+  fs.writeFileSync(p.paths.ACTIVE_UI, JSON.stringify({ uiPrettyName: 'Manifest', uiName: 'manifest', uiPath: tmp }));
+  await p.onStop();
+  calls.length = 0;
+  await p.onStart();
+  assert.ok(!calls.some(c => c[0] === 'exec' && c[3] === 'setVolumio3UI'));
+});

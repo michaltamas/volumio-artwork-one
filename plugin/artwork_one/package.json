@@ -27,5 +27,9 @@
   "engines": {
     "node": ">=20",
     "volumio": ">=4"
+  },
+  "dependencies": {
+    "kew": "^0.7.0",
+    "v-conf": "^1.4.0"
   }
 }
