@@ -1,4 +1,5 @@
 /** Volumio's small modals in the theme's dress: confirm, got it, password, the plugin installer, the updater, the NAS password. */
+import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import Icon from '../Icon';
 import { on, emit } from '../../core/socket';
@@ -16,14 +17,42 @@ export function ConfirmSheet() {
     </>
   );
 }
+// an Angular state a plugin's button names, as a route here
+const STATES: Record<string, string> = { 'volumio.playback': '/playback', 'volumio.browse': '/browse', 'volumio.queue': '/queue', 'volumio.settings': '/settings', 'volumio.multi-room': '/multi-room', 'volumio.plugin-manager': '/plugin-manager', 'volumio.home': '/home' };
 export function GenericModalSheet() {
   const data = useModal(s => s.data) || {};
-  const click = (b: any) => { if (b.emit) { emit(b.emit, b.payload); } useModal.getState().close(); };
+  const nav = useNavigate();
+  // as Volumio's own interfaces: a message to the player, else an address (in this page), else a page of the interface; then closed
+  const click = (b: any) => {
+    if (b.emit) { emit(b.emit, b.payload); }
+    else if (b.url) { window.open(b.url, '_self'); }
+    else if (b.state && STATES[b.state]) { nav(STATES[b.state]); }
+    useModal.getState().close();
+  };
+  const buttons = (data.buttons || []).map((b: any, i: number) => <button key={i} type="button" className={b.class || 'btn btn-info'} onClick={() => click(b)}>{b.name}</button>);
+  if (data.progress) {
+    const done = data.status === 'modalDone';
+    const pct = Math.max(0, Math.min(100, Number(data.progressNumber) || 0));
+    return (
+      <>
+        <div className="modal-header"><h3 className="modal-title">{data.title}</h3></div>
+        <div className="modal-body">
+          {done ? <h3>{data.message}</h3> : (
+            <div>
+              <h4>{data.message}</h4>
+              <div className="progress progress-striped active"><div className="progress-bar" style={{ width: pct + '%' }}>{pct}%</div></div>
+            </div>
+          )}
+        </div>
+        <div className="modal-footer">{done ? buttons : null}</div>
+      </>
+    );
+  }
   return (
     <>
       <div className="modal-header"><h3 className="modal-title"><i className="fa fa-info-circle"><Icon name="info" /></i> {data.title}</h3></div>
       <div className="modal-body" dangerouslySetInnerHTML={{ __html: String(data.message || '') }} />
-      <div className="modal-footer">{(data.buttons || []).map((b: any, i: number) => <button key={i} type="button" className={b.class || 'btn btn-info'} onClick={() => click(b)}>{b.name}</button>)}</div>
+      <div className="modal-footer">{buttons}</div>
     </>
   );
 }

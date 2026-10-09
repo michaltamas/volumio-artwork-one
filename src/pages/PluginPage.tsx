@@ -9,7 +9,7 @@ import { askUiConfig, onUiConfig, pageKey } from '../core/uiConfig';
 import { useSettings } from '../core/store/settings';
 import { useUiSettings } from '../core/store/uiSettings';
 import { useModal } from '../core/store/modal';
-import { Switch, Select, Segment } from '../components/settings/controls';
+import { Switch, Select, Segment, same } from '../components/settings/controls';
 import { CORE } from '../components/settings/CoreSections';
 import AppearanceSlot from '../components/settings/AppearanceSlot';
 import Spinner from '../components/Spinner';
@@ -80,6 +80,7 @@ export default function PluginPage({ wizard }: { wizard?: boolean }) {
   }, [pluginName, wizard]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const saveSection = async (section: any) => {
+    if (!section.onSave) { return; }   // nothing to call: never an empty callMethod
     const saveObj = { ...section.onSave };
     if (section.saveButton && section.saveButton.data) {
       const data: Record<string, any> = {};
@@ -90,7 +91,8 @@ export default function PluginPage({ wizard }: { wizard?: boolean }) {
     emit('callMethod', saveObj);
   };
   const saveButton = async (item: any) => {
-    const c = item.onClick || {};
+    if (!item.onClick) { return; }   // a button that says nothing does nothing: never an empty callMethod
+    const c = item.onClick;
     const run = () => {
       if (c.type === 'emit') { emit(c.message, c.data); }
       else if (c.type === 'openUrl') { window.open(c.url); }
@@ -123,6 +125,7 @@ export default function PluginPage({ wizard }: { wizard?: boolean }) {
   }
   const page = obj.page || {};
   const showDoc = !!(ui.pluginsDoc && ui.pluginsDoc.showDoc);
+  const showDesc = !(ui.pluginsDoc && ui.pluginsDoc.showDescription === false);   // shown unless the player's interface settings say otherwise
   return (
     <div className="container-fluid"><div className="row"><div className="col-xs-24" id="pluginWrapper">
       <PageHead variant="settings" back={() => nav('/settings')} backLabel="Settings" nav={<Crumbs root="Settings" current={page.label || ''} onHome={() => nav('/settings')} />} />
@@ -156,7 +159,9 @@ export default function PluginPage({ wizard }: { wizard?: boolean }) {
                               {item.element === 'input' ? <input id={item.id} type={item.type} className="form-control" value={item.value ?? ''} onChange={(e) => { item.value = item.type === 'number' ? (e.target.value === '' ? '' : Number(e.target.value)) : e.target.value; rerender(); }} {...inputAttrs(item.attributes)} /> : null}
                               {item.element === 'switch' ? <Switch on={item.value === true || item.value === 'true'} onChange={(v) => { item.value = v; rerender(); }} label={item.label} /> : null}
                               {item.element === 'select' ? (
-                                item.options && item.options.length > 1 && item.options.length <= 3
+                                // two or three choices as a segment, but only for a value one of them carries: a segment
+                                // cannot show anything else, the select shows the value's own label (as Volumio does)
+                                item.options && item.options.length > 1 && item.options.length <= 3 && item.options.some((o: any) => same(item.value, o) || (item.value && typeof item.value === 'object' && o && typeof o === 'object' && o.label === item.value.label))
                                   ? <Segment value={item.value} options={item.options} onChange={(o) => { item.value = o; rerender(); }} label={item.label} />
                                   : <Select value={item.value} options={item.options || []} onChange={(o) => { item.value = o; rerender(); }} label={item.label} placeholder="Enter an address..." byLabel={item.id === 'i2sid'} />
                               ) : null}
@@ -173,7 +178,7 @@ export default function PluginPage({ wizard }: { wizard?: boolean }) {
                             </div></div></div>
                           )}
                           {showDoc && item.doc ? <div className="control-doc"><a onClick={() => useModal.getState().open('gotit', { message: item.doc })}><i className="fa fa-info-circle"><Icon name="info" /></i></a></div> : null}
-                          {item.description ? <div className="control-description">{item.description}</div> : null}
+                          {showDesc && item.description ? <div className="control-description">{item.description}</div> : null}
                           <div style={{ clear: 'both' }} />
                         </div>
                       ) : null)}

@@ -22,5 +22,13 @@ export const useModal = create<ModalStore>((set) => ({
 }));
 
 // the backend's generic confirm/info dialog (plugin details, uninstall confirm, drive/share
-// prompts…): {title, message, size?, buttons: [{name, class, emit?, payload?}]}
-on('openModal', (d: any) => useModal.getState().open('generic', d));
+// prompts…): {title, message, size?, buttons: [{name, class, emit?, payload?, url?, state?}]}
+// With `progress: true` it is Volumio's progress dialog instead (install to disk, Storage Manager,
+// Soloist): a bar the player moves with `modalProgress`, and its buttons only with `modalDone`.
+on('openModal', (d: any) => useModal.getState().open('generic', d && d.progress ? { ...d, status: 'modalProgress' } : d));
+const progressing = () => { const m = useModal.getState(); return m.name === 'generic' && m.data && m.data.progress; };
+// as Volumio's own interfaces: these move a progress dialog only, never a plain one (Spotify sends one beside its own)
+on('modalProgress', (d: any) => { if (progressing()) { useModal.setState({ data: { ...useModal.getState().data, ...(d || {}), progress: true, status: 'modalProgress' } }); } });
+on('modalDone', (d: any) => { if (progressing()) { useModal.setState({ data: { ...useModal.getState().data, ...(d || {}), progress: true, status: 'modalDone' } }); } });
+// a plugin closing its dialogs (Spotify, between the steps of its sign-in): only the player's own, never a sheet the listener opened
+on('closeAllModals', () => { if (useModal.getState().name === 'generic') { useModal.getState().close(); } });
