@@ -6,6 +6,12 @@ All notable changes to this project are documented here. The format is based on
 
 Versions 1.x and 2.x were published in [volumio-artwork-theme](https://github.com/michaltamas/volumio-artwork-theme).
 
+## [Unreleased]
+
+### Fixed
+
+- **Settings → Playback options: the DAC Model shows the DAC that is set.** Volumio hands back the I2S DAC's overlay, which several DACs share (R-PI DAC and BassFly-uHAT use the same one), and the select picked the first of them. It now goes by the name Volumio returns with it. Reported by balbuze.
+
 ## [3.2.0] - 2026-10-07
 
 ### Changed

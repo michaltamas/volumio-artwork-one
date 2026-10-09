@@ -15,7 +15,15 @@ const optVal = (o: Option) => typeof o === 'string' ? o : (o.value !== undefined
 export function same(v: any, o: Option): boolean { if (v === o) { return true; } if (v && typeof v === 'object' && v.value !== undefined && typeof o === 'object') { return v.value === o.value; } return typeof o !== 'object' ? v === o : false; }
 
 export function Select({ value, options, onChange, label, className, placeholder }: { value: any; options: Option[]; onChange: (o: Option) => void; label?: string; className?: string; placeholder?: string }) {
-  const idx = options.findIndex(o => same(value, o));
+  // Volumio may hand back a value that does not tell the options apart: the I2S DAC saves its
+  // overlay, which "R-PI DAC" shares with others, and an option's own value ("bassfly") is not
+  // what is saved at all. The label then says which one is chosen: value and label together
+  // first, the label alone next, the value alone last.
+  const lab = value && typeof value === 'object' && value.label !== undefined ? value.label : undefined;
+  const has = (o: Option) => typeof o === 'object' && lab !== undefined && o.label === lab;
+  let idx = lab === undefined ? -1 : options.findIndex(o => has(o) && same(value, o));
+  if (idx < 0 && lab !== undefined) { idx = options.findIndex(has); }
+  if (idx < 0) { idx = options.findIndex(o => same(value, o)); }
   return (
     <div className={'ui-select-container ui-select-bootstrap' + (className ? ' ' + className : '')}>
       <select value={idx < 0 ? '' : String(idx)} onChange={(e) => onChange(options[Number(e.target.value)])} aria-label={label}>
