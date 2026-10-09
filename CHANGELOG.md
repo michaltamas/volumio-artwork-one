@@ -8,6 +8,10 @@ Versions 1.x and 2.x were published in [volumio-artwork-theme](https://github.co
 
 ## [Unreleased]
 
+### Changed
+
+- **Folders as covers, the songs inside as rows.** The grid / list choice is now kept separately for lists of folders and albums, and for lists of songs. Browsing by folder with covers on, an album's tracks open as rows (rows by default; switch them to a grid and that is remembered for song lists only), and going back to the folders keeps the covers. Suggested by a user on the forum.
+
 ### Fixed
 
 - **Settings → Playback options: the DAC Model shows the DAC that is set.** Volumio hands back the I2S DAC's overlay, which several DACs share (R-PI DAC and BassFly-uHAT use the same one), and the select picked the first of them. It now goes by the name Volumio returns with it. Reported by balbuze.

@@ -201,8 +201,8 @@ export default function Browse({ dedicated }: { dedicated?: boolean }) {
                   </label>
                   {b.showGridViewSelector() ? (
                     <div className="aw-viewtoggle" role="group" aria-label="View">
-                      <button type="button" className={b.showGridView ? 'active' : ''} onClick={() => b.setGridView(true)} aria-label="Grid" title="Grid"><Icon name="grid_view" /></button>
-                      <button type="button" className={!b.showGridView ? 'active' : ''} onClick={() => b.setGridView(false)} aria-label="List" title="List"><Icon name="list" /></button>
+                      <button type="button" className={(b.trackPage() ? b.showGridViewTracks : b.showGridView) ? 'active' : ''} onClick={() => b.setGridView(true, b.trackPage())} aria-label="Grid" title="Grid"><Icon name="grid_view" /></button>
+                      <button type="button" className={!(b.trackPage() ? b.showGridViewTracks : b.showGridView) ? 'active' : ''} onClick={() => b.setGridView(false, b.trackPage())} aria-label="List" title="List"><Icon name="list" /></button>
                     </div>
                   ) : null}
                 </>} />

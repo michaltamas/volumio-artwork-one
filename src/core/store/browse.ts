@@ -42,6 +42,8 @@ interface Trail extends BrowseItem { lists: BrowseList[]; info: BrowseInfo | nul
 
 // the same key (and JSON value) Volumio's localStorageService used, so a preference set in one build holds in the other; unset = list
 const GRID_KEY = 'ls.showGridView';
+const GRID_TRACKS_KEY = 'ls.showGridViewTracks';   // a list of tracks has its own choice: covers for albums and folders, rows for the songs inside one
+function readGridTracks(): boolean { try { const v = localStorage.getItem(GRID_TRACKS_KEY); return v === null ? false : JSON.parse(v) === true; } catch { return false; } }   // rows by default
 function readGrid(): boolean { try { const v = localStorage.getItem(GRID_KEY); return v === null ? true : JSON.parse(v) === true; } catch { return true; } }   // Grid by default (Artists, Albums — wherever the source offers it); List is a saved choice, not the fallback
 
 interface BrowseStore {
@@ -57,6 +59,7 @@ interface BrowseStore {
   dedicatedSearch: boolean;
   loading: boolean;
   showGridView: boolean;
+  showGridViewTracks: boolean;
   searchField: string;
   favourites: Record<string, boolean>;
   scroll: Record<string, number>;
@@ -68,7 +71,10 @@ interface BrowseStore {
   backHome: () => void;
   home: () => void;
   refresh: () => void;
-  setGridView: (on: boolean) => void;
+  setGridView: (on: boolean, tracks?: boolean) => void;
+  isTrackList: (list: BrowseList) => boolean;
+  gridFor: (list: BrowseList) => boolean;
+  trackPage: () => boolean;
   search: (value: string) => void;
   clearSearch: () => void;
   setDedicated: (on: boolean) => void;
@@ -116,6 +122,7 @@ export const useBrowse = create<BrowseStore>((set, get) => ({
   dedicatedSearch: false,
   loading: false,
   showGridView: readGrid(),
+  showGridViewTracks: readGridTracks(),
   searchField: '',
   favourites: {},
   scroll: {},
@@ -145,7 +152,10 @@ export const useBrowse = create<BrowseStore>((set, get) => ({
   backHome: () => set({ isBrowsing: false, isSearching: false, trail: [], info: null, lists: null, request: null, currentUri: '', searchField: '', prev: null, stamp: get().stamp + 1 }),
   home: () => get().backHome(),
   refresh: () => { const r = get().request; if (r) { set({ loading: true }); emit('browseLibrary', { uri: r.uri }); } },
-  setGridView: (on) => { try { localStorage.setItem(GRID_KEY, JSON.stringify(on)); } catch { /* private mode */ } set({ showGridView: on }); },
+  setGridView: (on, tracks) => {
+    try { localStorage.setItem(tracks ? GRID_TRACKS_KEY : GRID_KEY, JSON.stringify(on)); } catch { /* private mode */ }
+    set(tracks ? { showGridViewTracks: on } : { showGridView: on });
+  },
   // the landing's pill and the search page: Volumio's global search, results render in place
   search: (value) => {
     set({ searchField: value });
@@ -178,6 +188,11 @@ export const useBrowse = create<BrowseStore>((set, get) => ({
   },
   favouritesChanged: () => { if (favTimer) { window.clearTimeout(favTimer); } favTimer = window.setTimeout(() => { favTimer = null; get().loadFavourites(); }, 900); },
   canShowGridView: (list) => !!(list && list.availableListViews && list.availableListViews.indexOf('grid') > -1),
+  // a list of songs only: the tracks inside an album or a folder
+  isTrackList: (list) => { const it = (list && list.items) || []; return it.length > 0 && it.every(i => i && i.type === 'song'); },
+  gridFor: (list) => get().canShowGridView(list) && (get().isTrackList(list) ? get().showGridViewTracks : get().showGridView),
+  // the page offers a grid only for its tracks: the toggle then sets the tracks' choice
+  trackPage: () => { const l = (get().lists || []).filter(x => get().canShowGridView(x)); return l.length > 0 && l.every(x => get().isTrackList(x)); },
   showGridViewSelector: () => { const l = get().lists || []; return l.some(x => get().canShowGridView(x)); },
 }));
 

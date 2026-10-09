@@ -9,8 +9,8 @@ import { artistLists, norm } from './ArtistHead';
 export interface ListsProps { lists: BrowseList[]; filter: string; sortDesc: boolean; isArtist: boolean; artistsPage: boolean; serviceSearch: boolean; activeMenu: string | null; onMenuOpen: (key: string, open: boolean) => void }
 
 export default function BrowseLists({ lists, filter, sortDesc, isArtist, artistsPage, serviceSearch, activeMenu, onMenuOpen }: ListsProps) {
-  const grid = useBrowse(s => s.showGridView);
-  const canGrid = useBrowse(s => s.canShowGridView);
+  const gridFor = useBrowse(s => s.gridFor);
+  useBrowse(s => s.showGridView); useBrowse(s => s.showGridViewTracks);   // a change of either redraws
   const fav = useBrowse(s => s.favourites);
   const st = usePlayer(s => s.state);
   const playingUri = normUri(st && st.uri);
@@ -29,7 +29,7 @@ export default function BrowseLists({ lists, filter, sortDesc, isArtist, artists
   return (
     <>
       {lists.map((list, li) => {
-        const asGrid = grid && canGrid(list);
+        const asGrid = gridFor(list);
         const items = list.items || [];
         const cls = isArtist ? (albumsIdx.indexOf(li) > -1 ? ' aw-artist-albums' : songsIdx.indexOf(li) > -1 ? ' aw-artist-tracks' : '') : '';
         return (
