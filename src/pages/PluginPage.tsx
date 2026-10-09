@@ -158,7 +158,7 @@ export default function PluginPage({ wizard }: { wizard?: boolean }) {
                               {item.element === 'select' ? (
                                 item.options && item.options.length > 1 && item.options.length <= 3
                                   ? <Segment value={item.value} options={item.options} onChange={(o) => { item.value = o; rerender(); }} label={item.label} />
-                                  : <Select value={item.value} options={item.options || []} onChange={(o) => { item.value = o; rerender(); }} label={item.label} placeholder="Enter an address..." />
+                                  : <Select value={item.value} options={item.options || []} onChange={(o) => { item.value = o; rerender(); }} label={item.label} placeholder="Enter an address..." byLabel={item.id === 'i2sid'} />
                               ) : null}
                               {item.element === 'button' ? <button id={item.id} type="button" className="btn btn-info" name={item.id} plugin-attributes="" onClick={() => saveButton(item)}>{item.button_label !== undefined ? item.button_label : item.label}</button> : null}
                             </div></div>

@@ -14,6 +14,7 @@ Versions 1.x and 2.x were published in [volumio-artwork-theme](https://github.co
 
 ### Fixed
 
+- **Settings: the Playback Options tag on the settings page names the output by its value**, as the page's own select does. The label Volumio sends along with the value can be stale or belong to another card; one user saw "HDMI OUT" there while the right output was selected on the page itself.
 - **Settings → Playback options: the DAC Model shows the DAC that is set.** Volumio hands back the I2S DAC's overlay, which several DACs share (R-PI DAC and BassFly-uHAT use the same one), and the select picked the first of them. It now goes by the name Volumio returns with it. Reported by balbuze.
 
 ## [3.2.0] - 2026-10-07

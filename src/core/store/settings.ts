@@ -100,7 +100,19 @@ function askNext() {
 // pick the ALSA values out of a pushed UI config — only when it is the ALSA page
 function readAlsa(cfg: any) {
   const found: Record<string, any> = {};
-  const walk = (arr: any[]) => (arr || []).forEach(el => { if (!el) { return; } const id = String(el.id || ''); const v = el.value; const label = v && typeof v === 'object' ? (v.label || v.value) : v; if (id) { found[id] = label; } if (el.content) { walk(el.content); } });
+  const walk = (arr: any[]) => (arr || []).forEach(el => {
+    if (!el) { return; }
+    const id = String(el.id || ''); const v = el.value;
+    let label = v && typeof v === 'object' ? (v.label || v.value) : v;
+    // the output's name goes by its value, as the page's own select does: the label that comes with it can be stale or another card's
+    if (id === 'output_device' && v && typeof v === 'object' && Array.isArray(el.options)) {
+      const same = el.options.filter((o: any) => o && String(o.value) === String(v.value));
+      const pick = same.find((o: any) => o.label === v.label) || same[0];
+      if (pick && pick.label) { label = pick.label; }
+    }
+    if (id) { found[id] = label; }
+    if (el.content) { walk(el.content); }
+  });
   try { (cfg.sections || []).forEach((s: any) => walk(s.content)); walk(cfg.content); } catch { return; }
   if (found.output_device === undefined) { return; }
   const res = found.resampling;

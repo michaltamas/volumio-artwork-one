@@ -14,16 +14,15 @@ const optLabel = (o: Option) => typeof o === 'string' ? o : String(o.label ?? o.
 const optVal = (o: Option) => typeof o === 'string' ? o : (o.value !== undefined ? o.value : o.label);
 export function same(v: any, o: Option): boolean { if (v === o) { return true; } if (v && typeof v === 'object' && v.value !== undefined && typeof o === 'object') { return v.value === o.value; } return typeof o !== 'object' ? v === o : false; }
 
-export function Select({ value, options, onChange, label, className, placeholder }: { value: any; options: Option[]; onChange: (o: Option) => void; label?: string; className?: string; placeholder?: string }) {
-  // Volumio may hand back a value that does not tell the options apart: the I2S DAC saves its
-  // overlay, which "R-PI DAC" shares with others, and an option's own value ("bassfly") is not
-  // what is saved at all. The label then says which one is chosen: value and label together
-  // first, the label alone next, the value alone last.
+export function Select({ value, options, onChange, label, className, placeholder, byLabel }: { value: any; options: Option[]; onChange: (o: Option) => void; label?: string; className?: string; placeholder?: string; byLabel?: boolean }) {
+  // The value says which option is chosen; when several share it ("Audio Jack" and "HDMI Out"), the label picks among them.
+  // A field whose value does not tell the options apart at all says so with byLabel: the I2S DAC saves its overlay, which
+  // "R-PI DAC" and "BassFly-uHAT" share, and an option's own value ("bassfly") is not what is saved. Its label is the truth.
   const lab = value && typeof value === 'object' && value.label !== undefined ? value.label : undefined;
-  const has = (o: Option) => typeof o === 'object' && lab !== undefined && o.label === lab;
-  let idx = lab === undefined ? -1 : options.findIndex(o => has(o) && same(value, o));
-  if (idx < 0 && lab !== undefined) { idx = options.findIndex(has); }
-  if (idx < 0) { idx = options.findIndex(o => same(value, o)); }
+  const hasLabel = (o: Option) => typeof o === 'object' && lab !== undefined && o.label === lab;
+  const byValue = () => { const m = options.map((o, i) => (same(value, o) ? i : -1)).filter(i => i > -1); return m.find(i => hasLabel(options[i])) ?? (m.length ? m[0] : -1); };
+  let idx = byLabel && lab !== undefined ? options.findIndex(hasLabel) : -1;
+  if (idx < 0) { idx = byValue(); }
   return (
     <div className={'ui-select-container ui-select-bootstrap' + (className ? ' ' + className : '')}>
       <select value={idx < 0 ? '' : String(idx)} onChange={(e) => onChange(options[Number(e.target.value)])} aria-label={label}>
