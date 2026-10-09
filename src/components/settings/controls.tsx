@@ -12,7 +12,9 @@ export function Switch({ on, onChange, label, noLabel }: { on: boolean; onChange
 export type Option = { label?: string; value?: any } | string;
 const optLabel = (o: Option) => typeof o === 'string' ? o : String(o.label ?? o.value ?? '');
 const optVal = (o: Option) => typeof o === 'string' ? o : (o.value !== undefined ? o.value : o.label);
-export function same(v: any, o: Option): boolean { if (v === o) { return true; } if (v && typeof v === 'object' && v.value !== undefined && typeof o === 'object') { return v.value === o.value; } return typeof o !== 'object' ? v === o : false; }
+// values compare as text: a plugin may keep 0 in its options and "0" in its config (FusionDsp's attenuation)
+const eq = (a: any, b: any) => a === b || (a !== null && b !== null && a !== undefined && b !== undefined && typeof a !== 'object' && typeof b !== 'object' && String(a) === String(b));
+export function same(v: any, o: Option): boolean { if (eq(v, o)) { return true; } if (v && typeof v === 'object' && v.value !== undefined && typeof o === 'object') { return eq(v.value, o.value); } return typeof o !== 'object' ? eq(v, o) : false; }
 
 export function Select({ value, options, onChange, label, className, placeholder, byLabel }: { value: any; options: Option[]; onChange: (o: Option) => void; label?: string; className?: string; placeholder?: string; byLabel?: boolean }) {
   // The value says which option is chosen; when several share it ("Audio Jack" and "HDMI Out"), the label picks among them.
@@ -26,7 +28,9 @@ export function Select({ value, options, onChange, label, className, placeholder
   return (
     <div className={'ui-select-container ui-select-bootstrap' + (className ? ' ' + className : '')}>
       <select value={idx < 0 ? '' : String(idx)} onChange={(e) => onChange(options[Number(e.target.value)])} aria-label={label}>
-        {idx < 0 ? <option value="">{placeholder || ''}</option> : null}
+        {/* a value none of the options carries (a filter named with $samplerate$, a file since removed):
+            its own label, as Volumio's interfaces show it; the placeholder only when it has none */}
+        {idx < 0 ? <option value="">{lab !== undefined && lab !== null && String(lab) !== '' ? String(lab) : (placeholder || '')}</option> : null}
         {options.map((o, i) => <option key={i} value={i}>{optLabel(o)}</option>)}
       </select>
       <span className="caret" />
