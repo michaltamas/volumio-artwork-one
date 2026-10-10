@@ -58,7 +58,7 @@ function Shell() {
   // the wrapper's state classes follow the page beneath as soon as it is uncovered (the sheet slides over a styled page)
   const shownPage = covered ? page : underPage;
   const shownPath = covered ? loc.pathname : under.current.pathname;
-  const shell = shownPage === 'settings' || shownPage === 'plugin' || shownPage === 'plugin-manager';
+  const shell = shownPage === 'settings' || shownPage === 'plugin' || shownPage === 'plugin-manager' || shownPage === 'static-page';   // a static page (Credits) comes from a settings button
   const hasSide = useSettings(s => s.hasSide());
   useEffect(() => { if (page === 'settings') { useSettings.setState({ route: { name: 'volumio.settings', pluginName: '' } }); } }, [page]);
   return (

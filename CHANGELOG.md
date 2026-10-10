@@ -6,6 +6,12 @@ All notable changes to this project are documented here. The format is based on
 
 Versions 1.x and 2.x were published in [volumio-artwork-theme](https://github.com/michaltamas/volumio-artwork-theme).
 
+## [Unreleased]
+
+### Fixed
+
+- **Credits and Open Source licenses** (Settings → System) opened an empty page. It now shows Volumio's credits page as Volumio's own interfaces do — contributors, licenses, the legal disclaimer and the GPL source offer, with the license texts — plus an Artwork One section listing the open-source packages the interface uses, in the settings frame with its own head. `node scripts/credits.mjs` rebuilds the page when a dependency changes.
+
 ## [3.2.2] - 2026-10-10
 
 ### Fixed

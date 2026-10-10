@@ -3,12 +3,27 @@ import { useEffect, useState } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import Icon from '../components/Icon';
 import { HOST } from '../core/socket';
+import PageHead from '../components/PageHead';
+import Crumbs from '../components/browse/Crumbs';
+import Spinner from '../components/Spinner';
 
+// A page a settings button opens (Settings → System → Credits and Open Source licenses): Volumio's own
+// static page, shipped with the interface, shown in the settings frame like a plugin's page.
 export function StaticPage() {
   const { pageName = '' } = useParams();
-  const [html, setHtml] = useState('');
-  useEffect(() => { fetch(HOST + '/app/themes/artwork/assets/static-pages/' + encodeURIComponent(pageName) + '.html').then(r => r.ok ? r.text() : '').then(setHtml).catch(() => setHtml('')); }, [pageName]);
-  return <div dangerouslySetInnerHTML={{ __html: html }} />;
+  const nav = useNavigate();
+  const [html, setHtml] = useState<string | null>(null);
+  useEffect(() => { setHtml(null); fetch(HOST + '/app/themes/artwork/assets/static-pages/' + encodeURIComponent(pageName) + '.html').then(r => r.ok ? r.text() : '').then(setHtml).catch(() => setHtml('')); }, [pageName]);
+  const title = pageName ? pageName.charAt(0).toUpperCase() + pageName.slice(1) : '';
+  const back = () => { if (window.history.length > 1) { window.history.back(); } else { nav('/settings'); } };
+  return (
+    <div className="container-fluid aw-static-page"><div className="row"><div className="col-xs-24" id="pluginWrapper">
+      <PageHead variant="settings" back={back} backLabel="Settings" nav={<Crumbs root="Settings" current={title} onHome={() => nav('/settings')} />} />
+      {html === null ? <div className="aw-pluginwait"><Spinner size={24} /></div>
+        : html ? <div dangerouslySetInnerHTML={{ __html: html }} />
+        : <div className="aw-pluginwait"><p className="aw-pluginwait__text">This page is not available.</p></div>}
+    </div></div></div>
+  );
 }
 
 export function IframePage() {
