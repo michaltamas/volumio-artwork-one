@@ -11,6 +11,9 @@ import { albumart, rest } from '../../core/api';
 import { useBrowse, type BrowseItem } from '../../core/store/browse';
 import { useUi } from '../../core/store/ui';
 
+// Settings → Sources (Volumio's My Music page): network drives, USB, the library's sources
+const SOURCES_SETTINGS = '/plugin/miscellanea-my_music';
+
 export const BUILT_IN = ['favourites', 'playlists', 'music-library', 'artists://', 'albums://', 'genres://', 'upnp', 'Last_100', 'radio'];
 export const streamingOf = (sources: BrowseItem[]) => sources.filter(s => BUILT_IN.indexOf(s.uri) === -1);
 
@@ -139,7 +142,7 @@ export default function BrowseLanding({ dedicated }: { dedicated?: boolean }) {
 
           <div className="aw-sources-head">
             <span className="mono">SOURCES</span>
-            <a className="aw-sources-manage" onClick={() => nav('/settings')}>Manage</a>
+            <a className="aw-sources-manage" onClick={() => nav(SOURCES_SETTINGS)}>Manage</a>
           </div>
           <div className="aw-sources">
             {(['music-library', 'radio', 'upnp'] as const).map(u => { const src = source(u); if (!src) { return null; } const glyph = u === 'music-library' ? 'folder_open' : u === 'radio' ? 'radio' : 'dns'; return (
@@ -154,8 +157,8 @@ export default function BrowseLanding({ dedicated }: { dedicated?: boolean }) {
                 <div className="aw-source-body"><div className="aw-source-name">{x.name}</div></div><Icon name="chevron_right" className="aw-source-chev" />
               </div>
             ))}
-            <div className="aw-source aw-source--add" onClick={() => nav('/settings')}>
-              <Icon name="add" /><div className="aw-source-body"><div className="aw-source-name">Add a source</div><div className="aw-source-sub">Settings</div></div>
+            <div className="aw-source aw-source--add" onClick={() => nav(SOURCES_SETTINGS)}>
+              <Icon name="add" /><div className="aw-source-body"><div className="aw-source-name">Add a source</div><div className="aw-source-sub">Settings · Sources</div></div>
             </div>
           </div>
         </div>

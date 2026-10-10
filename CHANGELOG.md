@@ -15,6 +15,7 @@ Versions 1.x and 2.x were published in [volumio-artwork-theme](https://github.co
 
 ### Changed
 
+- **"Add a source" and "Manage" open Settings → Sources** directly, instead of the settings overview.
 - **Home and Library tabs.** The tab row on Home and on the library page now reads Home · Library · and your sources, with the page you are on marked, as the rail does. Home used to show "Library" as its current tab, and the library page had no way back to Home in the row.
 
 ## [3.2.1] - 2026-10-09
