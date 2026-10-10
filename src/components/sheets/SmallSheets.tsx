@@ -105,11 +105,45 @@ export function InstallerSheet() {
 }
 export function UpdaterSheet() {
   const data = useModal(s => s.data) || {};
+  const close = () => useModal.getState().close();
+  // the firmware upload (Settings → System): a title, a line and a bar, no status
+  if (!data.status) {
+    return (
+      <>
+        <div className="modal-header"><h3 className="modal-title"><i className="fa fa-refresh"><Icon name="refresh" /></i> {data.title}</h3></div>
+        <div className="modal-body"><div><h4>{data.description}</h4><Progress value={Number(data.progress) || 0} /></div></div>
+        <div className="modal-footer" />
+      </>
+    );
+  }
+  // Volumio's updater (modal-updater.html)
+  const ready = data.ready || {};
+  const p = data.progressInfo || {};
+  const done = data.done || {};
+  const update = () => { if (ready.alternativeEmit) { emit(ready.alternativeEmit.message, ready.alternativeEmit.payload); } else { emit('update', { value: 'now' }); } };
+  const pct = Math.max(0, Math.min(100, Number(p.progress) || 0));
   return (
     <>
       <div className="modal-header"><h3 className="modal-title"><i className="fa fa-refresh"><Icon name="refresh" /></i> {data.title}</h3></div>
-      <div className="modal-body"><div><h4>{data.description}</h4><Progress value={Number(data.progress) || 0} /></div></div>
-      <div className="modal-footer" />
+      <div className="modal-body">
+        {data.status === 'updateReady' ? <span dangerouslySetInnerHTML={{ __html: String(data.description || '') }} /> : null}
+        {data.status === 'updateProgress' ? (
+          <div>
+            <h4>{p.status}</h4>
+            <div className="progress progress-striped active"><div className="progress-bar" style={{ width: pct + '%' }}>{pct}%</div></div>
+            {p.downloadSpeed ? <span>Download speed: {p.downloadSpeed} |</span> : null} {p.eta ? <span>Time remaining: {p.eta}</span> : null}
+          </div>
+        ) : null}
+        {data.status === 'updateDone' ? <h3>{done.message}</h3> : null}
+      </div>
+      <div className="modal-footer">
+        {data.status === 'updateReady' ? (ready.updateavailable
+          ? <><button type="button" className="btn btn-warning" onClick={close}>Cancel</button> <button type="button" className="btn btn-primary" onClick={update}>Update now</button></>
+          : <button type="button" className="btn btn-primary" onClick={close}>OK</button>) : null}
+        {data.status === 'updateDone' ? (done.status === 'success'
+          ? <button type="button" className="btn btn-primary" onClick={() => { emit('reboot'); close(); }}>Restart system</button>
+          : (done.status === 'error' ? <button type="button" className="btn btn-primary" onClick={close}>OK</button> : null)) : null}
+      </div>
     </>
   );
 }

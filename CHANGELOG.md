@@ -8,6 +8,11 @@ Versions 1.x and 2.x were published in [volumio-artwork-theme](https://github.co
 
 ## [Unreleased]
 
+### Fixed
+
+- **Check Updates answers again.** Settings → System → Check Updates showed nothing: the theme never listened to Volumio's updater. It now shows "Checking for updates", the answer ("already on the latest version", or a new version with Update now), the download with its progress, and the end with Restart system — as Volumio's own interfaces do.
+- **Wi-Fi in the first-run wizard** connects the way Volumio's wizard does: over the player's own hotspot it waits for the end of the wizard before switching networks, so the phone doing the set-up is not cut off halfway, and the step shows "Connecting…" and the result.
+
 ### Changed
 
 - **Home and Library tabs.** The tab row on Home and on the library page now reads Home · Library · and your sources, with the page you are on marked, as the rail does. Home used to show "Library" as its current tab, and the library page had no way back to Home in the row.

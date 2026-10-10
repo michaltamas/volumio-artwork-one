@@ -226,7 +226,10 @@ export function NetworkDrives() {
 }
 
 const SECURITY = [{ label: 'open' }, { label: 'wep' }, { label: 'wpa' }, { label: 'wpa2' }];
-export function Wifi() {
+// In the wizard Volumio connects through the wizard plugin (connectWirelessNetworkWizard): over its own
+// hotspot it waits for the end of the wizard before switching networks, so the phone doing the set-up is
+// not cut off halfway, and it answers with pushWizardWirelessConnResults, which the wizard page shows.
+export function Wifi({ wizard, persistentWizard }: { wizard?: boolean; persistentWizard?: boolean } = {}) {
   const [nets, setNets] = useState<any>({ available: [] });
   const [connected, setConnected] = useState<any>(null);
   const [, setTick] = useState(0);
@@ -251,7 +254,12 @@ export function Wifi() {
   const list: any[] = nets.available || [];
   if (!list.length && !connected) { return <div id="wifiPlugin" className="panel panel-default" style={{ display: 'none' }} />; }
   const isOpen = (w: any) => w.security === 'open' || (w.security && w.security.label === 'open');
-  const connect = (w: any, i: number) => { emit('saveWirelessNetworkSettings', { ssid: w.ssid, security: (w.security && w.security.label) || w.security, password: w.password, hidden: w.hidden }); list[i].insertPassword = undefined; setTick(t => t + 1); };
+  const connect = (w: any, i: number) => {
+    const data = { ssid: w.ssid, security: (w.security && w.security.label) || w.security, password: w.password, hidden: w.hidden };
+    if (wizard) { emit('connectWirelessNetworkWizard', { ...data, persistentWizard: !!persistentWizard }); }
+    else { emit('saveWirelessNetworkSettings', data); }
+    list[i].insertPassword = undefined; setTick(t => t + 1);
+  };
   const signal = (s: number) => '/assets/wifi-icons/' + s + '.png';
   return (
     <div id="wifiPlugin" className="panel panel-default">

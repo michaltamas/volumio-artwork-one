@@ -30,5 +30,13 @@ const progressing = () => { const m = useModal.getState(); return m.name === 'ge
 // as Volumio's own interfaces: these move a progress dialog only, never a plain one (Spotify sends one beside its own)
 on('modalProgress', (d: any) => { if (progressing()) { useModal.setState({ data: { ...useModal.getState().data, ...(d || {}), progress: true, status: 'modalProgress' } }); } });
 on('modalDone', (d: any) => { if (progressing()) { useModal.setState({ data: { ...useModal.getState().data, ...(d || {}), progress: true, status: 'modalDone' } }); } });
+// Volumio's updater, as its own interfaces show it: "Checking for updates" (updateWaitMsg), the answer
+// (updateReady: a new version to install, or "already on the latest"), then the download (updateProgress)
+// and the end (updateDone) in the same dialog. Settings → System → Check Updates, and the player's own check.
+on('updateWaitMsg', (d: any) => useModal.getState().open('updater', { ...(d || {}), status: 'updateReady', ready: d || {} }));
+on('updateReady', (d: any) => useModal.getState().open('updater', { ...(d || {}), status: 'updateReady', ready: d || {} }));
+const updating = () => { const m = useModal.getState(); return m.name === 'updater' && m.data && m.data.status; };
+on('updateProgress', (d: any) => { if (updating()) { useModal.setState({ data: { ...useModal.getState().data, status: 'updateProgress', progressInfo: d || {} } }); } });
+on('updateDone', (d: any) => { if (updating()) { useModal.setState({ data: { ...useModal.getState().data, status: 'updateDone', done: d || {} } }); } });
 // a plugin closing its dialogs (Spotify, between the steps of its sign-in): only the player's own, never a sheet the listener opened
-on('closeAllModals', () => { if (useModal.getState().name === 'generic') { useModal.getState().close(); } });
+on('closeAllModals', () => { const n = useModal.getState().name; if (n === 'generic' || n === 'updater') { useModal.getState().close(); } });

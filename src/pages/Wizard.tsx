@@ -10,6 +10,7 @@ import { on, emit, HOST } from '../core/socket';
 import { useUiSettings } from '../core/store/uiSettings';
 import { usePhone } from '../core/usePhone';
 import { NetworkDrives, Wifi } from '../components/settings/CoreSections';
+import Spinner from '../components/Spinner';
 
 interface Step { name: string; type: string; show?: boolean }
 interface Named { id?: string; name: string }
@@ -183,7 +184,7 @@ export default function Wizard() {
   } else if (name === 'music') {
     view = <><h5 className="h-wizard">To add your music, simply connect a USB Drive or click the button below to add your Network Drive</h5><div><NetworkDrives /></div></>;
   } else if (name === 'network') {
-    view = <><h5 className="h-wizard">Select the wireless network you wish to connect</h5><div id="wifiPlugin" className="panel panel-default"><div className="panel-body"><Wifi /></div></div></>;
+    view = <><h5 className="h-wizard">Select the wireless network you wish to connect</h5><WifiResult /><div id="wifiPlugin" className="panel panel-default"><div className="panel-body"><Wifi wizard persistentWizard={persistent} /></div></div></>;
   } else if (name === 'advancedsettings') {
     view = <div className="wizard-panel col-sm-10 col-sm-offset-7">
       <h4 style={{ marginTop: 40 }}>Let's tailor your user experience</h4><br />
@@ -227,6 +228,23 @@ export default function Wizard() {
             {isLast && !persistent ? <button type="button" className="btn btn-info" onClick={finish}>Done</button> : null}
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// what the wizard plugin says about the Wi-Fi connection: connecting (with a message), connected, or deferred
+// to the end of the wizard (over its own hotspot) — Volumio's wizard-network.html, the panel above the list
+function WifiResult() {
+  const [res, setRes] = useState<any>(null);
+  useEffect(() => on('pushWizardWirelessConnResults', (d: any) => setRes(d && typeof d === 'object' ? d : null)), []);
+  if (!res) { return null; }
+  return (
+    <div id="wifiPlugin" className="panel panel-default aw-wizard-wifi-result">
+      <div className="panel-body">
+        {res.wait ? (
+          <div id="wizard-wifi-spinner"><Spinner size={24} />{res.message ? <div id="wizard-wifi-message"><h4 className="text-center">{res.message}</h4></div> : null}</div>
+        ) : (res.result ? <div id="wizard-wifi-message"><h4 className="text-center">{res.result}</h4></div> : null)}
       </div>
     </div>
   );
