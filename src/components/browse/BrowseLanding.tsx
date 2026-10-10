@@ -58,7 +58,9 @@ export default function BrowseLanding({ dedicated }: { dedicated?: boolean }) {
       {!dedicated ? (
         <PageHead variant="home"
           nav={<>
-            <div className="aw-tab active">Library</div>
+            {/* the same row as Home's: Home, Library (here), the sources */}
+            <div className="aw-tab" onClick={() => nav('/home')}>Home</div>
+            <div className="aw-tab active" aria-current="page">Library</div>
             {streaming.map(x => <div key={x.uri} className="aw-tab" onClick={() => fetch(x)}>{x.name}</div>)}
             {source('radio') ? <div className="aw-tab" onClick={() => fetch(source('radio'))}>Radio</div> : null}
           </>}

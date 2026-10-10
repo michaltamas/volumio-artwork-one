@@ -1,5 +1,5 @@
 /**
- * Home (spec §6.2): the tabs and the search pill, "Pick up where you left off", the recent
+ * Home (spec §6.2, renamed from the mockup's My Music): the tabs (Home, Library, the sources) and the search pill, "Pick up where you left off", the recent
  * albums shelf (Last_100 resolved to library albums), and the pinned shelf.
  */
 import { useEffect, useState } from 'react';
@@ -80,7 +80,9 @@ export default function Home() {
     <div id="artwork-home">
       <PageHead variant="start"
         nav={<>
-          <div className="aw-tab active">Library</div>
+          {/* where you are, then the places to go: Library is the rail's Music (the library to browse), then the sources */}
+          <div className="aw-tab active" aria-current="page">Home</div>
+          <div className="aw-tab" onClick={() => { useBrowse.getState().home(); nav('/browse'); }}>Library</div>
           {streaming.map(s => <div key={s.uri} className="aw-tab" onClick={() => openSource(s)}>{s.name}</div>)}
           {radio ? <div className="aw-tab" onClick={() => openSource(radio)}>Radio</div> : null}
         </>}
