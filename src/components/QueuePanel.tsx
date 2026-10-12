@@ -1,13 +1,14 @@
 /**
  * The floating queue panel (mockup "Queue — floating overlay panel"): header, chips,
  * NOW & NEXT rows with drag to reorder, a footer with what happens at the end.
+ * On Now Playing in a wide window it can be pinned: then it is docked beside the page, full height.
  */
 import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import Icon from './Icon';
 import { useQueue } from '../core/store/queue';
 import { usePlayer } from '../core/store/player';
-import { useUi } from '../core/store/ui';
+import { useUi, isQueueDocked, canDockQueue } from '../core/store/ui';
 import { useModal } from '../core/store/modal';
 import { useBrowserLoading } from '../core/localPlayback';
 import { albumart } from '../core/api';
@@ -20,12 +21,15 @@ function fmt(sec: any): string {
 }
 
 export default function QueuePanel() {
-  const open = useUi(s => s.queueOpen);
+  const onPlayback = useLocation().pathname === '/playback';
+  const docked = useUi(s => isQueueDocked(s, onPlayback));
+  const canPin = useUi(s => s.dockRoom) && onPlayback;
+  // pinned on Now Playing the queue is only ever the docked one, never the floating sheet as well
+  const open = useUi(s => docked || (s.queueOpen && !canDockQueue(s, onPlayback)));
   const queue = useQueue(s => s.queue);
   const st = usePlayer(s => s.state);
   const elapsedMs = usePlayer(s => s.elapsedMs);
   const root = useRef<HTMLDivElement>(null);
-  const onPlayback = useLocation().pathname === '/playback';
   const position = typeof st.position === 'number' ? st.position : -1;
   const playing = st.status === 'play';
   const browserLoading = useBrowserLoading();   // playing on the device, not yet in this browser
@@ -50,10 +54,11 @@ export default function QueuePanel() {
     if (!open) { return; }
     const el = root.current?.querySelector('.aw-queue__row.is-current');
     if (el) { el.scrollIntoView({ block: 'nearest' }); }
+    if (docked) { return; }   // docked it is part of the page: Escape does not take it away
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') { useUi.getState().hideQueue(); } };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [open]);
+  }, [open, docked]);
 
   // drag to reorder: the dragged row follows the pointer, the rows it passes slide aside, and
   // on release the player gets moveQueue and re-renders the new order
@@ -91,13 +96,14 @@ export default function QueuePanel() {
   };
 
   return (
-    <div className={'aw-queue' + (open ? ' open' : '') + (onPlayback ? ' on-playback' : '')} role="dialog" aria-label="Queue" aria-hidden={!open} ref={root}>
+    <div className={'aw-queue' + (open ? ' open' : '') + (onPlayback ? ' on-playback' : '') + (docked ? ' is-docked' : '')} role={docked ? 'complementary' : 'dialog'} aria-label="Queue" aria-hidden={!open} ref={root}>
       <div className="aw-queue__head">
         <div className="aw-queue__titles">
           <div className="aw-queue__title">Queue</div>
           <div className="aw-queue__sub mono">{queue.length} TRACKS{minutesLeft !== null ? <span>&nbsp;· {minutesLeft} MIN LEFT</span> : null}</div>
         </div>
-        <button type="button" className="aw-queue__close" onClick={() => useUi.getState().hideQueue()} aria-label="Close" title="Close"><Icon name="close" /></button>
+        {canPin ? <button type="button" className={'aw-queue__pin' + (docked ? ' active' : '')} onClick={() => useUi.getState().toggleQueuePin()} aria-pressed={docked} aria-label={docked ? 'Unpin' : 'Pin beside the cover'} title={docked ? 'Unpin' : 'Pin beside the cover'}><Icon name="push_pin" /></button> : null}
+        {docked ? null : <button type="button" className="aw-queue__close" onClick={() => useUi.getState().hideQueue()} aria-label="Close" title="Close"><Icon name="close" /></button>}
       </div>
       <div className="aw-queue__chips">
         <button type="button" className={'aw-queue__chip' + (st.random ? ' active' : '')} onClick={() => usePlayer.getState().shuffle()} title="Shuffle"><Icon name="shuffle" /><span>Shuffle</span></button>

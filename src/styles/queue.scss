@@ -14,9 +14,15 @@ body#artwork .aw-queue {
   &__titles { display: flex; flex-direction: column; gap: 4px; }
   &__title { font-size: 22px; font-weight: 700; letter-spacing: -.015em; line-height: normal; color: var(--ink); }
   &__sub { font-size: 11px; letter-spacing: .08em; color: var(--ink-muted); line-height: normal; }
-  &__close { margin-left: auto; width: 38px; height: 38px; border-radius: 11px; display: grid; place-items: center; padding: 0;
+  &__close, &__pin { margin-left: auto; width: 38px; height: 38px; border-radius: 11px; display: grid; place-items: center; padding: 0;
     background: transparent; border: 1px solid var(--fill-12); color: var(--ink-3); cursor: pointer;
-    .material-symbols-rounded { font-size: 21px; } &:hover { background: var(--fill-08); color: var(--ink); } }
+    .material-symbols-rounded { font-size: 21px; } &:hover { background: var(--fill-08); color: var(--ink); }
+    &:focus-visible { outline: 2px solid var(--ink-1); outline-offset: 2px; } }
+  .aw-queue__pin + .aw-queue__close { margin-left: -4px; }   /* pin and X side by side at the right, 10px apart (the head's gap is 14) */
+  &__pin.active { background: var(--ink); border-color: var(--ink); color: var(--on-ink); &:hover { background: var(--ink); color: var(--on-ink); } }
+  /* only the glyph turns: tilted while the queue floats, upright once it is pinned */
+  &__pin .material-symbols-rounded { transform: rotate(45deg); transition: transform .24s cubic-bezier(.2, .7, .2, 1); }
+  &__pin.active .material-symbols-rounded { transform: none; }
   &__chips { display: flex; flex-wrap: wrap; gap: 8px; padding: 18px 24px 16px; }
   &__chip { display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 13px; border-radius: 18px; cursor: pointer;
     background: var(--fill-06); border: 1px solid var(--fill-11); color: var(--ink-2);
@@ -65,7 +71,34 @@ body#artwork .aw-queue {
 }
 /* on Now Playing the mini player is away: the sheet reaches 20px from the bottom */
 body#artwork .aw-queue.on-playback { bottom: 20px; }
-@media (prefers-reduced-motion: reduce) { body#artwork .aw-queue { transition: none; } }
+/* pinned (Now Playing, wide windows only — DOCK_QUERY in core/store/ui.ts): the queue is a column of
+   the page, edge to edge and full height, and the page beside it is narrower by its width */
+body#artwork { --queue-dock-w: 440px; }
+@media (min-width: 1101px) {
+  body#artwork .aw-queue.is-docked { top: 0; right: 0; bottom: 0; width: var(--queue-dock-w); border-radius: 0; border: 0; border-left: 1px solid var(--panel-dock-line); box-shadow: none; transform: none;
+    background: linear-gradient(180deg, var(--panel-dock-top) 0%, var(--panel-dock) 55%); -webkit-backdrop-filter: blur(48px); backdrop-filter: blur(48px); }   /* the mockup's docked column, dark and light, lighter at the top where the cover shows through */
+  body#artwork #contentWrapper.aw-queue-docked { width: calc(100% - var(--rail-w) - var(--queue-dock-w)); }
+  /* the narrower column: Shuffle, Repeat and Save as playlist as 36px round icons (the tooltip names
+     them), Clear keeps its label at the right */
+  body#artwork .aw-queue.is-docked .aw-queue__chip:not(.aw-queue__chip--danger) { width: 36px; padding: 0; justify-content: center; > span:last-child { display: none; } .material-symbols-rounded { font-size: 20px; } }
+  body#artwork .aw-queue.is-docked .aw-queue__chip--danger { margin-left: auto; }
+  /* the docked column's own measures (mockup "Pinned — 1440 × 900"): a tighter head, 64px rows on a
+     12px inset with 42px covers; the floating sheet keeps its own */
+  body#artwork .aw-queue.is-docked {
+    .aw-queue__head { gap: 10px; padding: 26px 20px 0 24px; }
+    .aw-queue__pin { width: 36px; height: 36px; .material-symbols-rounded { font-size: 20px; } }
+    .aw-queue__chip .material-symbols-rounded { font-size: 19px; }
+    .aw-queue__chip--danger { gap: 7px; .material-symbols-rounded { font-size: 18px; } }
+    .aw-queue__scroll { padding: 10px 12px 0; }
+    .aw-queue__row { height: 64px; gap: 14px; padding: 0 12px; }
+    .aw-queue__drag { font-size: 18px; width: 16px; }
+    .aw-queue__slot { width: 22px; }
+    .aw-queue__num, .aw-queue__time { font-size: 12px; }
+    .aw-queue__cover { width: 42px; height: 42px; }
+    .aw-queue__remove .material-symbols-rounded { font-size: 19px; }
+  }
+}
+@media (prefers-reduced-motion: reduce) { body#artwork .aw-queue, body#artwork .aw-queue__pin .material-symbols-rounded { transition: none; } }
 @media (max-width: 600px) { body#artwork .aw-queue .aw-queue__hint { display: none; } body#artwork .aw-queue__row { gap: 10px; padding: 0 10px; } }
 
 /* shared by library and queue rows: the playing row while this browser loads the stream */

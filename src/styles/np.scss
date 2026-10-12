@@ -28,6 +28,8 @@
   #np-meta { min-width: 0; padding-top: 14px; flex: 1; display: flex; flex-direction: column; min-height: 0; }   /* the theme's fluid clamp for this never applied (csso dropped it): 14px is what shipped */
   .np-eyebrow { font-size: 11px; letter-spacing: .2em; color: var(--ink-35); margin-bottom: clamp(8px, 1.8vh, 16px); }
   .np-title { font-family: var(--font-ui); font-size: var(--t-display); line-height: .98; letter-spacing: -.035em; font-weight: 800; color: var(--ink); margin: 0; text-wrap: pretty; }
+  /* two lines at most: ClampedTitle shortens the text itself (a clip would cut the descenders) */
+  .np-title { overflow-wrap: anywhere; }
   .np-byline { display: contents; }
   .np-artist { font-size: clamp(17px, 1.6vw, 23px); font-weight: 400; color: var(--ink-2); margin-top: clamp(10px, 2.4vh, 22px); }
   .np-album { font-size: clamp(14px, 1.25vw, 18px); font-weight: 400; color: var(--ink-muted); margin-top: 5px; }
@@ -186,6 +188,7 @@
   .np-upnext-label { font-size: 11px; letter-spacing: .16em; color: var(--ink-muted); white-space: nowrap; background: transparent; border: 0; padding: 0; cursor: pointer; font-family: var(--font-mono);
     &:hover { color: var(--ink); } &:focus-visible { outline: 2px solid var(--ink-1); outline-offset: 4px; border-radius: 4px; } }
   .np-upnext-films { display: flex; gap: 13px; }
+  .np-upnext--covers-away { .np-upnext-label, .np-upnext-films { display: none; } }   /* beside the docked queue, when the row has no room for them */
   .np-upnext-film { display: block; padding: 0; margin: 0; border: 0; background: transparent; border-radius: 11px; cursor: pointer; transition: transform .15s ease;
     img { display: block; width: 44px; height: 44px; border-radius: 11px; object-fit: cover; transition: opacity .15s ease; }
     &:nth-child(1) img { opacity: 1; } &:nth-child(2) img { opacity: .6; } &:nth-child(3) img { opacity: .34; }
@@ -227,6 +230,7 @@ html.aw-is-light body#artwork #np .np-about__rule { background: rgba(20, 22, 26,
 /* below this the seg control has no room to earn its keep: Cover is the only face on offer
    (Lyrics stays reachable through the phone's own tile once that layout kicks in) */
 @media (max-width: 1100px) { body#artwork #np .np-seg { display: none; } }
+body#artwork #np.np--cramped .np-seg { display: none; }   /* beside the docked queue, when the footer no longer fits (NowPlaying.tsx) */
 @media (max-width: 1080px) { body#artwork #np .np-upnext-films { display: none; } }
 @media (max-width: 900px) { body#artwork #np .np-upnext-label { display: none; } }
 /* tall or narrow: the cover above the text (a landscape window merely resized boxy — not

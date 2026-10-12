@@ -21,6 +21,8 @@ const WHY: Record<string, string> = {
   'Sleep timer': 'Stops the music, or the player, after a set time',
   'Save queue as playlist': 'Keeps the queue as a playlist to play again',
   'Clear queue': 'Removes every track from the queue',
+  'Pin beside the cover': 'Keeps the queue beside Now Playing instead of over it',
+  'Unpin': 'The queue floats over the page again',
   'Menu': 'Home, library, playlists, zones, settings',
   'Expand menu': 'Shows the labels beside the icons',
   'Collapse menu': 'Icons only',

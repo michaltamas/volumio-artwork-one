@@ -37,7 +37,7 @@
   /* the album page's own backdrop, a shade lighter than the full-frame scrim */
   --cover-veil-1:rgba(8,10,12,.55); --cover-veil-2:rgba(8,10,12,.86);
   /* panels that float over the page (the queue, the sheets) and the scrim behind them */
-  --panel-fill:rgba(13,15,18,.86); --panel-deep:rgba(0,0,0,.9); --panel-sheet:rgba(13,15,18,.92); --scrim-page:rgba(5,6,8,.5);
+  --panel-fill:rgba(13,15,18,.86); --panel-dock:rgba(11,13,16,.78); --panel-dock-top:rgba(11,13,16,.5); --panel-dock-line:rgba(255,255,255,.10); --panel-deep:rgba(0,0,0,.9); --panel-sheet:rgba(13,15,18,.92); --scrim-page:rgba(5,6,8,.5);
   --menu-fill:rgba(255,255,255,.09); --menu-bright:.72;
   /* the row that plays, and the row under the pointer */
   --row-fill:rgba(255,255,255,.12); --row-hover:rgba(255,255,255,.07);
@@ -102,7 +102,7 @@
   --glass-3-fill:rgba(252,251,249,.90); --glass-3-border:rgba(20,22,26,.10);
   --rail-fill:rgba(255,255,255,.60);
   --bar-fill:rgba(255,255,255,.60); --bar-solid:rgba(252,251,249,.90); --bar-veil:rgba(255,255,255,.72);
-  --panel-fill:rgba(252,251,249,.90); --panel-deep:rgba(252,251,249,.96); --panel-sheet:rgba(252,251,249,.97); --scrim-page:rgba(24,20,14,.28);
+  --panel-fill:rgba(252,251,249,.90); --panel-dock:rgba(252,251,249,.90); --panel-dock-top:rgba(252,251,249,.66); --panel-dock-line:rgba(20,22,26,.09); --panel-deep:rgba(252,251,249,.96); --panel-sheet:rgba(252,251,249,.97); --scrim-page:rgba(24,20,14,.28);
   --menu-fill:rgba(252,251,249,.88); --menu-bright:1.04;
   /* on paper no row carries a panel of its own, the playing one included: the bars and the bold
      title mark it. Only the row under the pointer tints (the handoff's .055) */

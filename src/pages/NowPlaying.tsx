@@ -3,7 +3,7 @@
  * faces — Cover, Info, Lyrics — switched above the title; the seek bar, the transport, what
  * plays next and the volume along the bottom. On the phone the parts restack (zz-fluid).
  */
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../components/Icon';
 import SeekBar from '../components/SeekBar';
@@ -14,7 +14,7 @@ import { usePlayer } from '../core/store/player';
 import { useQueue } from '../core/store/queue';
 import { useMultiroom } from '../core/store/multiroom';
 import { useSignal } from '../core/store/signal';
-import { useUi } from '../core/store/ui';
+import { useUi, isQueueDocked, canDockQueue } from '../core/store/ui';
 import { albumart } from '../core/api';
 import { splitVal, quality, format, signal } from '../core/format';
 import { useLyrics } from '../core/store/lyrics';
@@ -27,6 +27,7 @@ import { useSleep } from '../core/store/sleep';
 import { useModal } from '../core/store/modal';
 import { useExternalSource } from '../core/external';
 import NpEmpty from '../components/np/NpEmpty';
+import ClampedTitle from '../components/np/ClampedTitle';
 
 type View = 'cover' | 'info' | 'lyrics';
 const VIEW_KEY = 'aw-np-view';
@@ -53,10 +54,18 @@ export default function NowPlaying() {
   const alsa = useSignal(s => s.alsa);
   const resample = useSignal.getState().resample();
   const bitPerfect = useSignal.getState().bitPerfect();
-  const queueOpen = useUi(s => s.queueOpen);
+  const queueDocked = useUi(s => isQueueDocked(s, true));
+  const queueOpen = useUi(s => queueDocked || (s.queueOpen && !canDockQueue(s, true)));
+  // pinned, the queue button puts the docked queue away and brings it back; it stays pinned
+  const toggleQueue = () => { const ui = useUi.getState(); if (canDockQueue(ui, true)) { ui.toggleDocked(); } else { ui.toggleQueue(); } };
+  const showQueue = () => { const ui = useUi.getState(); if (canDockQueue(ui, true)) { useUi.setState({ dockHidden: false }); } else { ui.showQueue(); } };
   const ext = useExternalSource();
   const nav = useNavigate();
-  const [view, setView] = useState<View>(readView);
+  const [chosenView, setView] = useState<View>(readView);
+  // beside the docked queue, when even the footer row no longer fits on one line, there is no room
+  // for the Cover/Info/Lyrics switch either: Cover is shown, the choice is kept for when room returns
+  const [cramped, setCramped] = useState(false);
+  const view: View = cramped ? 'cover' : chosenView;
   useEffect(() => {
     const mq = window.matchMedia(NARROW_NP_QUERY);
     const onNarrow = () => { if (mq.matches) { setView('cover'); } };
@@ -73,7 +82,7 @@ export default function NowPlaying() {
   const lyricsOn = view === 'lyrics';
   const toggleLyrics = () => setView(v => v === 'lyrics' ? 'cover' : 'lyrics');
   const drag = useSheetDrag(sheet, toggleLyrics);
-  useEffect(() => { try { localStorage.setItem(VIEW_KEY, view); } catch { /* private mode */ } }, [view]);
+  useEffect(() => { try { localStorage.setItem(VIEW_KEY, chosenView); } catch { /* private mode */ } }, [chosenView]);
   // Phone layout: the cover takes exactly what the other parts leave, measured (a title may wrap
   // to two or three lines), so the sheet never scrolls. Re-run on track/resize; cleared otherwise.
   const fitKey = [st.title, st.artist, st.album, st.samplerate, st.bitdepth, st.trackType].join('|');
@@ -98,6 +107,32 @@ export default function NowPlaying() {
 
   const pos = typeof st.position === 'number' ? st.position : 0;
   const upNext = queue.slice(pos + 1, pos + 4);
+  // beside the docked queue the footer row is narrower: rather than let UP NEXT drop onto a second
+  // line, its label and covers step aside (the queue button stays — it puts the docked queue away)
+  const footerRow = useRef<HTMLDivElement>(null);
+  const [upnextHidden, setUpnextHidden] = useState(false);
+  const upnextHiddenRef = useRef(false);
+  useLayoutEffect(() => {
+    const row = footerRow.current;
+    const set = (v: boolean) => { upnextHiddenRef.current = v; setUpnextHidden(v); };
+    if (!row || !queueDocked) { set(false); setCramped(false); return; }
+    let labelW = 0;
+    const check = () => {
+      const transport = row.querySelector<HTMLElement>('#np-transport'), right = row.querySelector<HTMLElement>('#np-footer-right');
+      if (!transport || !right) { return; }
+      const label = row.querySelector<HTMLElement>('.np-upnext-label');
+      if (label && !upnextHiddenRef.current) { labelW = label.offsetWidth; }
+      const n = row.querySelectorAll('.np-upnext-film').length;
+      const covers = n ? labelW + 13 + n * 44 + (n - 1) * 13 + 13 : 0;   // label, gap, the 44px covers 13px apart, gap
+      const bare = transport.offsetWidth + 24 + right.offsetWidth - (upnextHiddenRef.current ? 0 : covers);   // the row without the covers
+      const hide = bare + covers > row.clientWidth;
+      if (hide !== upnextHiddenRef.current) { set(hide); }
+      setCramped(bare > row.clientWidth);
+    };
+    check();
+    const ro = new ResizeObserver(check); ro.observe(row);
+    return () => ro.disconnect();
+  }, [queueDocked, upNext.length]);
   const bit = splitVal(st.bitdepth), rate = splitVal(st.samplerate);
   const q = quality(st);
   const fmt = format(st);
@@ -197,7 +232,7 @@ export default function NowPlaying() {
   }
 
   return (
-    <div id="np" className={(lyricsOn ? 'np--lyrics ' : '') + (view === 'info' ? 'np--info ' : '') + (leaving ? 'aw-np-out' : '') + (dragging ? ' aw-np-drag' : '')}>
+    <div id="np" className={(lyricsOn ? 'np--lyrics ' : '') + (view === 'info' ? 'np--info ' : '') + (cramped ? 'np--cramped ' : '') + (leaving ? 'aw-np-out' : '') + (dragging ? ' aw-np-drag' : '')}>
       {leaving || dragging ? <ArtStack /> : null}
       {topbar}
 
@@ -212,7 +247,7 @@ export default function NowPlaying() {
             ))}
           </div>
           {!lyricsOn && <div className="np-eyebrow mono">{queue.length ? <span>TRACK {pos + 1} OF {queue.length}</span> : <span>NOW PLAYING</span>}</div>}
-          <h1 className="np-title" title={st.title}>{st.title}</h1>
+          <ClampedTitle text={String(st.title || '')} />
           <div className="np-byline">
             <div className="np-artist">{st.artist}</div>
             <div className="np-album">{st.album}{info.year ? <span>&nbsp;·&nbsp;{info.year}</span> : null}</div>
@@ -262,15 +297,15 @@ export default function NowPlaying() {
 
       <div id="np-footer">
         <div id="np-seek"><SeekBar /></div>
-        <div id="np-footer-row">
+        <div id="np-footer-row" ref={footerRow}>
           <div id="np-transport">
             <button type="button" className={'btn btn-link np-fav' + (fav ? ' active' : '')} onClick={() => usePlayer.getState().toggleFavourite()} title="Add to favourites" disabled={!!st.disableUi}><Icon name="favorite" /></button>
             <Transport />
           </div>
           <div id="np-footer-right">
             {upNext.length ? (
-              <div id="np-upnext">
-                <button type="button" className="np-upnext-label mono" onClick={() => useUi.getState().showQueue()} title="Queue">UP NEXT</button>
+              <div id="np-upnext" className={upnextHidden ? 'np-upnext--covers-away' : undefined}>
+                <button type="button" className="np-upnext-label mono" onClick={showQueue} title="Queue">UP NEXT</button>
                 <div className="np-upnext-films">
                   {upNext.map((t, i) => (
                     <button key={t.uri + i} type="button" className="np-upnext-film" onClick={() => useQueue.getState().play(pos + 1 + i)} title={(t.name || t.title || '') + (t.artist ? ' · ' + t.artist : '')} aria-label={'Play ' + (t.name || t.title || '')}>
@@ -278,7 +313,7 @@ export default function NowPlaying() {
                     </button>
                   ))}
                 </div>
-                <button type="button" className={'np-queue' + (queueOpen ? ' active' : '')} onClick={() => useUi.getState().toggleQueue()} title="Queue">
+                <button type="button" className={'np-queue' + (queueOpen ? ' active' : '')} onClick={toggleQueue} title="Queue">
                   <Icon name="queue_music" />{queue.length ? <span className="np-queue__count mono">{queue.length}</span> : null}
                 </button>
               </div>

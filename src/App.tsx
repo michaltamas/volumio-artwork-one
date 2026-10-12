@@ -27,7 +27,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import { useEffect, useLayoutEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useBrowse } from './core/store/browse';
-import { useUi } from './core/store/ui';
+import { useUi, isQueueDocked } from './core/store/ui';
 import MyVolumio, { myVolumioState } from './pages/myvolumio/MyVolumio';
 
 function Shell() {
@@ -60,6 +60,7 @@ function Shell() {
   const shownPath = covered ? loc.pathname : under.current.pathname;
   const shell = shownPage === 'settings' || shownPage === 'plugin' || shownPage === 'plugin-manager' || shownPage === 'static-page';   // a static page (Credits) comes from a settings button
   const hasSide = useSettings(s => s.hasSide());
+  const queueDocked = useUi(s => isQueueDocked(s, covered));   // the pinned queue takes its width off the page
   useEffect(() => { if (page === 'settings') { useSettings.setState({ route: { name: 'volumio.settings', pluginName: '' } }); } }, [page]);
   return (
     <>
@@ -68,7 +69,7 @@ function Shell() {
       <div id="wizardScrim" />
       <div id="layout-container">
         <Rail />
-        <div id="contentWrapper" className={(shownPage === 'myvolumio' ? 'aw-state-myvolumio-' + myVolumioState(shownPath) : 'aw-state-volumio-' + shownPage) + (shell ? ' aw-settings-shell' : '') + (shell && !hasSide ? ' aw-settings-shell--noside' : '')}>
+        <div id="contentWrapper" className={(shownPage === 'myvolumio' ? 'aw-state-myvolumio-' + myVolumioState(shownPath) : 'aw-state-volumio-' + shownPage) + (shell ? ' aw-settings-shell' : '') + (shell && !hasSide ? ' aw-settings-shell--noside' : '') + (queueDocked ? ' aw-queue-docked' : '')}>
           {shell ? <div className="aw-settings-nav"><SettingsNav /></div> : null}
           <div id="content" className={covered ? 'playback' : underPage}>
             <div className={'aw-under' + (covered ? ' aw-under--covered' : '')} aria-hidden={covered || undefined}>
