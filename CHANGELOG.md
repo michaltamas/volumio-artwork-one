@@ -6,7 +6,16 @@ All notable changes to this project are documented here. The format is based on
 
 Versions 1.x and 2.x were published in [volumio-artwork-theme](https://github.com/michaltamas/volumio-artwork-theme).
 
-## [Unreleased]
+## [3.2.3] - 2026-10-13
+
+### Added
+
+- **Pin the queue beside Now Playing.** In a window wider than 1100px the queue has a pin next to its close button. Pinned, the queue becomes a column of the page, edge to edge and full height, and Now Playing moves aside to make room instead of sitting under it. In the narrower column Shuffle, Repeat and Save as playlist become round icons (their tooltips name them) and Clear keeps its label. The queue button and UP NEXT put the pinned queue away and bring it back; it stays pinned, in this browser, until it is unpinned. Elsewhere and on phones the queue floats as before.
+- Beside the pinned queue, when the bottom row runs out of room, the UP NEXT covers step aside first, then the Cover / Info / Lyrics switch, which shows Cover until there is room again (the choice is kept).
+
+### Changed
+
+- **The Now Playing title takes two lines at most.** A longer title ends in an ellipsis instead of pushing the page down over the controls; the full title is in its tooltip.
 
 ### Fixed
 
