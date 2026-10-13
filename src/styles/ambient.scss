@@ -70,10 +70,10 @@ body#artwork .aw-amb__text { display: flex; flex-direction: column; min-width: 0
 body#artwork .aw-amb__tag { font-size: clamp(11px, 1.3vh, 14px); letter-spacing: .16em; color: var(--amb-ink-3); margin-bottom: clamp(12px, 1.8vh, 20px); }
 body#artwork .aw-amb__title {
   font-size: clamp(28px, calc(5.5vh + 1.5vw), 92px); font-weight: 800; letter-spacing: -.032em; line-height: 1.02; text-wrap: pretty; /* 34/44/64/92 across the four frames */
-  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+  overflow-wrap: anywhere;   /* three lines at most: ClampedText shortens the text (a clip cuts the descenders) */
 }
-body#artwork .aw-amb__artist { font-size: clamp(20px, 3.9vh, 40px); font-weight: 600; letter-spacing: -.01em; margin-top: 2vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-body#artwork .aw-amb__album { font-size: clamp(15px, 2.5vh, 24px); color: var(--amb-ink-2); margin-top: 1.1vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+body#artwork .aw-amb__artist { font-size: clamp(20px, 3.9vh, 40px); font-weight: 600; letter-spacing: -.01em; margin-top: 2vh; overflow-wrap: anywhere; }   /* two lines at most (ClampedText) */
+body#artwork .aw-amb__album { font-size: clamp(15px, 2.5vh, 24px); color: var(--amb-ink-2); margin-top: 1.1vh; overflow-wrap: anywhere; }   /* two lines at most (ClampedText) */
 
 body#artwork .aw-amb__row { display: flex; align-items: center; gap: clamp(10px, 1.6vh, 18px); margin-top: clamp(20px, 3.7vh, 40px); }
 body#artwork .aw-amb__pill {
@@ -137,7 +137,7 @@ body#artwork .aw-amb--cover {
   .aw-amb__stage { inset: auto; left: var(--amb-x); right: var(--amb-x); top: var(--amb-top); height: var(--amb-cover); padding: 0; align-items: center; }
   .aw-amb__cover { width: var(--amb-cover); height: var(--amb-cover); box-shadow: 0 3vh 8vh -2vh rgba(0, 0, 0, .7); }
   .aw-amb__text { flex: 1; min-width: 0; }
-  .aw-amb__title { font-size: clamp(24px, 5.6vh, 64px); font-weight: 800; letter-spacing: -.03em; line-height: 1.05; -webkit-line-clamp: 2; }
+  .aw-amb__title { font-size: clamp(24px, 5.6vh, 64px); font-weight: 800; letter-spacing: -.03em; line-height: 1.05; }
   .aw-amb__artist { font-size: clamp(16px, 3vh, 34px); font-weight: 700; color: var(--amb-ink-2); margin-top: 1.6vh; }
   .aw-amb__album { font-size: clamp(13px, 2.4vh, 26px); color: var(--amb-ink-3); margin-top: .8vh; }
   .aw-amb__row { margin-top: clamp(16px, 3.6vh, 40px); gap: clamp(8px, 1.4vh, 16px); }
@@ -172,7 +172,7 @@ body#artwork .aw-amb--clock {
   .aw-amb__stage { position: absolute; inset: 0; display: flex; flex-direction: row; justify-content: center; align-items: center; padding: 30vh 0 0; }
   .aw-amb__cover { width: 16vh; height: 16vh; box-shadow: 0 20px 40px -16px rgba(0, 0, 0, .8); }
   .aw-amb__text { gap: .8vh; }
-  .aw-amb__title { font-size: clamp(22px, 4.7vh, 48px); font-weight: 700; letter-spacing: -.02em; -webkit-line-clamp: 2; }
+  .aw-amb__title { font-size: clamp(22px, 4.7vh, 48px); font-weight: 700; letter-spacing: -.02em; }
   .aw-amb__artist { font-size: clamp(15px, 2.8vh, 28px); font-weight: 400; color: var(--amb-ink-2); margin-top: 0; }
   .aw-amb__album, .aw-amb__row, .aw-amb__time--block, .aw-amb__name--corner, .aw-amb__tag { display: none; }
   .aw-amb__line { display: block; margin-top: .4vh; color: var(--amb-ink-3); }

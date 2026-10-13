@@ -45,8 +45,10 @@ export const useAmbient = create<AmbientStore>((set, get) => ({
   settings: read(), active: false, remote: false, kiosk: KIOSK,
   enabled: () => get().settings.on && get().settings.delay !== 0 && get().kiosk,
   set: (patch) => { const s = { ...get().settings, ...patch }; try { localStorage.setItem(KEY, JSON.stringify(s)); } catch { /* nothing to remember it with */ } set({ settings: s }); arm(); },
-  // the same settings pushed again (the companion answers the caller and then everyone) change nothing: the display stays as it is
-  adopt: (remote) => { const next = clean(remote); const same = JSON.stringify(next) === JSON.stringify(get().settings) && get().remote; set({ settings: next, remote: true }); if (same) { return; } if (get().active) { get().exit(); } arm(); },
+  // the same settings pushed again (the companion answers the caller and then everyone) change nothing: the display stays as it is.
+  // New settings saved from another screen are applied in place: the ambient screen stays up unless they turn it off — leaving
+  // it would count as a touch, and with Always the display would show the interface for a minute before coming back
+  adopt: (remote) => { const next = clean(remote); const same = JSON.stringify(next) === JSON.stringify(get().settings) && get().remote; set({ settings: next, remote: true }); if (same) { return; } if (get().active && !get().enabled()) { get().exit(); wokeAt = 0; } arm(); },   // turned off from elsewhere is not a touch: turned back on to Always, it comes back at once
   revert: () => { set({ settings: read(), remote: false }); arm(); },
   enter: () => { if (get().active) { return; } set({ active: true }); document.documentElement.setAttribute('data-aw-ambient', ''); },
   exit: () => { if (!get().active) { return; } set({ active: false }); wokeAt = Date.now(); document.documentElement.removeAttribute('data-aw-ambient'); arm(); },

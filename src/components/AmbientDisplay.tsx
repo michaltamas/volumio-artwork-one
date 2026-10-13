@@ -5,7 +5,8 @@
  */
 import { useEffect, useRef, useState } from 'react';
 import { useAmbient } from '../core/store/ambient';
-import { usePlayer } from '../core/store/player';
+import { useHeldTrack } from '../core/useHeldTrack';
+import ClampedText from './ClampedText';
 import { useQueue } from '../core/store/queue';
 import { useSignal } from '../core/store/signal';
 import { useMultiroom } from '../core/store/multiroom';
@@ -25,8 +26,7 @@ function clockNow(mode: '12' | '24'): { text: string; suffix: string } {
 export default function AmbientDisplay() {
   const active = useAmbient(s => s.active);
   const settings = useAmbient(s => s.settings);
-  const st = usePlayer(s => s.state);
-  const elapsedMs = usePlayer(s => s.elapsedMs);
+  const { st, elapsedMs } = useHeldTrack();   // short stops between tracks keep the last track on the screen
   const queue = useQueue(s => s.queue);
   const output = useSignal(s => s.output);
   const alsa = useSignal(s => s.alsa);
@@ -95,9 +95,10 @@ export default function AmbientDisplay() {
             {cover ? <img className="aw-amb__cover" src={cover} alt={st.album || ''} /> : null}
             <div className="aw-amb__text">
               {paused ? <div className="aw-amb__tag mono">PAUSED</div> : null}
-              <div className="aw-amb__title">{st.title}</div>
-              {st.artist ? <div className="aw-amb__artist">{st.artist}</div> : null}
-              {st.album ? <div className="aw-amb__album">{st.album}{year ? <span>&nbsp;·&nbsp;{year}</span> : null}{trackNo ? <span>&nbsp;·&nbsp;{trackNo}</span> : null}</div> : null}
+              {/* long titles (mixes, remixes), artists and albums wrap rather than end in an ellipsis on one line */}
+              <ClampedText className="aw-amb__title" text={String(st.title || '')} lines={3} />
+              {st.artist ? <ClampedText className="aw-amb__artist" text={String(st.artist)} lines={2} /> : null}
+              {st.album ? <ClampedText className="aw-amb__album" text={[st.album, year, trackNo].filter(Boolean).join('\u00a0·\u00a0')} lines={2} /> : null}
               <div className="aw-amb__row">
                 {signalText || bitrateText ? <div className={'aw-amb__pill mono aw-q--' + q}><span className="aw-amb__pill-num">{signalText || bitrateText}</span>{formatText ? <span className="aw-amb__pill-unit">{formatText}</span> : null}</div> : null}
                 {bitPerfect && !paused ? <div className="aw-amb__bp"><span className="aw-amb__dot" /><span className="mono">BIT PERFECT</span></div> : null}

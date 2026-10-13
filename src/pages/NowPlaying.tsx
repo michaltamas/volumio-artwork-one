@@ -28,6 +28,7 @@ import { useModal } from '../core/store/modal';
 import { useExternalSource } from '../core/external';
 import NpEmpty from '../components/np/NpEmpty';
 import ClampedTitle from '../components/np/ClampedTitle';
+import { useHeldTrack } from '../core/useHeldTrack';
 
 type View = 'cover' | 'info' | 'lyrics';
 const VIEW_KEY = 'aw-np-view';
@@ -46,7 +47,7 @@ function readView(): View {
 }
 
 export default function NowPlaying() {
-  const st = usePlayer(s => s.state);
+  const { st } = useHeldTrack();   // the short stop between two tracks does not flash the empty page
   const fav = usePlayer(s => s.favourite.favourite);
   const queue = useQueue(s => s.queue);
   const zone = useMultiroom(s => s.zones.find(z => z.isSelf)?.name || '');

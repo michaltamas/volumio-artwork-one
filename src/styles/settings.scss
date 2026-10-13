@@ -82,8 +82,10 @@ body#artwork .aw-switch { position: relative; width: 52px; height: 30px; padding
 body#artwork .aw-seg { display: flex; padding: 3px; border-radius: 999px; background: var(--fill-08); border: 1px solid var(--fill-12);
   button { border: 0; background: transparent; border-radius: 999px; padding: 7px 11px; font-family: var(--font-mono); font-size: 12px; letter-spacing: .06em; color: var(--ink-3); cursor: pointer;
     &:hover:not(.active) { color: var(--ink); } &.active { background: var(--ink); color: var(--on-ink); font-weight: 700; } &:focus-visible { outline: 2px solid var(--ink-1); outline-offset: 2px; } } }
-body#artwork .aw-select { position: relative; display: inline-flex; align-items: center; height: 38px; padding: 0 8px 0 14px; border-radius: 999px; background: var(--fill-10); border: 1px solid var(--fill-13); color: var(--ink); cursor: pointer;
-  select { appearance: none; -webkit-appearance: none; border: 0; background: transparent; color: inherit; font-family: var(--font-ui); font-size: 14px; font-weight: 500; padding-right: 28px; cursor: pointer; outline: 0; }
+body#artwork .aw-select { position: relative; display: inline-flex; align-items: center; height: 38px; padding: 0; border-radius: 999px; background: var(--fill-10); border: 1px solid var(--fill-13); color: var(--ink); cursor: pointer;
+  /* the select is the whole pill, so a tap anywhere on it opens the list (it used to be as wide as its text: wide on a phone, the rest of the pill did nothing) */
+  select { appearance: none; -webkit-appearance: none; flex: 1; align-self: stretch; width: 100%; min-width: 0; border: 0; border-radius: inherit; background: transparent; color: inherit; font-family: var(--font-ui); font-size: 14px; font-weight: 500; padding: 0 36px 0 14px; cursor: pointer; outline: 0; }
+  &:has(select:focus-visible) { outline: 2px solid var(--ink-1); outline-offset: 2px; }   // keyboard focus only, not after a tap
   select option { color: #14161a; }
   .material-symbols-rounded { position: absolute; right: 8px; font-size: 20px; color: var(--ink-3); pointer-events: none; } }
 body#artwork .aw-amb-night { display: flex; align-items: center; gap: 10px; &__dash { color: var(--ink-3); } }

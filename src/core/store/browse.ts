@@ -7,6 +7,7 @@
  * without asking the player; revisiting a uri already on the trail rewinds to it.
  */
 import { create } from 'zustand';
+import { plainLists, plainItem } from '../plainText';
 import { on, emit } from '../socket';
 import { searchPlaylists } from '../playlistSearch';
 import { rest } from '../api';
@@ -200,7 +201,8 @@ on('pushBrowseSources', (data: BrowseItem[]) => useBrowse.setState({ sources: Ar
 on('pushBrowseLibrary', (data: any) => {
   if (!data || !data.navigation) { return; }
   const st = useBrowse.getState();
-  const raw: BrowseList[] = data.navigation.lists || [];
+  // plugins that dress titles as HTML for Volumio's Angular interfaces (Bandcamp, …): plain text here, as Nova shows them
+  const raw: BrowseList[] = plainLists(data.navigation.lists || []);
   const lists: BrowseList[] = st.request && st.request.uri === 'Last_100' ? oncePerFile(raw) : raw;
   // a search's answer: the playlists' matches are added as one more list once they are in
   if (st.isSearching && !st.isBrowsing && pendingPlaylists) {
@@ -208,7 +210,7 @@ on('pushBrowseLibrary', (data: any) => {
     // placed after the library's own lists ("Found … Album / Track"), before the services
     p.then((pl) => { const cur = useBrowse.getState(); if (!pl || !cur.isSearching || cur.lists !== lists) { return; } let at = 0; while (at < lists.length && /^Found /.test(String(lists[at].title || ''))) { at++; } useBrowse.setState({ lists: [...lists.slice(0, at), pl, ...lists.slice(at)], stamp: cur.stamp + 1 }); });
   }
-  const info = data.navigation.info || null;
+  const info = data.navigation.info ? plainItem(data.navigation.info) : null;
   const patch: Partial<BrowseStore> = { lists, info, prev: data.navigation.prev || null, loading: false, stamp: st.stamp + 1 };
   const req = st.request;
   if (req && req.uri && st.isBrowsing) {
