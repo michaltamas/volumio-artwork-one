@@ -6,6 +6,21 @@ All notable changes to this project are documented here. The format is based on
 
 Versions 1.x and 2.x were published in [volumio-artwork-theme](https://github.com/michaltamas/volumio-artwork-theme).
 
+## [3.2.4] - 2026-10-14
+
+### Changed
+
+- **Installed and enabled, Artwork One switches on.** The first start after an installation switches the player to Artwork One, once; later starts leave the choice alone, so someone who goes back to another interface stays there, and an update keeps whatever the player showed.
+- **Long titles on the ambient screen wrap** instead of ending in an ellipsis after one line: the title takes up to three lines, the artist and the album up to two, in every layout.
+- **Bandcamp and other plugins that dress titles as HTML** show plain text, as Nova does, instead of the markup (`<span style='color: …'>`). Entities are decoded (`&amp;` shows as `&`).
+
+### Fixed
+
+- **The ambient screen stays up when its settings change.** Saved from a phone or a computer, new settings used to take the player's display out of ambient for a minute (with Always) before they showed; they now apply in place, and turning the ambient screen off still takes it away.
+- **No clock between tracks.** Volumio reports a moment of stop between two tracks (longer with streaming services); the ambient screen showed its idle clock and Now Playing its empty page for that moment. The last track now stays on the screen until a stop has lasted four seconds.
+- **The Layout menu in Appearance opens wherever it is tapped**, not only on its text.
+- **The Now Playing title no longer cuts the descenders** (g, y, p) of its second line.
+
 ## [3.2.3] - 2026-10-13
 
 ### Added
