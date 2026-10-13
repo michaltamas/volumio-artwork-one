@@ -102,3 +102,34 @@ test('stopped while active, the next start brings the interface back (an update,
   await p.onStart();
   assert.ok(!calls.some(c => c[0] === 'exec' && c[3] === 'setVolumio3UI'));
 });
+
+test('first start after an installation switches the player to Artwork One, once; an update or a later start leaves the choice alone', async () => {
+  const conf = path.join(tmp, 'config.json');
+  const manifest = { uiPrettyName: 'Manifest', uiName: 'manifest', uiPath: tmp };
+  const fresh = async (configText) => {
+    fs.writeFileSync(conf, configText);
+    fs.writeFileSync(path.join(tmp, 'data', 'active_volumio_ui'), JSON.stringify(manifest));
+    const { ctx, calls } = fakeVolumio();
+    const p = new Plugin(ctx); p.onVolumioStart();
+    await p.onStart();
+    return { p, calls, switched: calls.some(c => c[0] === 'exec' && c[3] === 'setVolumio3UI' && c[4].volumio3_ui.value === 'artwork') };
+  };
+  // installed (Volumio made an empty configuration) and enabled: it switches, and remembers it did
+  const a = await fresh('{}');
+  assert.equal(a.switched, true);
+  assert.equal(a.p.isActive(), true);
+  assert.equal(a.p.config.get('introduced'), true);
+  // the user goes back to Manifest; Volumio restarts: it stays on Manifest
+  fs.writeFileSync(a.p.paths.ACTIVE_UI, JSON.stringify(manifest));
+  const { ctx, calls } = fakeVolumio();
+  const b = new Plugin(ctx); b.onVolumioStart(); await b.onStart();
+  assert.equal(calls.some(c => c[0] === 'exec' && c[3] === 'setVolumio3UI'), false);
+  assert.equal(b.isActive(), false);
+  // an update from the store over a player on Manifest (the stop before it wrote wasActive: false): no switch
+  const c = await fresh(JSON.stringify({ wasActive: { type: 'boolean', value: false } }));
+  assert.equal(c.switched, false);
+  assert.equal(c.p.isActive(), false);
+  // a player with settings from before (theme, pins): no switch either
+  const d = await fresh(JSON.stringify({ theme: { type: 'string', value: 'light' } }));
+  assert.equal(d.switched, false);
+});
