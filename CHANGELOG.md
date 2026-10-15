@@ -6,6 +6,32 @@ All notable changes to this project are documented here. The format is based on
 
 Versions 1.x and 2.x were published in [volumio-artwork-theme](https://github.com/michaltamas/volumio-artwork-theme).
 
+## [3.2.5] - 2026-10-15
+
+### Changed
+
+- **Settings, redesigned.** Every settings page is built from cards: a header with an icon, title and a line on what the section does, rows with a short hint under the label instead of an ⓘ, and a Save that turns into *Unsaved* with Cancel once something changes. The page head carries the plugin's version and author, Help and the Enabled switch. Volumio's own System and Appearance pages get shorter names, hints and a Reset card of their own (in English; other languages keep the player's translation).
+- **Settings open where you left them.** On a wide screen Settings opens straight on the section visited last; on a phone the menu is the landing, with the Wi-Fi network, the version and waiting plugin updates on its rows.
+- **Search in Settings.** The field at the top of the menu (⌘K) finds sections and single settings across Volumio's pages and the plugins'; the menu counts the hits per section, and a result opens its page and flashes the row.
+- **Network drives** form checks the fields, fills an empty name from the path, and accepts an address typed as `smb://nas/music` or `\\nas\music`. It waits for the player's answer instead of closing at once.
+- **Transport bars.** The order is the same everywhere: shuffle, previous, play, next, repeat. The Now Playing footer is three zones — up next on the left, the controls in the middle, volume, output and queue on the right — and the mini player follows the same layout. The heart sits at the end of the Cover / Info / Lyrics row and fills when the track is a favourite.
+- **Remaining time on tap.** Tapping the total time under the seek bar switches it to the time remaining, and the choice is kept.
+- **Track numbers** that MPD puts before a title (`03 - Title`) are left out of the Now Playing title. The genre moved to the Info face.
+- **Queue: drag the whole row.** A track moves by dragging it anywhere (a mouse after a few pixels, a finger after holding it), without the handle.
+
+### Added
+
+- **Transparency switch.** Theme › Transparency turns the frosted glass off in this browser (it follows *Reduce transparency* in the system too), and Ambient › Transparency does the same on the player's own display — for slower screens.
+- **Keys wake the ambient screen** can be turned off (Ambient settings), for displays with a remote or keyboard that should not end it.
+
+### Fixed
+
+- **Volumio app for Android:** the interface no longer leaves an empty band under the status bar and above the navigation bar; the app reserves that room itself.
+- **The queue follows a move at once** on every screen; Volumio does not report the new position after a move, so the theme asks for it.
+- **Plugin pages that never loaded** (Sources among them) open again.
+- **I²S DACs** show their own name as the output instead of a stale "HDMI Out".
+- **System update** shows that it is waiting for the player, with a Close and a message when nothing comes back in a minute.
+
 ## [3.2.4] - 2026-10-14
 
 ### Changed
