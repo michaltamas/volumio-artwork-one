@@ -4,7 +4,7 @@ body#artwork {
   #sideMenuScrim { position: fixed; inset: 0; z-index: 399; background: var(--scrim-page); -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); }
   .outputs__menu {
     position: fixed; z-index: 400; top: 12px; right: 12px; bottom: 12px; left: auto; width: min(350px, calc(100vw - 24px)); max-height: calc(100vh - 91px);   /* what Volumio's own frame left the sheet with */
-    padding: 20px 20px calc(20px + env(safe-area-inset-bottom, 0px));
+    padding: 20px 20px calc(20px + var(--sa-b));
     overflow-y: auto; -webkit-overflow-scrolling: touch; border-radius: 18px;
     background: var(--panel-deep); -webkit-backdrop-filter: blur(34px) saturate(1.1); backdrop-filter: blur(34px) saturate(1.1);
     border: 1px solid var(--fill-10); box-shadow: 0 30px 70px -24px var(--shadow-strong); color: var(--ink-1);
@@ -65,3 +65,11 @@ body#artwork .aw-local__busy { width: 52px; height: 30px; display: grid; place-i
 body#artwork .aw-local__spin { color: var(--ink-2); }
 body#artwork .aw-local__loading { display: inline-flex; align-items: center; gap: 6px; }
 body#artwork .aw-local__link { background: none; border: 0; padding: 0; font: inherit; color: var(--ink-1); text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
+/* FusionDsp's quick controls: the same row as Play in this browser (icon, name and state, the switch),
+   with the plugin's page one tap away, and the preset as the theme's select under it */
+body#artwork .outputs__menu .aw-dsp__row { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto auto; align-items: center; gap: 14px;
+  .aw-local__icon { width: 44px; height: 44px; border-radius: 10px; display: grid; place-items: center; background: var(--fill-08); .material-symbols-rounded { font-size: 22px; color: var(--ink-1); } }
+  .aw-local__hint { font-size: 12px; color: var(--ink-dim); margin-top: 2px; } }
+body#artwork .outputs__menu .aw-dsp__page { width: 34px; height: 34px; border-radius: 10px; border: 1px solid var(--fill-12); background: transparent; color: var(--ink-3); display: grid; place-items: center; padding: 0; cursor: pointer;
+  .material-symbols-rounded { font-size: 19px; } &:hover { background: var(--fill-08); color: var(--ink); } &:focus-visible { outline: 2px solid var(--ink-1); outline-offset: 2px; } }
+body#artwork .outputs__menu .aw-dsp__preset { margin-top: 10px; }

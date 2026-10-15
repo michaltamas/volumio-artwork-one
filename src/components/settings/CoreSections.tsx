@@ -1,5 +1,5 @@
 /** Volumio's own sections inside the settings pages (system version, network, wifi, library, functionalities, network drives, backgrounds, firmware). */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../Icon';
 import { usePhone } from '../../core/usePhone';
@@ -8,7 +8,7 @@ import { useSettings } from '../../core/store/settings';
 import { useUiSettings } from '../../core/store/uiSettings';
 import { useModal } from '../../core/store/modal';
 import { useToasts } from '../../core/store/toast';
-import { Switch, Select, Progress, upload } from './controls';
+import { Switch, Select, Segment, Progress, upload } from './controls';
 import Spinner from '../Spinner';
 import { usePlayer } from '../../core/store/player';
 
@@ -115,59 +115,56 @@ export function MyMusicPluginEnabler() {
   );
 }
 
-function DriveForm({ drive, setDrive, adding, onSave, onCancel, shares }: { drive: any; setDrive: (d: any) => void; adding: boolean; onSave: () => void; onCancel: () => void; shares: any }) {
+function DriveForm({ drive, setDrive, adding, onSave, onCancel, shares, busy, error }: { drive: any; setDrive: (d: any) => void; adding: boolean; onSave: () => void; onCancel: () => void; shares: any; busy?: boolean; error?: string }) {
   const [advanced, setAdvanced] = useState(!adding);
   const [pwType, setPwType] = useState('password');
   const [open, setOpen] = useState<number | null>(null);
-  const field = (key: string, label: string, placeholder: string, doc?: string, type = 'text') => (
-    <div className="form-group">
-      <label className="control-label"><span>{label}</span></label>
-      <div className="control-item"><input type={type} value={drive[key] || ''} onChange={(e) => setDrive({ ...drive, [key]: e.target.value })} placeholder={placeholder} className="form-control" /></div>
-      {doc ? <div className="control-description"><span>{doc}</span></div> : null}
+  // the settings cards' row (SettingsCard): the label and its hint, the field in the control track
+  const field = (key: string, label: string, placeholder: string, doc?: string, type = 'text', extra?: React.ReactNode) => (
+    <div className="aw-sc-row aw-sc-row--wide">
+      <div className="aw-sc-row__text"><label className="aw-sc-row__label">{label}</label>{doc ? <div className="aw-sc-row__hint">{doc}</div> : null}</div>
+      <div className="aw-sc-row__control aw-drive__field"><input type={type} value={drive[key] || ''} onChange={(e) => setDrive({ ...drive, [key]: e.target.value })} placeholder={placeholder} className="aw-sc-input" aria-label={label} autoComplete="off" />{extra}</div>
     </div>
   );
   return (
-    <>
+    <div className="aw-drive">
       {adding ? (
-        <div>
-          {!shares ? <div className="text-center col-sm-12 col-sm-offset-6"><div className="alert alert-info" role="alert"><Spinner size={16} /> <span>Scanning for network drives</span></div></div> : null}
-          {shares && shares.nas && shares.nas.length === 0 ? <div className="text-center col-sm-12 col-sm-offset-6"><div className="alert alert-info" role="alert"><Icon name="error" /> <span>No Network Drives Found</span></div></div> : null}
-          {shares && shares.nas && shares.nas.length ? (
-            <div className="row"><div className="col-sm-12 col-sm-offset-6">
-              {shares.nas.map((share: any, i: number) => (
-                <div className="panel panel-default" key={i}>
-                  <div className="panel-heading"><h4 className="panel-title"><div className="accordion-toggle" onClick={() => setOpen(open === i ? null : i)}><span><Icon name={open === i ? 'remove' : 'add'} /> {share.name} <Icon name="storage" className="pull-right" /></span></div></h4></div>
-                  {open === i ? <div className="panel-body">{(share.shares || []).map((disk: any, j: number) => (
-                    <div className="radio" key={j}><label><input type="radio" name={'share-' + share.name} onChange={() => setDrive({ ...drive, ip: share.ip || share.name, name: disk.sharename, path: disk.path })} /> {disk.sharename}</label></div>
-                  ))}</div> : null}
-                </div>
-              ))}
-            </div></div>
-          ) : null}
+        <div className="aw-drive__found">
+          {!shares ? <div className="aw-drive__note"><Spinner size={16} /><span>Scanning for network drives…</span></div> : null}
+          {shares && shares.nas && shares.nas.length === 0 ? <div className="aw-drive__note"><Icon name="info" /><span>No network drives found. Enter the drive's address below.</span></div> : null}
+          {shares && shares.nas && shares.nas.length ? shares.nas.map((share: any, i: number) => (
+            <div className="aw-drive__nas" key={i}>
+              <button type="button" className="aw-drive__nas-head" onClick={() => setOpen(open === i ? null : i)} aria-expanded={open === i}><Icon name="storage" /><span>{share.name}</span><Icon name={open === i ? 'expand_less' : 'expand_more'} /></button>
+              {open === i ? <div className="aw-drive__shares">{(share.shares || []).map((disk: any, j: number) => (
+                <label className="aw-drive__share" key={j}><input type="radio" name={'share-' + share.name} onChange={() => setDrive({ ...drive, ip: share.ip || share.name, name: disk.sharename, path: disk.path })} /> <span>{disk.sharename}</span></label>
+              ))}</div> : null}
+            </div>
+          )) : null}
         </div>
       ) : null}
-      <form className="form-horizontal" onSubmit={(e) => e.preventDefault()}>
-        {field('name', 'Alias', 'Name', 'Choose an Alias that will be displayed in NAS Mounts')}
-        {field('ip', 'NAS IP Address', 'NAS Ip Address or Name', 'IP Address of your Network Drive')}
-        {field('path', 'Path', 'Path/to/Share', 'Network Share Name or subfolder path')}
+      <form onSubmit={(e) => e.preventDefault()}>
+        {field('name', 'Alias', 'Name', 'The name shown under NAS mounts.')}
+        {field('ip', 'NAS address', 'IP address or name', 'The network drive\'s IP address or name.')}
+        {field('path', 'Path', 'Path/to/Share', 'The share, or a folder inside it.')}
         {advanced ? (
-          <div>
-            <div className="form-group"><label className="control-label"><span>File Share Type</span></label><div className="control-item"><Select value={drive.fstype} options={['cifs', 'nfs']} onChange={(o) => setDrive({ ...drive, fstype: o })} placeholder="Fs type" /></div></div>
+          <>
+            <div className="aw-sc-row aw-sc-row--seg">
+              <div className="aw-sc-row__text"><label className="aw-sc-row__label">File share type</label></div>
+              <div className="aw-sc-row__control"><Segment value={{ value: drive.fstype || 'cifs' }} options={[{ label: 'SMB / CIFS', value: 'cifs' }, { label: 'NFS', value: 'nfs' }]} onChange={(o: any) => setDrive({ ...drive, fstype: o.value })} label="File share type" /></div>
+            </div>
             {field('username', 'Username', 'Username')}
-            {field('password', 'Password', 'Password', undefined, pwType)}
-            {field('options', 'Options', 'Options')}
-          </div>
+            {field('password', 'Password', 'Password', undefined, pwType, <button type="button" className="aw-drive__eye" onClick={() => setPwType(pwType === 'password' ? 'text' : 'password')} aria-label={pwType === 'password' ? 'Show the password' : 'Hide the password'}><Icon name={pwType === 'password' ? 'visibility' : 'visibility_off'} /></button>)}
+            {field('options', 'Options', 'Options', 'Mount options, for example vers=3.0.')}
+          </>
         ) : null}
-        <div className="form-group"><label className="control-label" /><div className="control-item">
-          {!advanced ? <button type="button" className="btn btn-info" onClick={() => setAdvanced(true)}><span>Show Advanced Options</span></button> : <button type="button" className="btn btn-warning" onClick={() => setAdvanced(false)}><span>Hide Advanced Options</span></button>}
-          {advanced ? <button type="button" className="btn btn-link" onClick={() => setPwType(pwType === 'password' ? 'text' : 'password')} aria-label="Show password"><Icon name={pwType === 'password' ? 'visibility' : 'visibility_off'} /></button> : null}
-        </div></div>
-        <div className="form-group"><label className="control-label" /><div className="control-item">
-          <button type="button" className="btn btn-warning" onClick={onCancel}><span>Cancel</span></button>
-          <button type="button" className="btn btn-info saveAddEditDrive" onClick={onSave}><span>Save</span></button>
-        </div></div>
+        {error ? <div className="aw-drive__error" role="alert"><Icon name="error" /><span>{error}</span></div> : null}
+        <footer className="aw-sc__foot aw-drive__foot">
+          <button type="button" className="aw-drive__more" onClick={() => setAdvanced(!advanced)}>{advanced ? 'Hide advanced options' : 'Show advanced options'}</button>
+          <button type="button" className="aw-sc__cancel" onClick={onCancel}>Cancel</button>
+          <button type="button" className="aw-sc__save is-on" onClick={onSave} disabled={busy}>{busy ? <><Spinner size={14} /> Connecting…</> : 'Save'}</button>
+        </footer>
       </form>
-    </>
+    </div>
   );
 }
 
@@ -180,28 +177,59 @@ export function NetworkDrives() {
   const [drive, setDrive] = useState<any>({});
   useEffect(() => {
     const offs = [
-      on('pushListShares', (d: any) => setShares(Array.isArray(d) ? d : [])),
+      on('pushListShares', (d: any) => {
+        const list = Array.isArray(d) ? d : [];
+        setShares(list);
+        if (pending.current) { const name = pending.current.name; const found = list.find((x: any) => x && x.name === name); finish(!!found, found ? undefined : 'The drive was not added. Check the address and the path — the player says why in its message.'); }
+      }),
+      on('pushToastMessage', (t: any) => { if (pending.current && t && t.type === 'error') { finish(false, String(t.message || t.title || '')); } }),
       on('pushNetworkSharesDiscovery', (d: any) => setDiscovered(d)),
       on('pushAddShare', (d: any) => { useToasts.getState().show(d && d.success ? 'success' : 'error', d && d.success ? 'Share successfully mounted...' : 'An error occured during adding share', ''); emit('getListShares'); }),
       on('pushDeleteShare', (d: any) => { useToasts.getState().show(d && d.success ? 'success' : 'error', d && d.success ? 'Share successfully unmounted...' : 'An error occured during deleting share', ''); if (d && d.success) { emit('getListShares'); } }),
-      on('nasCredentialsCheck', (d: any) => useModal.getState().open('nas-password', d)),
+      on('nasCredentialsCheck', (d: any) => { finish(true); useModal.getState().open('nas-password', d); }),
     ];
     emit('getListShares'); emit('getListUsbDrives');
     return () => offs.forEach(f => f());
   }, []);
-  const save = () => { if (adding) { emit('addShare', drive); } else { emit('editShare', drive); } setAdding(false); setEditing(null); };
+  // Volumio refuses a drive without an alias or a path and answers only with a toast; a mount can take a while
+  // (it detects the SMB version first). The form stays until the drive shows up in the list the player sends
+  // after it, and says why when it does not.
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const pending = useRef<{ name: string; timer: number } | null>(null);
+  const finish = (ok: boolean, why?: string) => {
+    if (!pending.current) { return; }
+    window.clearTimeout(pending.current.timer); pending.current = null; setBusy(false);
+    if (ok) { setAdding(false); setEditing(null); setError(''); } else { setError(why || 'The drive was not added. Check the address, the path and, under advanced options, the user name and password.'); }
+  };
+  const save = () => {
+    // the address as Volumio wants it, a bare IP or name: "http://192.168.1.220/", "smb://nas/music" and
+    // "\\\\nas\\music" all come down to the host, and a share typed after it goes to the path when that is empty
+    const raw = String(drive.ip || '').trim().replace(/\\/g, '/').replace(/^[a-z][a-z0-9+.-]*:\/\//i, '').replace(/^\/+/, '');
+    const cut = raw.indexOf('/');
+    const ip = (cut < 0 ? raw : raw.slice(0, cut)).replace(/:\d+$/, '');
+    const extra = cut < 0 ? '' : raw.slice(cut + 1).replace(/^\/+|\/+$/g, '');
+    const path = String(drive.path || '').trim() || extra;
+    if (!ip) { setError('Enter the NAS address (its IP address or name).'); return; }
+    if (!path) { setError('Enter the path: the share\'s name, or a folder inside it.'); return; }
+    // the alias is what the drive is called under NAS mounts: the share's own name when none is given
+    const alias = String(drive.name || '').trim() || (path.split('/').filter(Boolean).pop() || ip).replace(/\//g, '-');
+    const d = { ...drive, ip, path, name: alias };
+    setDrive(d); setError(''); setBusy(true);
+    pending.current = { name: alias, timer: window.setTimeout(() => finish(false, 'The player did not answer. The NAS may be off, or the address is wrong.'), 60000) };
+    emit(adding ? 'addShare' : 'editShare', d);
+  };
   const del = async (d: any) => { if (await useModal.getState().confirm({ title: 'Delete Drive', message: `Do you want to delete ${d.name}?`, danger: true })) { emit('deleteShare', { id: d.id }); } };
   return (
     <div>
       <div id="networkDrives" className="panel panel-default">
         <div className="panel-heading"><h3 className="panel-title"><i className="fa fa-hdd-o" /> <span>Network Drives</span><i className="fa fa-info-circle pull-right" onClick={() => emit('showNasHelper')} /></h3></div>
         <div className="panel-body">
-          <button type="button" id="addNewDrive" className="btn btn-info" onClick={() => { setDrive({ fstype: 'cifs' }); setAdding(true); setEditing(null); setDiscovered(undefined); emit('getNetworkSharesDiscovery'); }} title="Add New Drive">
-            {!adding ? <span><Icon name="add" /> <span>Add New Drive</span></span> : <span><Icon name="refresh" /> <span>Rescan</span></span>}
+          <button type="button" id="addNewDrive" className="aw-sc-pill" onClick={() => { setDrive({ fstype: 'cifs' }); setAdding(true); setEditing(null); setDiscovered(undefined); emit('getNetworkSharesDiscovery'); }} title="Add New Drive">
+            <Icon name={adding ? 'refresh' : 'add'} /><span className="aw-sc-pill__text">{adding ? 'Scan again' : 'Add a drive'}</span>
           </button>
-          <div className="clearfix" /><br />
-          {adding ? <DriveForm drive={drive} setDrive={setDrive} adding onSave={save} onCancel={() => setAdding(false)} shares={discovered} /> : null}
-          {shares ? (
+          {adding ? <DriveForm drive={drive} setDrive={setDrive} adding onSave={save} onCancel={() => { setAdding(false); setError(''); }} shares={discovered} busy={busy} error={error} /> : null}
+          {shares && shares.length ? (
             <table className="table tableSmall"><tbody>
               <tr><th><span>Alias</span></th>{!phone ? <th><span>Path</span></th> : null}<th><span>Mounted</span></th><th><span>Size</span></th><th /></tr>
               {shares.map((d: any, i: number) => (
@@ -215,7 +243,7 @@ export function NetworkDrives() {
                     <button type="button" className="btn btn-info" onClick={() => { setEditing(i); setAdding(false); setDrive(d); }} title="Edit Drive"><Icon name="edit" /></button>
                   </td>
                 </tr>,
-                editing === i ? <tr key={'e' + i}><td colSpan={5}><div className="row"><div className="col-xs-24"><DriveForm drive={drive} setDrive={setDrive} adding={false} onSave={save} onCancel={() => setEditing(null)} shares={null} /></div></div></td></tr> : null]
+                editing === i ? <tr key={'e' + i}><td colSpan={5}><div className="row"><div className="col-xs-24"><DriveForm drive={drive} setDrive={setDrive} adding={false} onSave={save} onCancel={() => { setEditing(null); setError(''); }} shares={null} busy={busy} error={error} /></div></div></td></tr> : null]
               ))}
             </tbody></table>
           ) : null}

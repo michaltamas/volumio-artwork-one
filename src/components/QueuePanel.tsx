@@ -1,6 +1,6 @@
 /**
  * The floating queue panel (mockup "Queue — floating overlay panel"): header, chips,
- * NOW & NEXT rows with drag to reorder, a footer with what happens at the end.
+ * NOW & NEXT rows, each dragged by itself to reorder, a footer with what happens at the end.
  * On Now Playing in a wide window it can be pinned: then it is docked beside the page, full height.
  */
 import { useEffect, useRef } from 'react';
@@ -60,23 +60,23 @@ export default function QueuePanel() {
     return () => document.removeEventListener('keydown', onKey);
   }, [open, docked]);
 
-  // drag to reorder: the dragged row follows the pointer, the rows it passes slide aside, and
-  // on release the player gets moveQueue and re-renders the new order
-  const onDragStart = (e: React.PointerEvent<HTMLSpanElement>) => {
-    if (e.button) { return; }
-    const row = e.currentTarget.closest('.aw-queue__row') as HTMLElement | null; const list = row?.parentElement;
-    if (!row || !list) { return; }
-    e.preventDefault();
-    const rows = Array.from(list.querySelectorAll<HTMLElement>('.aw-queue__row'));
-    const from = rows.indexOf(row); if (from < 0) { return; }
-    const rects = rows.map(r => r.getBoundingClientRect());
-    const startY = e.clientY; let to = from;
-    row.classList.add('is-dragging'); list.classList.add('is-reordering');
+  // drag to reorder, by the whole row: the dragged row follows the pointer, the rows it passes slide aside, and
+  // on release the player gets moveQueue and re-renders the new order. A mouse starts the drag once it moves a few
+  // pixels (a click still plays the row); a finger holds the row a moment first (a swipe still scrolls the list).
+  const dragged = useRef(false);   // a drag just ended: the click it ends in plays nothing
+  const onRowDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.button || (e.target as HTMLElement).closest('button')) { return; }
+    const row = e.currentTarget; const list = row.parentElement;
+    if (!list || list.children.length < 2) { return; }
+    const touch = e.pointerType === 'touch' || e.pointerType === 'pen';
+    const startX = e.clientX, startY = e.clientY;
+    let started = false, holdTimer = 0, lastY = startY;
+    let rows: HTMLElement[] = [], rects: DOMRect[] = [], from = -1, to = -1;
     const place = (y: number) => {
       const dy = y - startY;
       const cy = rects[from].top + rects[from].height / 2 + dy;
       to = from;
-      rects.forEach((rc, i) => { if (i < from && cy < rc.top + rc.height / 2) { to = Math.min(to, i); } if (i > from && cy > rc.top + rc.height / 2) { to = Math.max(to, i); } });
+      rects.forEach((rc, i) => { if (i < from && cy <= rc.top + rc.height / 2) { to = Math.min(to, i); } if (i > from && cy >= rc.top + rc.height / 2) { to = Math.max(to, i); } });
       rows.forEach((r, i) => {
         if (i === from) { r.style.transform = 'translateY(' + dy + 'px)'; return; }
         let shift = 0;
@@ -85,14 +85,44 @@ export default function QueuePanel() {
         r.style.transform = shift ? 'translateY(' + shift + 'px)' : '';
       });
     };
-    const move = (ev: PointerEvent) => place(ev.clientY);
-    const up = () => {
-      document.removeEventListener('pointermove', move); document.removeEventListener('pointerup', up); document.removeEventListener('pointercancel', up);
+    const begin = () => {
+      rows = Array.from(list.querySelectorAll<HTMLElement>('.aw-queue__row'));
+      from = rows.indexOf(row); if (from < 0) { return; }
+      rects = rows.map(r => r.getBoundingClientRect()); to = from; started = true;
+      row.classList.add('is-dragging'); list.classList.add('is-reordering');
+      if (touch && navigator.vibrate) { try { navigator.vibrate(10); } catch { /* not on this device */ } }
+      place(lastY);
+    };
+    // a finger is followed by its touch events: the first move after the hold is cancelled, so the list does not
+    // scroll under the row (a pointer would be cancelled by the browser's own scroll before the drag could take it)
+    const onTouch = (ev: TouchEvent) => {
+      const t = ev.touches[0]; if (!t) { return; }
+      lastY = t.clientY;
+      if (started) { ev.preventDefault(); place(t.clientY); return; }
+      if (Math.abs(t.clientY - startY) > 8 || Math.abs(t.clientX - startX) > 8) { end(); }   // moved before the hold: a scroll, not a drag
+    };
+    const move = (ev: PointerEvent) => {
+      if (touch) { return; }
+      lastY = ev.clientY;
+      if (started) { place(ev.clientY); return; }
+      if (Math.abs(ev.clientY - startY) > 5 || Math.abs(ev.clientX - startX) > 8) { begin(); }
+    };
+    const end = () => {
+      window.clearTimeout(holdTimer);
+      document.removeEventListener('pointermove', move); document.removeEventListener('pointerup', end); document.removeEventListener('pointercancel', end);
+      document.removeEventListener('touchmove', onTouch); document.removeEventListener('touchend', end); document.removeEventListener('touchcancel', end);
+      if (!started) { return; }
       rows.forEach(r => { r.style.transform = ''; });
       row.classList.remove('is-dragging'); list.classList.remove('is-reordering');
+      dragged.current = true; window.setTimeout(() => { dragged.current = false; }, 0);
       if (to !== from) { useQueue.getState().move(from, to); }
     };
-    document.addEventListener('pointermove', move); document.addEventListener('pointerup', up); document.addEventListener('pointercancel', up);
+    if (touch) {
+      holdTimer = window.setTimeout(begin, 350);
+      document.addEventListener('touchmove', onTouch, { passive: false }); document.addEventListener('touchend', end); document.addEventListener('touchcancel', end);
+    } else {
+      document.addEventListener('pointermove', move); document.addEventListener('pointerup', end); document.addEventListener('pointercancel', end);
+    }
   };
 
   return (
@@ -113,15 +143,14 @@ export default function QueuePanel() {
       </div>
       <div className="aw-queue__sechead">
         <span className="mono">NOW &amp; NEXT</span>
-        {queue.length > 1 ? <span className="aw-queue__hint">Drag to reorder</span> : null}
+        {queue.length > 1 ? <span className="aw-queue__hint"><span className="aw-queue__hint--mouse">Drag a track to reorder</span><span className="aw-queue__hint--touch">Hold a track to move it</span></span> : null}
       </div>
       <div className="aw-queue__scroll">
         <div className="aw-queue__list">
           {queue.map((t, i) => {
             const current = i === position;
             return (
-              <div key={t.uri + i} className={'aw-queue__row' + (current ? ' is-current' : '') + (current && !playing ? ' is-paused' : '')} onClick={() => useQueue.getState().play(i)}>
-                <span className="material-symbols-rounded aw-queue__drag" aria-hidden="true" onPointerDown={onDragStart}>drag_indicator</span>
+              <div key={t.uri + i} className={'aw-queue__row' + (current ? ' is-current' : '') + (current && !playing ? ' is-paused' : '')} onPointerDown={onRowDown} onClick={() => { if (!dragged.current) { useQueue.getState().play(i); } }} onContextMenu={(e) => { if (e.nativeEvent instanceof PointerEvent && e.nativeEvent.pointerType !== 'mouse') { e.preventDefault(); } }}>
                 <div className="aw-queue__slot">
                   {current ? (current && playing && browserLoading ? <Spinner size={16} className="aw-loading-spin" /> : <span className="aw-queue__eq"><i /><i /><i /></span>) : <><span className="aw-queue__num mono">{i + 1}</span><span className="material-symbols-rounded aw-queue__play">play_arrow</span></>}
                 </div>

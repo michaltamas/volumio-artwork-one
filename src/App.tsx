@@ -18,6 +18,8 @@ import PluginManager from './pages/PluginManager';
 import { StaticPage, IframePage } from './pages/StaticPage';
 import SettingsNav from './components/settings/SettingsNav';
 import SettingsSide from './components/settings/SettingsSide';
+import { SearchResults } from './components/settings/SettingsSearch';
+import { LAST_KEY } from './pages/Settings';
 import { useSettings } from './core/store/settings';
 import Toasts from './components/Toasts';
 import UndoToast from './components/UndoToast';
@@ -59,8 +61,13 @@ function Shell() {
   const shownPage = covered ? page : underPage;
   const shownPath = covered ? loc.pathname : under.current.pathname;
   const shell = shownPage === 'settings' || shownPage === 'plugin' || shownPage === 'plugin-manager' || shownPage === 'static-page';   // a static page (Credits) comes from a settings button
-  const hasSide = useSettings(s => s.hasSide());
+  const hasSide = useSettings(s => !!s.pageKey());
+  const searching = useSettings(s => !!s.searchQuery.trim());
+  useSettings(s => s.route);   // the section the search returns to follows the open page
+  const searchWhere = String((useSettings.getState().activeItem() || {} as any).name || '');
   const queueDocked = useUi(s => isQueueDocked(s, covered));   // the pinned queue takes its width off the page
+  // the section open last: Settings opens on it next time (pages/Settings)
+  useEffect(() => { if (/^\/(plugin\/|plugin-manager$)/.test(loc.pathname)) { try { localStorage.setItem(LAST_KEY, loc.pathname); } catch { /* storage blocked */ } } }, [loc.pathname]);
   useEffect(() => { if (page === 'settings') { useSettings.setState({ route: { name: 'volumio.settings', pluginName: '' } }); } }, [page]);
   return (
     <>
@@ -69,10 +76,12 @@ function Shell() {
       <div id="wizardScrim" />
       <div id="layout-container">
         <Rail />
-        <div id="contentWrapper" className={(shownPage === 'myvolumio' ? 'aw-state-myvolumio-' + myVolumioState(shownPath) : 'aw-state-volumio-' + shownPage) + (shell ? ' aw-settings-shell' : '') + (shell && !hasSide ? ' aw-settings-shell--noside' : '') + (queueDocked ? ' aw-queue-docked' : '')}>
+        <div id="contentWrapper" className={(shownPage === 'myvolumio' ? 'aw-state-myvolumio-' + myVolumioState(shownPath) : 'aw-state-volumio-' + shownPage) + (shell ? ' aw-settings-shell' + (hasSide ? ' aw-settings-shell--side' : '') : '') + (queueDocked ? ' aw-queue-docked' : '')}>
           {shell ? <div className="aw-settings-nav"><SettingsNav /></div> : null}
           <div id="content" className={covered ? 'playback' : underPage}>
-            <div className={'aw-under' + (covered ? ' aw-under--covered' : '')} aria-hidden={covered || undefined}>
+            {/* the settings search's results take over the content area; the section stays mounted under them */}
+            {shell && searching ? <div className="aw-sres-host"><SearchResults where={searchWhere} /></div> : null}
+            <div className={'aw-under' + (covered ? ' aw-under--covered' : '') + (shell && searching ? ' aw-under--searched' : '')} aria-hidden={covered || undefined}>
             <ErrorBoundary name="page"><Routes location={isNp ? under.current : loc}>
               <Route path="/" element={<Navigate to="/home" replace />} />
               <Route path="/home" element={<Home />} />
@@ -94,9 +103,7 @@ function Shell() {
             </div>
             {isNp ? <ErrorBoundary name="now-playing"><NowPlaying /></ErrorBoundary> : null}
           </div>
-          {/* only rendered when the shell actually has 3 grid columns (aw-settings-shell--noside
-             drops to 2) — mounted anyway, this element has nowhere to go but wraps onto a new
-             row, which steals height from row 1 and leaves .aw-snav short of the mini-player */}
+          {/* the side column only on a page that has something for it; elsewhere the page takes its width */}
           {shell && hasSide ? <div className="aw-settings-side"><SettingsSide /></div> : null}
         </div>
         <QueuePanel />

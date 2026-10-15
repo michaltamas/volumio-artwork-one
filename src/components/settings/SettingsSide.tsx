@@ -2,6 +2,10 @@
 import { useMenu } from '../../core/store/menu';
 import { useSettings } from '../../core/store/settings';
 import { usePlayer } from '../../core/store/player';
+import { buildDay } from '../../core/format';
+
+// Volumio names its boards by their build ('pi'); the one everyone knows by a longer name says it
+const BOARDS: Record<string, string> = { pi: 'Raspberry Pi' };
 
 export default function SettingsSide() {
   const key = useSettings(s => s.pageKey());
@@ -37,13 +41,13 @@ export default function SettingsSide() {
       {key === 'system' && systemInfo ? (
         <div>
           <div className="aw-sside__eyebrow mono">THIS PLAYER</div>
-          <div className="aw-kv">
-            <div className="aw-kv__title mono">HARDWARE</div>
-            <div className="aw-kv__row"><span>Board</span><span className="mono">{systemInfo.hardware}</span></div>
+          {/* handoff 15D: the player's name first, the build as the day it names (the full time in the tooltip) */}
+          <div className="aw-kv aw-kv--rows">
+            <div className="aw-kv__row"><span>Name</span><span>{systemInfo.name}</span></div>
+            <div className="aw-kv__row"><span>Board</span><span className="mono">{BOARDS[String(systemInfo.hardware)] || systemInfo.hardware}</span></div>
             {systemInfo.os ? <div className="aw-kv__row"><span>OS</span><span className="mono">{systemInfo.os}</span></div> : null}
             <div className="aw-kv__row"><span>Version</span><span className="mono">{systemInfo.systemversion}</span></div>
-            {systemInfo.builddate ? <div className="aw-kv__row"><span>Built</span><span className="mono">{systemInfo.builddate}</span></div> : null}
-            <div className="aw-kv__row"><span>Name</span><span className="mono">{systemInfo.name}</span></div>
+            {systemInfo.builddate ? <div className="aw-kv__row"><span>Built</span><span className="mono" title={String(systemInfo.builddate)}>{buildDay(systemInfo.builddate)}</span></div> : null}
           </div>
         </div>
       ) : null}

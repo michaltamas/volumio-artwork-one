@@ -1,17 +1,28 @@
 /**
- * The seek bar (mockup 2a 2b 2e): elapsed · a track with a handle · remaining / duration.
+ * The seek bar (handoff 16D): elapsed · a track with a handle · the total, which a tap turns into
+ * the time remaining and back (remembered in this browser; the phone's Now Playing shows the
+ * remaining time always).
  * The whole hit area scrubs by pointer; the fill and the label follow the finger and the seek
  * is sent once on release. The arrow keys step by five seconds.
  */
 import { useRef, useState } from 'react';
 import { usePlayer } from '../core/store/player';
 import { mmss } from '../core/format';
+import { create } from 'zustand';
+
+const REMAIN_KEY = 'aw-seek-remain';
+// one choice for every seek bar on the screen (the mini player's and Now Playing's)
+const useRemain = create<{ on: boolean; flip: () => void }>((set, get) => ({
+  on: (() => { try { return localStorage.getItem(REMAIN_KEY) === '1'; } catch { return false; } })(),
+  flip: () => { const on = !get().on; set({ on }); try { localStorage.setItem(REMAIN_KEY, on ? '1' : '0'); } catch { /* storage blocked */ } },
+}));
 
 export default function SeekBar() {
   const duration = usePlayer(s => s.state.duration || 0);
   const elapsedMs = usePlayer(s => s.elapsedMs);
   const seekTo = usePlayer(s => s.seekTo);
   const [scrub, setScrub] = useState<number | null>(null);
+  const remain = useRemain(s => s.on);
   const hit = useRef<HTMLDivElement>(null);
   if (!duration) { return null; }
   const totalMs = duration * 1000;
@@ -38,7 +49,7 @@ export default function SeekBar() {
     if (e.key === 'ArrowLeft') { e.preventDefault(); seekTo(Math.max(0, cur - 5)); }
   };
   return (
-    <div className="artwork-seek">
+    <div className={'artwork-seek' + (remain ? ' is-remain' : '')}>
       <span className="seek-time seek-elapsed mono">{mmss(shownMs)}</span>
       <div className="artwork-seek__hit" ref={hit} role="slider" tabIndex={0} aria-label="Seek" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(pct)} onPointerDown={onPointerDown} onKeyDown={onKey}>
         <div className="seek-track">
@@ -46,8 +57,8 @@ export default function SeekBar() {
           <div className="seek-handle" style={{ left: pct + '%' }} />
         </div>
       </div>
-      <span className="seek-time seek-remaining mono">-{mmss(totalMs - shownMs)}</span>
-      <span className="seek-time seek-duration mono">{mmss(totalMs)}</span>
+      <button type="button" className="seek-time seek-remaining mono" onClick={useRemain.getState().flip} title="Show the total time">-{mmss(totalMs - shownMs)}</button>
+      <button type="button" className="seek-time seek-duration mono" onClick={useRemain.getState().flip} title="Show the time remaining">{mmss(totalMs)}</button>
     </div>
   );
 }

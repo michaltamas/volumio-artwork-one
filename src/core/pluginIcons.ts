@@ -23,10 +23,11 @@ const TABLE: Record<string, string> = {
   'circle': 'circle', 'square': 'square', 'asterisk': 'emergency', 'cutlery': 'restaurant', 'coffee': 'coffee', 'beer': 'sports_bar', 'car': 'directions_car', 'plane': 'flight', 'bed': 'bed', 'child': 'child_care',
   'paw': 'pets', 'eyedropper': 'colorize', 'adjust': 'contrast', 'crop': 'crop', 'expand': 'open_in_full', 'compress': 'close_fullscreen', 'window-maximize': 'web_asset', 'chrome': 'public', 'firefox': 'public',
   'hashtag': 'tag', 'percent': 'percent', 'calculator': 'calculate', 'id-card': 'badge', 'address-book': 'contacts', 'handshake-o': 'handshake', 'balance-scale': 'balance', 'plug-o': 'power',
+  pencil: 'edit', copy: 'content_copy', files: 'content_copy', 'level-up': 'north_east', filter: 'filter_alt', 'user-circle': 'account_circle', 'user-circle-o': 'account_circle', trash: 'delete', 'trash-o': 'delete',
 };
 
-export function pluginIcon(fa?: string): string {
+export function pluginIcon(fa?: string, fallback = 'extension'): string {
   const s = String(fa || '').trim();
   const name = s.split(/\s+/).map(c => c.replace(/^fa-/, '')).find(c => c && c !== 'fa' && !/^fa-?(lg|\dx|fw)$/.test(c) && TABLE[c]);
-  return name ? TABLE[name] : 'extension';
+  return name ? TABLE[name] : fallback;
 }

@@ -12,6 +12,9 @@ import { Switch } from '../components/settings/controls';
 import Spinner from '../components/Spinner';
 import { usePlugins } from '../core/store/plugins';
 
+// the store names its categories as it likes ("user interface" beside "Audio interface"): each one starts with a capital here
+const firstUpper = (v: any) => { const t = String(v ?? ''); return t ? t.charAt(0).toUpperCase() + t.slice(1) : t; };
+
 export default function PluginManager() {
   const nav = useNavigate();
   const [tab, setTab] = useState(0);
@@ -37,7 +40,6 @@ export default function PluginManager() {
       <PageHead variant="settings" back={() => nav('/settings')} backLabel="Settings" nav={<Crumbs root="Settings" current="Plugins" onHome={() => nav('/settings')} />} />
       <div className="boxHeader"><div className="title"><h2><a className="btn btn-primary" onClick={() => window.history.back()}><i className="fa fa-arrow-left"><Icon name="arrow_back" /></i></a> <span>Plugins</span></h2></div></div>
       <div id="pluginsPlugin" className="panel panel-default">
-        <div className="panel-heading"><h3 className="panel-title"><i className="fa fa-plug" /> <span>Plugins Management</span></h3></div>
         <div className="panel-body">
           <ul className="nav nav-tabs">
             <li className={tab === 0 ? 'active' : ''}><a onClick={() => setTab(0)}>Search Plugins</a></li>
@@ -45,8 +47,8 @@ export default function PluginManager() {
           </ul>
           {tab === 0 ? (
             <div className="row">
-              <div className="col-sm-4">
-                {((available && available.categories) || []).map((c: any, i: number) => <div key={i}><button type="button" className={'btn btn-link pluginCategoryBtn' + (category && c.name === category.name ? ' active' : '')} onClick={() => setCategory(c)}>{c.prettyName}</button></div>)}
+              <div className="col-sm-4 aw-plugin-cats" role="tablist" aria-label="Categories">
+                {((available && available.categories) || []).map((c: any, i: number) => <div key={i}><button type="button" role="tab" aria-selected={!!category && c.name === category.name} className={'btn btn-link pluginCategoryBtn' + (category && c.name === category.name ? ' active' : '')} onClick={(e) => { setCategory(c); e.currentTarget.scrollIntoView({ block: 'nearest', inline: 'nearest' }); }}>{firstUpper(c.prettyName)}</button></div>)}
                 <div className="clearfix" />
               </div>
               <div className="col-sm-20">

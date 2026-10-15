@@ -1,4 +1,8 @@
 :root {
+  /* the system bars a screen draws under (iPhone notch, Android status and navigation bars): what the browser reports.
+     Volumio's Android app is the exception: its WebView reports the phone's bars although the app draws them itself
+     above and below it, so there the theme leaves no room for them (core/insets.ts sets the class). */
+  --sa-t: env(safe-area-inset-top, 0px); --sa-b: env(safe-area-inset-bottom, 0px);
   /* ground & ink (spec §3.1) */
   --ground:#0a0c0e; --ground-deep:#080a0c; --card-flat:#141414;
   --ink:#ffffff; --ink-1:#f2f3f5; --ink-2:#e4e7ea; --ink-3:#c2c8cd;
@@ -62,6 +66,15 @@
   --q-radio-ink:#e4e7ea; --q-radio-line:rgba(255,255,255,.26);
   /* a plain surface a step off the ground (inherited panels that are not glass) */
   --surface-2:#333333;
+  /* the settings cards (handoff 15): the card, its hairlines, the icon tile, the controls, a changed card's ink edge, the footer */
+  --sc-fill:rgba(255,255,255,.05); --sc-line:rgba(255,255,255,.09); --sc-fill-dirty:rgba(255,255,255,.07); --sc-line-dirty:rgba(255,255,255,.20);
+  --sc-head-line:rgba(255,255,255,.08); --sc-row-line:rgba(255,255,255,.06); --sc-tile:rgba(255,255,255,.08); --sc-icon:#c2c8cd;
+  --sc-ctl-fill:rgba(255,255,255,.08); --sc-ctl-line:rgba(255,255,255,.13); --sc-ctl-fill-on:rgba(255,255,255,.10); --sc-ctl-line-on:#f2f3f5; --sc-input-fill:rgba(0,0,0,.20);
+  --sc-save-off:rgba(255,255,255,.06); --sc-save-off-ink:#71777d; --sc-unsaved:#e6b35a;
+  --sc-danger:#ff8f8f; --sc-danger-line:rgba(255,107,107,.30); --sc-danger-card:rgba(255,255,255,.03); --sc-danger-card-line:rgba(255,107,107,.22); --sc-danger-tile:rgba(255,107,107,.10);
+  --sc-pill-line:rgba(255,255,255,.16); --sc-pill-fill:rgba(255,255,255,.08); --sc-switch-off:rgba(255,255,255,.16); --sc-knob-off:#c2c8cd;
+  /* the transport bars (handoff 16): the pills, the quiet glyphs (shuffle, repeat, the speaker), the seek and volume tracks */
+  --tb-pill:rgba(255,255,255,.10); --tb-pill-line:rgba(255,255,255,.13); --tb-dim:#c2c8cd; --tb-track:rgba(255,255,255,.20);
   /* radius / space / rail (spec §3.4) */
   --r-frame:18px; --r-panel:16px; --r-card:14px; --r-cover:6px; --r-control:12px; --r-pill:999px;
   /* fluid sizes: mockup values are the upper bound (1440px frame), they scale down with the viewport
@@ -140,6 +153,14 @@
   --q-lossless-num:#14161a; --q-lossless-unit:#5e646c; --q-lossless-wash:rgba(255,255,255,.70); --q-lossless-line:rgba(20,22,26,.12);
   --q-lossy-ink:#5e646c; --q-lossy-wash:rgba(20,22,26,.04); --q-lossy-line:rgba(20,22,26,.10);
   --q-radio-ink:#14161a; --q-radio-line:rgba(20,22,26,.26);
+  /* the settings cards on paper: white cards, ink edges (handoff 15C) */
+  --sc-fill:#ffffff; --sc-line:rgba(20,22,26,.08); --sc-fill-dirty:#ffffff; --sc-line-dirty:#14161a;
+  --sc-head-line:rgba(20,22,26,.08); --sc-row-line:rgba(20,22,26,.07); --sc-tile:rgba(20,22,26,.05); --sc-icon:#5e646c;
+  --sc-ctl-fill:#faf8f5; --sc-ctl-line:rgba(20,22,26,.14); --sc-ctl-fill-on:#faf8f5; --sc-ctl-line-on:#14161a; --sc-input-fill:#faf8f5;
+  --sc-save-off:rgba(20,22,26,.05); --sc-save-off-ink:#596069; --sc-unsaved:#8a5a12;
+  --sc-danger:#a8231c; --sc-danger-line:rgba(179,38,30,.30); --sc-danger-card:#ffffff; --sc-danger-card-line:rgba(179,38,30,.24); --sc-danger-tile:rgba(179,38,30,.07);
+  --sc-pill-line:rgba(20,22,26,.14); --sc-pill-fill:#faf8f5; --sc-switch-off:rgba(20,22,26,.14); --sc-knob-off:#ffffff;
+  --tb-pill:rgba(255,255,255,.70); --tb-pill-line:rgba(20,22,26,.12); --tb-dim:#5e646c; --tb-track:rgba(20,22,26,.14);
   --art-1:#fbf9f6; --art-2:#f6f3ef;
   --aw-band:#faf8f5;
 }
@@ -150,3 +171,4 @@
      paper at every start */
   :root[data-aw-theme="system"] { @include aw-light; }
 }
+:root.aw-android-app { --sa-t: 0px; --sa-b: 0px; }

@@ -28,6 +28,11 @@ interface QueueStore {
   saveAsPlaylist: (name: string) => void;
 }
 
+// After a move (or a removal) Volumio pushes the new queue to every screen but not the state: the playing
+// track's new position never arrives, and a screen would mark (and show the cover of) whatever now sits at the
+// old one. So every new queue is followed by asking for the state (once, for a burst of queue pushes).
+let resync = 0;
+
 export const useQueue = create<QueueStore>(() => ({
   queue: [],
   play: (index) => emit('play', { value: index }),
@@ -39,5 +44,8 @@ export const useQueue = create<QueueStore>(() => ({
   saveAsPlaylist: (name) => emit('saveQueueToPlaylist', { name }),
 }));
 
-on('pushQueue', (data: QueueItem[]) => useQueue.setState({ queue: Array.isArray(data) ? data : [] }));
+on('pushQueue', (data: QueueItem[]) => {
+  useQueue.setState({ queue: Array.isArray(data) ? data : [] });
+  window.clearTimeout(resync); resync = window.setTimeout(() => { resync = 0; emit('getState', ''); }, 150);
+});
 emit('getQueue');

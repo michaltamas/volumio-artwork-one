@@ -11,9 +11,8 @@ body#artwork {
   .btn:not(.btn-link), button.btn:not(.btn-link) { border-radius: var(--r-pill); border: 1px solid var(--glass-2-border); background: var(--glass-2-fill); color: var(--ink-1); &:hover { background: var(--glass-2-hover); } }
   .btn-primary, .btn-info, .saveButton, button.btn-primary { background: var(--ink); color: var(--ground); border: 0; &:hover { background: var(--ink-1); color: var(--ground); } }
   .btn-danger { background: var(--err); color: var(--ink); border: 0; }
-  .setting-container, .setting-container .panel, .setting-container .panel-body, .setting-container .panel-heading,
   #pluginWrapper .panel, #pluginWrapper .panel-default, #pluginWrapper .panel-body, #pluginWrapper .panel-heading { background: transparent !important; border: 0 !important; box-shadow: none !important; }
-  .panel-title, .setting-container h2, .config-section-title, .section-label { font-family: var(--font-ui); font-weight: 700; color: var(--ink-1); }
+  .panel-title, .config-section-title, .section-label { font-family: var(--font-ui); font-weight: 700; color: var(--ink-1); }
   .panel-title .fa { color: var(--ink-dim); }
   .help-block, .setting-description, small { color: var(--ink-muted); }
 }
@@ -21,16 +20,52 @@ body#artwork #contentWrapper.aw-settings-shell { display: grid; height: 100%;
   > #content { position: relative; height: 100%; overflow-y: auto; min-width: 0; } }
 .aw-settings-side { display: block; min-width: 0; }
 .aw-snav {
-  display: flex; flex-direction: column; gap: 2px; min-width: 0; height: 100%; padding: 40px 16px 24px; border-right: 1px solid var(--fill-07);
-  &__eyebrow { font-size: 10px; letter-spacing: .18em; color: var(--ink-dim); padding: 0 14px 14px; }
-  &__item { display: flex; align-items: center; gap: 12px; height: 42px; padding: 0 14px; border-radius: 11px; color: var(--ink-3); font-size: 15px; cursor: pointer; text-decoration: none;
+  display: flex; flex-direction: column; gap: 2px; min-width: 0; height: 100%; padding: 32px 14px calc(var(--mini-h) + 24px); border-right: 1px solid var(--fill-06); overflow-y: auto; scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+  &__title { padding: 0 12px; font-size: 22px; font-weight: 800; letter-spacing: -.02em; line-height: 27px; color: var(--ink); }
+  &__item { flex: none; display: flex; align-items: center; gap: 12px; height: 42px; padding: 0 12px; border-radius: 11px; border: 1px solid transparent; color: var(--ink-3); font-size: 15px; cursor: pointer; text-decoration: none;
     .material-symbols-rounded { font-size: 20px; color: var(--ink-dim); }
     &:hover { background: var(--fill-06); color: var(--ink-1); }
-    &.active { background: var(--fill-10); color: var(--ink-1); font-weight: 600; .material-symbols-rounded { color: var(--ink-1); } }
-    &:focus-visible { outline: 2px solid var(--ink-1); outline-offset: 2px; } }
+    &.active { background: var(--fill-10); color: var(--ink); font-weight: 600; .material-symbols-rounded { color: var(--ink); } }
+    &:focus-visible { outline: 2px solid var(--ink-1); outline-offset: 2px; }
+    /* during a search: the sections without a match step back, the one you were in keeps a dashed edge */
+    &.is-dim { color: var(--ink-dim); .material-symbols-rounded { color: inherit; } }
+    &.was-here { border: 1px dashed var(--fill-18); .material-symbols-rounded { color: inherit; } } }
   &__label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  &__foot { margin-top: auto; padding: 0 14px; font-size: 10px; letter-spacing: .14em; color: var(--ink-75); }
+  &__count { margin-left: auto; font-size: 11px; color: var(--ink-2); }
+  &__out.material-symbols-rounded { margin-left: auto; font-size: 16px; }
+  /* Help and the shop: under a hairline at the foot */
+  &__foot { margin-top: auto; padding-top: 10px; border-top: 1px solid var(--fill-08); display: flex; flex-direction: column; gap: 2px; }
+  &__item--foot { height: 40px; font-size: 14px; color: var(--ink-muted); .material-symbols-rounded { font-size: 19px; } }
 }
+/* the settings search field: at the top of the menu, and on the phone's landing */
+.aw-sfield { display: flex; align-items: center; gap: 9px; height: 42px; margin: 14px 0; padding: 0 12px; border-radius: 999px; background: var(--fill-07); border: 1px solid var(--fill-11); cursor: text; font-weight: 400;
+  > .material-symbols-rounded { font-size: 19px; color: var(--ink-muted); }
+  input { flex: 1; min-width: 0; height: 100%; padding: 0; border: 0 !important; background: transparent !important; outline: 0 !important; box-shadow: none; font-family: var(--font-ui); font-size: 14px; color: var(--ink);
+    &::placeholder { color: var(--ink-muted); } &::-webkit-search-cancel-button { display: none; } }
+  &__key { margin-left: auto; font-size: 10px; color: var(--ink-faint); }
+  &__clear { margin-left: auto; display: grid; place-items: center; padding: 0; border: 0; background: transparent; color: var(--ink-3); cursor: pointer; .material-symbols-rounded { font-size: 18px; } &:hover { color: var(--ink); } }
+  &.is-active, &:focus-within { background: var(--fill-12); border-color: var(--ink-1); > .material-symbols-rounded { color: var(--ink); } } }
+/* the results: the content area's own page while a search is open */
+#content > .aw-under.aw-under--searched { display: none; }
+.aw-sres-host { padding: 40px clamp(24px, 3.9vw, 56px); }
+.aw-sres {
+  &__head { display: flex; align-items: baseline; flex-wrap: wrap; column-gap: 14px; }
+  &__title { margin: 0; font-family: var(--font-ui); font-size: 36px; font-weight: 800; letter-spacing: -.028em; line-height: 43px; color: var(--ink); }
+  &__count { font-size: 12px; letter-spacing: .14em; color: var(--ink-muted); }
+  &__list { margin-top: 28px; padding: 6px 10px; border-radius: 18px; background: var(--sc-fill); border: 1px solid var(--sc-line); }
+  &__row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: center; padding: 14px 16px; border-radius: 12px; border-bottom: 1px solid var(--sc-row-line); cursor: pointer;
+    &:last-child { border-bottom-color: transparent; }
+    &.is-focus { background: var(--fill-08); border-bottom-color: transparent; outline: 2px solid var(--ink-1); outline-offset: -2px; } }
+  &__text { min-width: 0; }
+  &__eyebrow { font-size: 10px; letter-spacing: .16em; color: var(--ink-dim); + .aw-sres__name { margin-top: 4px; } }
+  &__name { font-size: 16px; font-weight: 600; color: var(--ink); }
+  &__sub { margin-top: 3px; font-size: 13px; color: var(--ink-muted); }
+  &__chev.material-symbols-rounded { font-size: 21px; color: var(--ink-3); }
+  &__hint { margin: 16px 0 0; font-size: 13px; line-height: 1.55; color: var(--ink-dim); }
+  &__none { padding: 34px 2px 30px; font-size: 16px; color: var(--ink-muted); }
+  &__loading { display: flex; align-items: center; gap: 10px; margin-top: 16px; padding: 0 2px; .mono { font-size: 10px; letter-spacing: .16em; color: var(--ink-dim); } }
+  &__spin { width: 13px; height: 13px; border-radius: 50%; border: 2px solid var(--fill-20); border-top-color: var(--ink-3); animation: aw-spin .9s linear infinite; } }
 .aw-mnav { display: none; }
 .aw-settings-nav { display: block; min-width: 0; }
 .aw-sside { height: 100%; padding: 40px 26px 0; min-width: 0; border-left: 1px solid var(--fill-07); background: var(--shade-28); -webkit-backdrop-filter: blur(34px); backdrop-filter: blur(34px);
@@ -46,20 +81,14 @@ body#artwork #contentWrapper.aw-settings-shell { display: grid; height: 100%;
   li:last-child::after { display: none; }
   &__name { font-size: 17px; font-weight: 600; color: var(--ink-1); }
   &__val { margin-top: 5px; font-size: 12px; letter-spacing: .06em; color: var(--ink-muted); text-transform: uppercase; } }
+/* the side column's player card (15D): plain rows split by hairlines, the label left, the value right */
+.aw-kv.aw-kv--rows { margin-top: 16px; padding: 6px 20px; border-radius: 16px; background: var(--sc-fill); border-color: var(--sc-line);
+  .aw-kv__row { align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--sc-row-line); &:last-child { border-bottom: 0; }
+    > span:first-child { font-size: 13px; color: var(--ink-muted); } > span:last-child { font-size: 14px; color: var(--ink); text-align: right; } > .mono:last-child { font-size: 13px; } } }
 .aw-kv { margin-top: 26px; padding: 18px 20px; border-radius: 14px; background: var(--fill-05); border: 1px solid var(--fill-08);
   &__title { font-size: 11px; letter-spacing: .18em; color: var(--ink-muted); margin-bottom: 12px; }
   &__row { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 6px 0;
     > span:first-child { font-size: 14px; color: var(--ink-dim); } > .mono { font-size: 13px; color: var(--ink-1); text-align: right; word-break: break-word; } } }
-/* the landing */
-body#artwork .setting-container.panel { background: transparent; border: 0; box-shadow: none; margin: 0; padding: 40px 34px 0;
-  .panel-heading { background: transparent; border: 0; padding: 0; }
-  .panel-title { font-family: var(--font-ui); font-size: 34px; font-weight: 800; letter-spacing: -.025em; color: var(--ink); margin: 0; .fa { display: none; } }
-  .panel-body { padding: 0; }
-  /* the frame's row/column boxes under the heading (the clearfix keeps the search pill's margin inside) */
-  .panel-body > .row { margin: 0 -15px; } .panel-body > .row::before, .panel-body > .row::after { content: ' '; display: table; } .panel-body > .row::after { clear: both; }
-  .panel-body > .row > .col-xs-24 { position: relative; float: left; width: 100%; min-height: 1px; padding: 0 15px; box-sizing: border-box; }
-  .hardwareToggleCheckbox { margin-top: 16px; font-size: 14px; color: var(--ink-2); display: flex; align-items: center; gap: 10px; } }
-.aw-settings-hint { margin: 34px 0 10px; font-size: 11px; letter-spacing: .18em; color: var(--ink-dim); }   /* a paragraph keeps the frame's 10px foot */
 /* the theme card and the ambient rows (the appearance slot) */
 body#artwork .aw-theme-card { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; padding: 18px 20px; margin: 0 0 26px; border-radius: var(--r-panel); background: var(--fill-06); border: 1px solid var(--line-soft, var(--hairline-soft));
   &__text { min-width: 0; flex: 1; } &__title { font-size: 16px; font-weight: 600; color: var(--ink); } &__hint { margin-top: 4px; font-size: 13px; color: var(--ink-dim); } }
@@ -93,42 +122,27 @@ body#artwork .aw-time { width: 76px; height: 34px; padding: 0 8px; border-radius
   &:disabled { opacity: .45; } }
 @media (max-width: 560px) { body#artwork .aw-amb-row { grid-template-columns: 1fr; gap: 10px; } }
 body#artwork .aw-amb-save { margin: 14px 0 0; .control-buttons { display: flex; justify-content: flex-start; } }
-/* the settings search (handoff 11a) */
-body#artwork .aw-ssearch { margin: 20px 0 0; max-width: 652px; }
-body#artwork .aw-ssearch__field { display: flex; align-items: center; gap: 11px; height: 46px; padding: 0 16px; border-radius: 999px; margin: 0; font-weight: 400; cursor: text; background: var(--fill-10); border: 1px solid var(--fill-13); transition: background-color .15s ease, border-color .15s ease;
-  > .material-symbols-rounded { font-size: 21px; color: var(--ink-3); }
-  input { flex: 1; min-width: 0; border: 0; background: transparent; outline: 0; padding: 0; font-family: var(--font-ui); font-size: 15px; color: var(--ink); &::placeholder { color: var(--ink-muted); } &::-webkit-search-cancel-button { display: none; } } }
-body#artwork .aw-ssearch.is-active .aw-ssearch__field, body#artwork .aw-ssearch__field:focus-within { background: var(--fill-14); border-color: var(--ink-1); > .material-symbols-rounded { color: var(--ink-1); } }
-body#artwork .aw-ssearch__key { margin-left: auto; font-size: 11px; letter-spacing: .1em; color: var(--ink-faint); }
-body#artwork .aw-ssearch__clear { margin-left: auto; border: 0; background: transparent; padding: 0; display: grid; place-items: center; color: var(--ink-3); cursor: pointer; .material-symbols-rounded { font-size: 19px; } &:hover { color: var(--ink); } }
-body#artwork .aw-ssearch__count { font-size: 10px; letter-spacing: .16em; color: var(--ink-dim); margin-top: 20px; }
-body#artwork .aw-ssearch__list { display: flex; flex-direction: column; gap: 2px; margin-top: 10px; }
-body#artwork .aw-ssearch__row { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 16px; padding: 12px 14px; border-radius: 12px; cursor: pointer;
-  &.is-focus { background: var(--fill-10); outline: 2px solid var(--ink-1); outline-offset: 2px; .aw-ssearch__chev { color: var(--ink-3); } } }
-body#artwork .aw-ssearch__text { min-width: 0; }
-body#artwork .aw-ssearch__eyebrow { font-size: 10px; letter-spacing: .16em; color: var(--ink-dim); margin-bottom: 4px; }
-body#artwork .aw-ssearch__title { font-size: 15px; font-weight: 600; color: var(--ink); }
-body#artwork .aw-ssearch__sub { font-size: 13px; color: var(--ink-muted); margin-top: 2px; }
-body#artwork .aw-ssearch__chev { font-size: 20px; color: var(--ink-dim); }
-body#artwork .aw-ssearch__loading { display: flex; align-items: center; gap: 10px; margin-top: 16px; padding: 0 14px; .mono { font-size: 10px; letter-spacing: .16em; color: var(--ink-dim); } }
-body#artwork .aw-ssearch__spin { width: 13px; height: 13px; border-radius: 50%; border: 2px solid var(--fill-20); border-top-color: var(--ink-3); animation: aw-spin .9s linear infinite; }
-body#artwork .aw-ssearch__none { padding: 34px 14px 30px; font-size: 16px; color: #5e646c; }
-body#artwork .aw-ssearch-host + .aw-settings-hint { margin-top: 24px; }
-body#artwork .aw-ssearch-host.is-active ~ .aw-settings-hint { display: none; }
-body#artwork #pluginWrapper .panel.aw-flash { animation: aw-flash .6s ease-out; }
+body#artwork #pluginWrapper .panel.aw-flash, body#artwork #pluginWrapper .aw-sc-row.aw-flash { animation: aw-flash .6s ease-out; }
 @keyframes aw-flash { 0% { background-color: var(--fill-14); } 100% { background-color: transparent; } }
 /* fluid: the shell's columns */
-body#artwork #contentWrapper.aw-settings-shell { grid-template-columns: clamp(170px, 15vw, 216px) 1fr clamp(250px, 23.6vw, 340px); }
-body#artwork #contentWrapper.aw-settings-shell.aw-settings-shell--noside { grid-template-columns: clamp(170px, 15vw, 216px) 1fr; }
+body#artwork #contentWrapper.aw-settings-shell { --aw-side-w: clamp(250px, 23.6vw, 340px); grid-template-columns: clamp(170px, 16.7vw, 240px) 1fr var(--aw-side-w); }
+/* the page scrolls under the side column, so its scrollbar is the window's right edge: the content area spans
+   both columns and, when the page has a side column, keeps its width clear; the column (nothing to click in
+   it) sits beneath. A page without one takes the whole width. */
+@media (min-width: 1181px) {
+  body#artwork #contentWrapper.aw-settings-shell > #content { grid-column: 2 / -1; grid-row: 1; z-index: 1; }
+  body#artwork #contentWrapper.aw-settings-shell--side > #content { padding-right: var(--aw-side-w); }
+  body#artwork #contentWrapper.aw-settings-shell > .aw-settings-side { grid-column: 3; grid-row: 1; z-index: 0; }
+}
 @media (max-width: 1180px) {
-  body#artwork #contentWrapper.aw-settings-shell, body#artwork #contentWrapper.aw-settings-shell.aw-settings-shell--noside { grid-template-columns: clamp(170px, 15vw, 216px) 1fr; }
+  body#artwork #contentWrapper.aw-settings-shell { grid-template-columns: clamp(170px, 16.7vw, 240px) 1fr; }
   body#artwork #contentWrapper.aw-settings-shell > .aw-settings-side { display: none; }
 }
 @media (max-width: 720px) {
-  body#artwork #contentWrapper.aw-settings-shell, body#artwork #contentWrapper.aw-settings-shell.aw-settings-shell--noside { grid-template-columns: 1fr; grid-template-rows: auto minmax(0, 1fr); }
+  body#artwork #contentWrapper.aw-settings-shell { grid-template-columns: 1fr; grid-template-rows: auto minmax(0, 1fr); }
   body#artwork #contentWrapper.aw-settings-shell .aw-snav { flex-direction: row; height: auto; overflow-x: auto; padding: 10px 8px; gap: 4px; border-right: 0; border-bottom: 1px solid var(--fill-07); scrollbar-width: none; }
   body#artwork #contentWrapper.aw-settings-shell .aw-snav::-webkit-scrollbar { display: none; }
-  body#artwork #contentWrapper.aw-settings-shell .aw-snav__eyebrow, body#artwork #contentWrapper.aw-settings-shell .aw-snav__foot { display: none; }
+  body#artwork #contentWrapper.aw-settings-shell .aw-snav__title, body#artwork #contentWrapper.aw-settings-shell .aw-snav .aw-sfield, body#artwork #contentWrapper.aw-settings-shell .aw-snav__foot { display: none; }
   body#artwork #contentWrapper.aw-settings-shell .aw-snav__item { flex: none; height: 38px; }
 }
 @media (max-width: 640px) {

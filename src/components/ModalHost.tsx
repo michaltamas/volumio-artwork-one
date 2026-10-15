@@ -2,7 +2,7 @@
  * The modal frame the theme's sheets sit in: a blurred scrim, a centred window of the sheet's
  * width. Escape and a tap on the scrim close it.
  */
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useModal } from '../core/store/modal';
 import PowerSheet from './sheets/PowerSheet';
 import PlaylistSheet from './sheets/PlaylistSheet';
@@ -25,6 +25,19 @@ export default function ModalHost() {
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
   }, [name]);
+  // the window takes the focus, on its footer's last button (OK, Close, Update now): with a remote or a
+  // keyboard (a TV on the player's HDMI) Enter answers it and Tab stays in it, never on the page behind
+  const box = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!name) { return; }
+    const t = window.setTimeout(() => {
+      const el = box.current; if (!el || el.contains(document.activeElement)) { return; }
+      const btns = el.querySelectorAll<HTMLElement>('.modal-footer button:not(:disabled)');
+      const target = btns.length ? btns[btns.length - 1] : el.querySelector<HTMLElement>('button:not(:disabled), input, select, [tabindex]');
+      if (target) { target.focus(); } else { el.focus(); }
+    }, 60);
+    return () => window.clearTimeout(t);
+  }, [name, data && data.status]);
   if (!name) { return null; }
   let sheet: React.ReactNode = null;
   if (name === 'power-off') { sheet = <PowerSheet />; }
@@ -48,7 +61,7 @@ export default function ModalHost() {
     <>
       <div className="modal-backdrop in" onClick={() => useModal.getState().close()} />
       <div className={'modal aw-dlg--' + name} role="dialog" onClick={(e) => { if (e.target === e.currentTarget) { useModal.getState().close(); } }}>
-        <div className="modal-dialog" style={{ width }}>
+        <div className="modal-dialog" style={{ width }} ref={box} tabIndex={-1}>
           <div className="modal-content">{sheet}</div>
         </div>
       </div>

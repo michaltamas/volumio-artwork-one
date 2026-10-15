@@ -33,9 +33,10 @@
 }
 
 body#artwork .modal-content { @include aw-form-controls; }
+body#artwork .outputs__menu .aw-dsp { @include aw-form-controls; }   /* the DSP preset in Zones & outputs: the same select as the plugin pages */
 body#artwork #pluginWrapper {
   @include aw-form-controls;
-  padding: 40px 34px 60px;
+  padding: 40px clamp(24px, 3.9vw, 56px) 60px;
   .box { background: transparent; border: 0; box-shadow: none; padding: 0; }
   /* the inherited frame's title box: 20px over the header, 12px to the right of the title, a capitalised h2 */
   .boxHeader { background: transparent; border: 0; padding: 0; margin: 20px 0 0;
@@ -67,7 +68,19 @@ body#artwork #pluginWrapper {
   .control-label { font-size: 16px; font-weight: 600; color: var(--ink-1); }
   .equalizer { display: inline-block; margin: 10px; &.vertical { margin: 10px 20px; } &.horizontal { margin: 10px 0 20px; width: 180px; } }
   .equalizer-label { width: 15px; text-align: center; white-space: nowrap; margin-left: -8px; display: block; font-size: 11px; color: var(--ink-dim); }
-  .equalizer.vertical input[type="range"] { writing-mode: vertical-lr; direction: rtl; height: 140px; width: 20px; }
+  /* the equalizer's bars as the theme's sliders (Now Playing's volume): a 5px track filled with ink up to the
+     value, a 13px ink thumb in a soft ring; vertical bars fill from the bottom, where the minimum is */
+  .equalizer input[type="range"] { -webkit-appearance: none; appearance: none; margin: 0; padding: 0; background: transparent; cursor: pointer; --aw-fill: 0%;
+    &::-webkit-slider-runnable-track { width: 5px; height: 5px; border-radius: 3px; background: linear-gradient(90deg, var(--ink) var(--aw-fill), var(--fill-20) var(--aw-fill)); }
+    &::-moz-range-track { width: 5px; height: 5px; border-radius: 3px; background: var(--fill-20); }
+    &::-moz-range-progress { width: 5px; height: 5px; border-radius: 3px; background: var(--ink); }
+    &::-webkit-slider-thumb { -webkit-appearance: none; width: 13px; height: 13px; margin-top: -4px; border-radius: 50%; background: var(--ink); border: 0; box-shadow: 0 0 0 3px var(--fill-14), 0 2px 6px var(--shadow-soft); }
+    &::-moz-range-thumb { width: 13px; height: 13px; border: 0; border-radius: 50%; background: var(--ink); box-shadow: 0 0 0 3px var(--fill-14); }
+    &:focus-visible { outline: none; &::-webkit-slider-thumb { box-shadow: 0 0 0 3px var(--fill-30), 0 2px 6px var(--shadow-soft); } } }
+  .equalizer.horizontal input[type="range"] { width: 100%; height: 20px; }
+  .equalizer.vertical input[type="range"] { writing-mode: vertical-lr; direction: rtl; height: 140px; width: 20px;
+    &::-webkit-slider-runnable-track { width: 5px; height: 100%; background: linear-gradient(0deg, var(--ink) var(--aw-fill), var(--fill-20) var(--aw-fill)); }
+    &::-webkit-slider-thumb { margin-top: 0; margin-left: -4px; } }
   .equalizer-bars { display: flex; flex-wrap: wrap; }
   table.table { width: 100%; border-collapse: collapse; th, td { text-align: left; padding: 8px; border-top: 1px solid var(--fill-08); } }
   hr { border: 0; border-top: 1px solid var(--fill-08); margin: 20px 0; }
@@ -93,21 +106,36 @@ body#artwork #pluginWrapper {
 /* Plugins page */
 body#artwork .aw-state-volumio-plugin-manager #content {
   @include aw-form-controls;
-  > .box, .box { padding: 40px 34px 60px; background: transparent; border: 0; box-shadow: none; }
-  .boxHeader { background: transparent; border: 0; padding: 0; margin: 20px 0 0; .title { margin: 0 12px 0 0; } .title h2 { margin: 0; display: inline-block; background: transparent; padding: 0; font-family: var(--font-ui); font-size: 34px; font-weight: 800; letter-spacing: -.025em; color: var(--ink); text-transform: capitalize; .btn, a.btn { display: none; } } }
+  > .box, .box { padding: 40px clamp(24px, 3.9vw, 56px) 60px; background: transparent; border: 0; box-shadow: none; }   /* the settings pages' own margins */
+  /* the title as on every settings page (.aw-sp-head__title) */
+  .boxHeader { background: transparent; border: 0; padding: 0; margin: 0; .title { margin: 0 12px 0 0; } .title h2 { margin: 0; display: inline-block; background: transparent; padding: 0; font-family: var(--font-ui); font-size: 38px; font-weight: 800; letter-spacing: -.028em; line-height: 1.05; color: var(--ink); text-transform: capitalize; .btn, a.btn { display: none; } } }
   .box > .panel.panel-default { background: transparent; border: 0; box-shadow: none; margin: 0;
     > .panel-heading { background: transparent; border: 0; padding: 0; margin-top: 34px; padding-bottom: 12px; border-bottom: 1px solid var(--fill-10);
       .panel-title { font-family: var(--font-mono); font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-35); font-weight: 400; margin: 0; .fa { display: none; } } }
     > .panel-body { padding: 0; background: transparent; border: 0; box-shadow: none; } }
-  .nav-tabs { display: flex; list-style: none; margin: 18px 0 22px; padding: 0; border-bottom: 1px solid var(--fill-10);
+  .nav-tabs { display: flex; list-style: none; margin: 34px 0 22px; padding: 0; border-bottom: 1px solid var(--fill-10);
     > li { margin-bottom: -1px; }   /* the frame's tabs overlap the rule by a pixel */
     > li > a { display: block; background: transparent; border: 0; border-bottom: 2px solid transparent; border-radius: 0; margin: 0 22px 0 0; padding: 10px 0; font-size: 15px; line-height: 1.42857143; font-weight: 500; color: var(--ink-dim); cursor: pointer; }
     > li > a:hover { color: var(--ink-1); } > li.active > a { color: var(--ink); font-weight: 600; border-bottom-color: var(--ink); } }
   /* the inherited grid: the categories beside the cards from 768px, stacked over them below */
   .row { margin: 0 -15px; } .col-sm-4, .col-sm-20 { padding: 0 15px; min-width: 0; }
-  @media (min-width: 768px) { .row { display: flex; align-items: flex-start; } .col-sm-4 { flex: 0 0 16.6667%; } .col-sm-20 { flex: 0 0 83.3333%; } }
+  /* the categories take the width of their longest name ("System hardware"), the cards the rest */
+  @media (min-width: 768px) { .row { display: flex; align-items: flex-start; } .col-sm-4 { flex: 0 0 auto; } .col-sm-20 { flex: 1 1 0%; } }
   .btn.pluginCategoryBtn { height: auto; border: 0; padding: 8px 0; white-space: nowrap; background: transparent; justify-content: flex-start; line-height: 1.4; font-size: 15px; color: var(--ink-3); border-radius: 0; cursor: pointer;
     &:hover { background: transparent; color: var(--ink); } &.active { color: var(--ink); font-weight: 600; } }
+  /* narrower than the two-column layout: the categories become one row of chips (the dialogs' pills),
+     scrolled sideways, the chosen one in ink */
+  @media (max-width: 767px) {
+    .aw-plugin-cats { display: flex; gap: 8px; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; margin: 0 -5px 18px; padding: 2px 20px 4px;   // the column sits 5px in (the row's -15px against the page's 20px): edge to edge, the first chip in line with the cards
+     
+      &::-webkit-scrollbar { display: none; }
+      > div { flex: none; } > .clearfix { display: none; } }
+    .aw-plugin-cats .btn.pluginCategoryBtn { height: 38px; padding: 0 16px; border-radius: 19px; font-size: 14px; font-weight: 500; line-height: 1; color: var(--ink-2);
+      background: var(--fill-06); border: 1px solid var(--fill-11);
+      &:hover { background: var(--fill-10); color: var(--ink); }
+      &.active { font-weight: 600; color: var(--on-ink); background: var(--ink); border-color: var(--ink); }
+      &:focus-visible { outline: 2px solid var(--ink-1); outline-offset: 2px; } }
+  }
   .panel-body .panel.panel-default { background: var(--fill-06); border: 1px solid var(--fill-10); border-radius: 14px; padding: 18px 20px; margin: 0 0 12px; box-shadow: none;
     > .panel-heading { background: transparent; border: 0; padding: 0; margin: 0; .panel-title { font-family: var(--font-ui); font-size: 18px; font-weight: 700; letter-spacing: -.01em; text-transform: none; color: var(--ink); margin: 0;
       /* the FontAwesome glyph box the card was drawn with: a 16px inline-block of line-height 1 */
@@ -238,15 +266,20 @@ body#artwork #pluginWrapper {
   #networkDrives > .panel-body { padding: 0; }
   #networkDrives #addNewDrive { float: right; margin-top: -46px; background: transparent; color: var(--ink-2); border: 1px solid var(--fill-18); font-weight: 500; }
   #networkDrives table.table, #networkDrives table.table tbody { display: block; width: 100%; margin: 0; }
-  #networkDrives table.table tr { display: grid; grid-template-columns: 1fr 210px 150px 44px; align-items: center; gap: 18px; padding: 14px 12px; border-radius: 11px; border-top: 1px solid var(--fill-05);
+  #networkDrives table.table tr { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 210px) 80px 90px 84px;   /* alias · path · mounted · size · edit/delete: fixed, so the head row and the drive rows line up */ align-items: center; gap: 18px; padding: 14px 12px; border-radius: 11px; border-top: 1px solid var(--fill-05);
     &:first-child { border-top: 0; padding: 22px 12px 11px; border-radius: 0; border-bottom: 1px solid var(--fill-10); }
     th { font-family: var(--font-mono); font-size: 10px; letter-spacing: .16em; color: var(--ink-dim); font-weight: 400; text-transform: uppercase; padding: 0; border: 0; }
     td { padding: 0; border: 0; vertical-align: middle; color: var(--ink-1); }
     td:nth-child(1) { font-size: 16px; font-weight: 600; } td:nth-child(2) { font-family: var(--font-mono); font-size: 12px; color: var(--ink-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     td:nth-child(3) .fa.true .material-symbols-rounded { color: var(--ok); } td:nth-child(3) .fa.false .material-symbols-rounded { color: var(--err); }
-    td:nth-child(4) { font-family: var(--font-mono); font-size: 13px; color: var(--ink-3); }
+    td:nth-child(4) { font-family: var(--font-mono); font-size: 13px; color: var(--ink-3); white-space: nowrap; }
+    td.commandCol { display: flex; gap: 8px; justify-content: flex-end; }
     td.commandCol .btn { height: 32px; line-height: 30px; padding: 0 10px; } }
-  @media (max-width: 900px) { #networkDrives table.table tr { grid-template-columns: 1fr 120px 44px; td:nth-child(2) { display: none; } } }
+  /* narrower: no path column (below 768px the table has none at all, PluginPage's phone markup) */
+  @media (max-width: 900px) { #networkDrives table.table tr { grid-template-columns: minmax(0, 1fr) 70px 80px 84px; } }
+  @media (min-width: 768px) and (max-width: 900px) { #networkDrives table.table tr { td:nth-child(2), th:nth-child(2) { display: none; } } }
+  /* the phone: the mounted state is its icon alone (no head), the alias keeps the room */
+  @media (max-width: 767px) { #networkDrives table.table tr { grid-template-columns: minmax(0, 1fr) 22px 66px 80px; gap: 10px; th:nth-child(2) { visibility: hidden; } td:nth-child(1) { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } } }
   #systemVersion > .panel-body { display: block; padding: 20px 22px !important; border-radius: 16px; margin-top: 4px; background: var(--fill-09) !important; border: 1px solid var(--fill-14) !important;
     .sv-main { display: block; font-size: 16px; font-weight: 600; color: var(--ink-1); }
     .sv-sub { display: block; margin-top: 10px; font-family: var(--font-mono); font-size: 11px; color: var(--ink-dim); text-transform: uppercase; letter-spacing: .04em; } }

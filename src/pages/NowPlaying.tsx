@@ -5,8 +5,10 @@
  */
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import FavIcon from '../components/FavIcon';
 import Icon from '../components/Icon';
 import SeekBar from '../components/SeekBar';
+import { OutputPill, QueuePill } from '../components/BarPills';
 import Transport from '../components/Transport';
 import Volume from '../components/Volume';
 import ArtStack from '../components/ArtStack';
@@ -16,7 +18,7 @@ import { useMultiroom } from '../core/store/multiroom';
 import { useSignal } from '../core/store/signal';
 import { useUi, isQueueDocked, canDockQueue } from '../core/store/ui';
 import { albumart } from '../core/api';
-import { splitVal, quality, format, signal } from '../core/format';
+import { quality, format, signal, rateLine, shownTitle } from '../core/format';
 import { useLyrics } from '../core/store/lyrics';
 import { useTrackInfo } from '../core/store/trackInfo';
 import { useSheetDrag, PHONE } from '../core/useSheetDrag';
@@ -108,33 +110,35 @@ export default function NowPlaying() {
 
   const pos = typeof st.position === 'number' ? st.position : 0;
   const upNext = queue.slice(pos + 1, pos + 4);
-  // beside the docked queue the footer row is narrower: rather than let UP NEXT drop onto a second
-  // line, its label and covers step aside (the queue button stays — it puts the docked queue away)
+  // The footer's left zone holds up next; when the row is too narrow for it (a smaller window, beside the
+  // docked queue) the covers and their label step aside rather than squeeze the centred transport. The
+  // row is "cramped" when even the transport and the right cluster alone do not fit.
   const footerRow = useRef<HTMLDivElement>(null);
   const [upnextHidden, setUpnextHidden] = useState(false);
   const upnextHiddenRef = useRef(false);
   useLayoutEffect(() => {
     const row = footerRow.current;
     const set = (v: boolean) => { upnextHiddenRef.current = v; setUpnextHidden(v); };
-    if (!row || !queueDocked) { set(false); setCramped(false); return; }
-    let labelW = 0;
+    if (!row) { return; }
+    let needW = 0;   // what the covers and the label take, measured while they show
     const check = () => {
-      const transport = row.querySelector<HTMLElement>('#np-transport'), right = row.querySelector<HTMLElement>('#np-footer-right');
-      if (!transport || !right) { return; }
-      const label = row.querySelector<HTMLElement>('.np-upnext-label');
-      if (label && !upnextHiddenRef.current) { labelW = label.offsetWidth; }
-      const n = row.querySelectorAll('.np-upnext-film').length;
-      const covers = n ? labelW + 13 + n * 44 + (n - 1) * 13 + 13 : 0;   // label, gap, the 44px covers 13px apart, gap
-      const bare = transport.offsetWidth + 24 + right.offsetWidth - (upnextHiddenRef.current ? 0 : covers);   // the row without the covers
-      const hide = bare + covers > row.clientWidth;
+      const left = row.querySelector<HTMLElement>('#np-upnext'), transport = row.querySelector<HTMLElement>('#np-transport'), right = row.querySelector<HTMLElement>('#np-footer-right');
+      if (!left || !transport || !right) { return; }
+      // a zone's content, not its cell: from its first item's left edge to its last item's right edge
+      const span = (el: HTMLElement) => { const a = el.firstElementChild, z = el.lastElementChild; return a && z ? z.getBoundingClientRect().right - a.getBoundingClientRect().left : 0; };
+      if (!upnextHiddenRef.current) { needW = span(left); }
+      const rightW = span(right);
+      const gap = 48;   // the grid's two 24px gaps
+      const side = (row.clientWidth - transport.offsetWidth - gap) / 2;
+      const hide = needW > Math.min(side, row.clientWidth - transport.offsetWidth - gap - rightW);
       if (hide !== upnextHiddenRef.current) { set(hide); }
-      setCramped(bare > row.clientWidth);
+      setCramped(queueDocked && transport.offsetWidth + gap + rightW > row.clientWidth);
     };
     check();
     const ro = new ResizeObserver(check); ro.observe(row);
     return () => ro.disconnect();
   }, [queueDocked, upNext.length]);
-  const bit = splitVal(st.bitdepth), rate = splitVal(st.samplerate);
+  const chipRate = rateLine(st);
   const q = quality(st);
   const fmt = format(st);
   // Leaving: the sheet is lifted out of the flow over the page's box, the page beneath is shown
@@ -240,29 +244,31 @@ export default function NowPlaying() {
       <div id="np-hero">
         <div id="np-cover">{st.albumart ? <img src={albumart(st.albumart)} alt={st.album || ''} /> : null}</div>
         <div id="np-meta" className={lyricsOn ? 'np-meta--lyrics' : ''}>
-          <div className="np-seg" role="tablist" aria-label="Now Playing view">
-            {views.map(v => (
-              <button key={v} type="button" role="tab" className={view === v ? 'active' : ''} aria-selected={view === v} onClick={() => setView(v)} disabled={v === 'lyrics' && lyricsState === 'none'}>
-                {v === 'cover' ? 'Cover' : v === 'info' ? 'Info' : 'Lyrics'}
-              </button>
-            ))}
+          {/* the heart has a fixed spot at the end of the face switch's row (handoff 16B): a long title never moves it */}
+          <div className="np-tabrow">
+            <div className="np-seg" role="tablist" aria-label="Now Playing view">
+              {views.map(v => (
+                <button key={v} type="button" role="tab" className={view === v ? 'active' : ''} aria-selected={view === v} onClick={() => setView(v)} disabled={v === 'lyrics' && lyricsState === 'none'}>
+                  {v === 'cover' ? 'Cover' : v === 'info' ? 'Info' : 'Lyrics'}
+                </button>
+              ))}
+            </div>
+            <button type="button" className={'np-heart' + (fav ? ' active' : '')} onClick={() => usePlayer.getState().toggleFavourite()} title={fav ? 'Remove from favourites' : 'Add to favourites'} aria-pressed={fav} disabled={!!st.disableUi}><FavIcon on={fav} /></button>
           </div>
           {!lyricsOn && <div className="np-eyebrow mono">{queue.length ? <span>TRACK {pos + 1} OF {queue.length}</span> : <span>NOW PLAYING</span>}</div>}
-          <ClampedTitle text={String(st.title || '')} />
+          <ClampedTitle text={shownTitle(st)} />
           <div className="np-byline">
             <div className="np-artist">{st.artist}</div>
             <div className="np-album">{st.album}{info.year ? <span>&nbsp;·&nbsp;{info.year}</span> : null}</div>
             <div id="np-chip-slot">
               <div className="np-quality">
-                {(st.bitdepth || st.samplerate) ? (
+                {/* one chip (handoff 16B): depth/rate, then the format */}
+                {(chipRate || (fmt && !ext)) ? (
                   <div className={'np-chip mono aw-q--' + q}>
-                    {bit.n ? <span className="np-chip-num">{bit.n}</span> : null}
-                    {bit.u ? <span className="np-chip-unit np-chip-unit--bit">{bit.u}</span> : null}
-                    {rate.n ? <span className="np-chip-num np-chip-num--rate">{rate.n}</span> : null}
-                    {rate.u ? <span className="np-chip-unit">{rate.u}</span> : null}
+                    {chipRate ? <span className="np-chip-num">{chipRate}</span> : null}
+                    {fmt && !ext ? <span className="np-chip-unit">{fmt}</span> : null}
                   </div>
-                ) : (st.bitrate ? <div className={'np-chip mono aw-q--' + q}><span className="np-chip-val">{String(st.bitrate)}</span></div> : null)}
-                {fmt && !ext ? <span className="np-format mono">{fmt}</span> : null}
+                ) : null}
               </div>
               {ext ? (
                 <div className={'np-external np-external--' + ext.kind}>
@@ -280,7 +286,6 @@ export default function NowPlaying() {
                   {output ? <><span className="np-arrow">→</span><span className="np-node-final">{output}</span></> : null}
                 </div>
               ) : null}
-              {view === 'cover' && info.genre ? <div className="np-library mono"><span>{info.genre}</span></div> : null}
             </div>
           </div>
           {view === 'info' ? <InfoFace /> : null}
@@ -289,7 +294,7 @@ export default function NowPlaying() {
       </div>
 
       <div className="np-m-actions">
-        <button type="button" className={'np-m-tile' + (fav ? ' active' : '')} onClick={() => usePlayer.getState().toggleFavourite()} title="Add to favourites"><Icon name="favorite" /></button>
+        <button type="button" className={'np-m-tile' + (fav ? ' active' : '')} onClick={() => usePlayer.getState().toggleFavourite()} title={fav ? 'Remove from favourites' : 'Add to favourites'} aria-pressed={fav}><FavIcon on={fav} /></button>
         <button type="button" className="np-m-tile" title="Add to playlist" onClick={() => addToPlaylist({ uri: String(st.uri || ''), service: st.service, type: 'song', title: st.title, artist: st.artist, album: st.album, albumart: st.albumart })} disabled={!!st.disableUi}><Icon name="playlist_add" /></button>
         <button type="button" className={'np-m-tile' + (st.repeat ? ' active' : '')} onClick={() => usePlayer.getState().cycleRepeat()} title="Repeat"><Icon name={st.repeat && st.repeatSingle ? 'repeat_one' : 'repeat'} /></button>
         <button type="button" className={'np-m-tile np-m-tile--lyrics' + (lyricsOn ? ' active' : '')} onClick={toggleLyrics} disabled={lyricsState === 'none'} title="Lyrics" aria-label="Lyrics"><Icon name="lyrics" /></button>
@@ -298,15 +303,11 @@ export default function NowPlaying() {
 
       <div id="np-footer">
         <div id="np-seek"><SeekBar /></div>
+        {/* handoff 16B: one grid, three zones — up next (left), the transport centred on the content area, volume · output · queue (right) */}
         <div id="np-footer-row" ref={footerRow}>
-          <div id="np-transport">
-            <button type="button" className={'btn btn-link np-fav' + (fav ? ' active' : '')} onClick={() => usePlayer.getState().toggleFavourite()} title="Add to favourites" disabled={!!st.disableUi}><Icon name="favorite" /></button>
-            <Transport />
-          </div>
-          <div id="np-footer-right">
+          <div id="np-upnext" className={upnextHidden ? 'np-upnext--covers-away' : undefined}>
             {upNext.length ? (
-              <div id="np-upnext" className={upnextHidden ? 'np-upnext--covers-away' : undefined}>
-                <button type="button" className="np-upnext-label mono" onClick={showQueue} title="Queue">UP NEXT</button>
+              <>
                 <div className="np-upnext-films">
                   {upNext.map((t, i) => (
                     <button key={t.uri + i} type="button" className="np-upnext-film" onClick={() => useQueue.getState().play(pos + 1 + i)} title={(t.name || t.title || '') + (t.artist ? ' · ' + t.artist : '')} aria-label={'Play ' + (t.name || t.title || '')}>
@@ -314,12 +315,15 @@ export default function NowPlaying() {
                     </button>
                   ))}
                 </div>
-                <button type="button" className={'np-queue' + (queueOpen ? ' active' : '')} onClick={toggleQueue} title="Queue">
-                  <Icon name="queue_music" />{queue.length ? <span className="np-queue__count mono">{queue.length}</span> : null}
-                </button>
-              </div>
+                <button type="button" className="np-upnext-label mono" onClick={showQueue} title="Queue">UP NEXT</button>
+              </>
             ) : null}
+          </div>
+          <div id="np-transport"><Transport /></div>
+          <div id="np-footer-right">
             <div className="np-volume"><Volume /></div>
+            <OutputPill />
+            <QueuePill active={queueOpen} onClick={toggleQueue} />
           </div>
         </div>
       </div>

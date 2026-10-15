@@ -6,6 +6,10 @@
 .artwork-seek .seek-elapsed { color: var(--ink); }
 .artwork-seek .seek-duration { margin-left: auto; }
 .artwork-seek .seek-remaining { display: none; }
+/* the total turns into the time remaining on a tap (SeekBar) */
+.artwork-seek button.seek-time { border: 0; background: transparent; padding: 0; font-family: var(--font-mono); line-height: inherit; text-align: right; cursor: pointer; &:hover { color: var(--ink); } &:focus-visible { outline: 2px solid var(--ink-1); outline-offset: 2px; border-radius: 4px; } }
+.artwork-seek.is-remain .seek-remaining { display: block; margin-left: auto; }
+.artwork-seek.is-remain .seek-duration { display: none; }
 .artwork-seek__hit {
   position: relative; flex: 1 1 auto; min-width: 0; height: 16px; display: flex; align-items: center;
   cursor: pointer; touch-action: none; user-select: none; -webkit-user-select: none;
@@ -47,3 +51,17 @@
     &:disabled { cursor: default; }
   }
 }
+
+/* ---- the bars' pills (handoff 16D): where the music plays, the queue; the sizes are each bar's ---- */
+.tb-pill { flex: none; display: inline-flex; align-items: center; border: 1px solid var(--tb-pill-line); background: var(--tb-pill); color: var(--ink); font-family: var(--font-ui); cursor: pointer; min-width: 0; max-width: 200px;
+  .material-symbols-rounded { color: var(--ink); }
+  &.tb-pill--output .material-symbols-rounded { color: var(--tb-dim); }
+  .tb-pill__name { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tb-pill__count { font-size: 12px; font-weight: 700; }
+  &:hover { background: var(--fill-16); }
+  &.active { background: var(--ink-1); border-color: var(--ink-1); color: var(--on-ink); .material-symbols-rounded { color: var(--on-ink); } }
+  &:focus-visible { outline: 2px solid var(--ink-1); outline-offset: 2px; } }
+
+/* the filled heart (FavIcon): sits where the font's glyph would, at its size */
+.aw-fav-fill { display: block; flex: none; }
+.np-heart .aw-fav-fill { font-size: 24px; } .mini-fav .aw-fav-fill { font-size: 22px; } .np-m-tile .aw-fav-fill { font-size: 24px; }

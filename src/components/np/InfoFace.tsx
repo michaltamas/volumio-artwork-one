@@ -19,7 +19,8 @@ export default function InfoFace() {
   const img = (artist && artist.thumb) || (st.albumart ? albumart(st.albumart) : '');
   const artistSub = artist ? [artist.description, artist.begin].filter(Boolean).join(' · ') : '';
   const n = info.tracks;
-  const albumSub = [album && album.label, (album && album.year) || info.year, n ? n + (n === 1 ? ' track' : ' tracks') : ''].filter(Boolean).join(' · ');
+  // the genre lives here, not on the Cover face (handoff 16B)
+  const albumSub = [album && album.label, (album && album.year) || info.year, info.genre, n ? n + (n === 1 ? ' track' : ' tracks') : ''].filter(Boolean).join(' · ');
   const goArtist = () => { if (!canGo) { return; } useBrowse.getState().open({ uri: 'artists://' + encodeURIComponent(st.artist), title: st.artist, name: st.artist, type: 'folder', service: 'mpd' }, true); nav('/browse'); };
   const goAlbum = () => { if (!canGo || !st.album) { return; } useBrowse.getState().open({ uri: 'albums://' + encodeURIComponent(st.artist) + '/' + encodeURIComponent(st.album), title: st.album, name: st.album, type: 'folder', service: 'mpd' }, true); nav('/browse'); };
   return (

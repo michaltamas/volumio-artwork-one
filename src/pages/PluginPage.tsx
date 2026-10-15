@@ -1,39 +1,24 @@
-/** A settings page generated from a plugin's UI config: sections of rows (input, switch, select, button), core sections, the save button. */
+/** A settings page generated from a plugin's UI config (handoff 15): the page's head, then a card per section — rows of input, switch, select, button, equalizer — and Volumio's own core sections. */
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import Icon from '../components/Icon';
 import PageHead from '../components/PageHead';
 import Crumbs from '../components/browse/Crumbs';
 import { emit, HOST } from '../core/socket';
 import { askUiConfig, onUiConfig, pageKey } from '../core/uiConfig';
 import { useSettings } from '../core/store/settings';
-import { useUiSettings } from '../core/store/uiSettings';
+import { useMenu } from '../core/store/menu';
+import { usePlugins } from '../core/store/plugins';
 import { useModal } from '../core/store/modal';
-import { Switch, Select, Segment, same } from '../components/settings/controls';
+import { Switch } from '../components/settings/controls';
+import SettingsCard, { type CardView, type RowView } from '../components/settings/SettingsCard';
+import { pageCopy, sectionLabel, itemCopy } from '../core/settingsCopy';
+import { pluginIcon } from '../core/pluginIcons';
+import { plainText } from '../core/plainText';
+import { buildDay } from '../core/format';
 import { CORE } from '../components/settings/CoreSections';
 import AppearanceSlot from '../components/settings/AppearanceSlot';
 import Spinner from '../components/Spinner';
-
-// a plugin's `attributes` on an input are HTML attributes as Volumio's Angular interface spread them:
-// `style` as a CSS string (Now Playing: "margin-bottom: 32px;"), `readonly`, `maxlength`… React wants
-// a style object and its own names, and throws on the string (error #62) — which left the page blank
-function inputAttrs(attrs: any): Record<string, any> {
-  const out: Record<string, any> = {};
-  (Array.isArray(attrs) ? attrs : []).forEach((a: any) => {
-    if (!a || typeof a !== 'object') { return; }
-    Object.keys(a).forEach((k) => {
-      const v = a[k];
-      if (k === 'style') {
-        if (typeof v === 'string') { const o: Record<string, string> = {}; v.split(';').forEach((d) => { const i = d.indexOf(':'); if (i > 0) { o[d.slice(0, i).trim().replace(/-([a-z])/g, (_, c) => c.toUpperCase())] = d.slice(i + 1).trim(); } }); out.style = { ...(out.style || {}), ...o }; }
-        else if (v && typeof v === 'object') { out.style = { ...(out.style || {}), ...v }; }
-        return;
-      }
-      const name: Record<string, string> = { readonly: 'readOnly', maxlength: 'maxLength', minlength: 'minLength', autocomplete: 'autoComplete', tabindex: 'tabIndex', class: 'className', for: 'htmlFor' };
-      out[name[k.toLowerCase()] || k] = v;
-    });
-  });
-  return out;
-}
 
 function visible(item: any, section: any): boolean {
   if (item.hidden) { return false; }
@@ -47,15 +32,32 @@ function visible(item: any, section: any): boolean {
   return true;
 }
 
+// what a section's save would send, as text: the card is changed while this differs from what the player sent
+const valuesOf = (section: any) => JSON.stringify((section.content || []).map((c: any) => c.element === 'equalizer' ? ((c.config && c.config.bars) || []).map((b: any) => b.value) : c.value));
+const restore = (section: any, snap: string) => { const v = JSON.parse(snap); (section.content || []).forEach((c: any, i: number) => { if (c.element === 'equalizer') { ((c.config && c.config.bars) || []).forEach((b: any, bi: number) => { b.value = v[i][bi]; }); } else { c.value = v[i]; } }); };
+const same = (a: any, b: any) => String(a ?? '').replace(/[^a-z0-9]/gi, '').toLowerCase() === String(b ?? '').replace(/[^a-z0-9]/gi, '').toLowerCase();
+// the hint under a row: the plugin's description, else its documentation (as text: some send HTML) — not when it only repeats the label
+function hintOf(item: any, label: string): string | undefined {
+  const t = plainText(String(item.description || item.doc || '')).trim();
+  return t && !same(t, label) && !same(t, item.label) ? t : undefined;
+}
+
 export default function PluginPage({ wizard }: { wizard?: boolean }) {
   const { pluginName = '' } = useParams();
-  const [params] = useSearchParams();
+  // a plugin's page without its own settings entry (FusionDsp, Spotify, …) sits under Plugins: its crumb and its back lead there
+  const underPlugins = useSettings(st => !!pluginName && st.menu().length > 0 && !st.inMenu(pluginName));
+  const parent = underPlugins ? { path: '/plugin-manager', label: 'Plugins', trail: [{ title: 'Plugins', uri: '/plugin-manager' } as any] } : { path: '/settings', label: 'Settings', trail: undefined };
   const nav = useNavigate();
-  const ui = useUiSettings(s => s.settings);
   const [obj, setObj] = useState<any>(null);
   const [show, setShow] = useState(false);
   const [answered, setAnswered] = useState(false);   // the ask came back empty
   const takeRef = useRef<(d: any) => void>(() => {});
+  const snaps = useRef<Map<any, string>>(new Map());   // each section's values as the player sent them
+  const plugin = usePlugins(st => st.installed.find((p: any) => p && pluginName === p.category + '-' + p.name) || null);
+  const storeEntry = usePlugins(st => { const cats = (st.available && st.available.categories) || []; for (const c of cats) { const f = (c.plugins || []).find((p: any) => p && pluginName === (p.category || c.name) + '-' + p.name); if (f) { return f; } } return null; });
+  const menuName = useSettings(st => { const it = st.menu().find(i => i && i.state === 'volumio.plugin' && String((i.params && i.params.pluginName) || '').replace('/', '-') === pluginName); return it ? String(it.name || '') : ''; });
+  const systemInfo = useMenu(st => st.systemInfo);
+  useEffect(() => { usePlugins.getState().ensure(); }, []);
   const [, bump] = useState(0);
   const rerender = () => bump(n => n + 1);
   useEffect(() => {
@@ -66,6 +68,7 @@ export default function PluginPage({ wizard }: { wizard?: boolean }) {
     const take = (data: any) => {
       if (!alive) { return; }
       if (!data) { setAnswered(true); return; }   // the ask timed out, or the player had nothing for this page
+      snaps.current = new Map((data.sections || []).map((sec: any) => [sec, valuesOf(sec)]));
       setObj(data);
       const pp = data.page && data.page.passwordProtection;
       if (!pp || !pp.enabled) { setShow(true); }
@@ -89,6 +92,7 @@ export default function PluginPage({ wizard }: { wizard?: boolean }) {
     }
     if (saveObj.askForConfirm) { const c = saveObj.askForConfirm; if (!(await useModal.getState().confirm(c))) { return; } delete saveObj.askForConfirm; }
     emit('callMethod', saveObj);
+    snaps.current.set(section, valuesOf(section)); rerender();   // saved: the card is clean until the next change
   };
   const saveButton = async (item: any) => {
     if (!item.onClick) { return; }   // a button that says nothing does nothing: never an empty callMethod
@@ -104,13 +108,13 @@ export default function PluginPage({ wizard }: { wizard?: boolean }) {
     if (c.askForConfirm) { if (!(await useModal.getState().confirm({ ...c.askForConfirm, danger: item.id === 'factory' }))) { return; } if (c.type === 'emit') { emit(c.message, c.data); } else { emit('callMethod', c); } return; }
     run();
   };
-  const isAppearance = pluginName === 'miscellanea-appearance';
+  const back = <PageHead variant="settings" back={() => nav(parent.path)} backLabel={parent.label} nav={<Crumbs root="Settings" trail={parent.trail} onCrumb={() => nav('/plugin-manager')} current={obj && show ? ((obj.page && obj.page.label) || '') : ''} onHome={() => nav('/settings')} />} actions={helpItem(obj) ? <button type="button" className="aw-sp-helpicon" onClick={() => saveButton(helpItem(obj))} aria-label="Help" title="Help"><Icon name="help" /></button> : undefined} />;
   // nothing yet: say so, instead of a blank screen — the settings may take a moment on a slow player, and a
   // plugin that fails to build them would otherwise leave the page black for good
   if (!show || !obj) {
     return (
       <div className="container-fluid"><div className="row"><div className="col-xs-24" id="pluginWrapper">
-        <PageHead variant="settings" back={() => nav('/settings')} backLabel="Settings" nav={<Crumbs root="Settings" current="" onHome={() => nav('/settings')} />} />
+        {back}
         <div className="aw-pluginwait">
           {answered ? (
             <>
@@ -124,74 +128,103 @@ export default function PluginPage({ wizard }: { wizard?: boolean }) {
     );
   }
   const page = obj.page || {};
-  const showDoc = !!(ui.pluginsDoc && ui.pluginsDoc.showDoc);
-  const showDesc = !(ui.pluginsDoc && ui.pluginsDoc.showDescription === false);   // shown unless the player's interface settings say otherwise
+  const copy = pageCopy(pluginName);
+  const help = helpItem(obj);
+  const sections: any[] = (obj.sections || []).filter((s: any) => !s.hidden && !(s.coreSection && (copy.dropCore || []).indexOf(s.coreSection) > -1));
+  const order = copy.first || [];
+  const rank = (s: any) => { const i = order.indexOf(s.id); return i < 0 ? order.length : i; };
+  sections.sort((a, b) => rank(a) - rank(b));   // stable: the rest keep the player's order
+  const moved: { card: CardView; section: any }[] = [];
+  const cards: { card: CardView; section: any }[] = [];
+  sections.forEach((section: any, si: number) => {
+    const key = (section.id || 'section') + '-' + si;
+    if (section.coreSection) {
+      const Core = CORE[section.coreSection];
+      const head = CORE_CARDS[section.coreSection];
+      if (Core) { cards.push({ section, card: { key, id: section.id, label: head ? head.label : '', icon: head ? head.icon : 'settings', bare: !head, rows: [], core: <Core />, action: section.coreSection === 'network-drives' ? <button type="button" className="aw-sc__action" onClick={() => emit('showNasHelper')} aria-label="About network drives" title="About network drives"><Icon name="info" /></button> : undefined } }); }
+      return;
+    }
+    const sc = (copy.sections || {})[section.id];
+    const rows: RowView[] = [];
+    (section.content || []).forEach((item: any) => {
+      if (!visible(item, section) || item === help) { return; }
+      const ic = itemCopy(sc && sc.items ? sc.items[item.id] : undefined, String(item.label ?? ''));
+      const btn = item.button_label !== undefined && !same(item.button_label, item.label) ? String(item.button_label) : undefined;
+      const row: RowView = { item, label: ic.label, hint: ic.hint || hintOf(item, ic.label), button: ic.button || btn };
+      if (pluginName === 'system_controller-system' && item.id === 'update' && systemInfo && systemInfo.systemversion) { row.hint = 'INSTALLED ' + systemInfo.systemversion + (systemInfo.builddate ? ' · ' + buildDay(systemInfo.builddate) : ''); row.hintMono = true; }
+      const own = (copy.ownCard || {})[item.id];
+      if (own) { moved.push({ section, card: { key: own.id, id: own.id, label: own.label, icon: own.icon, danger: own.danger, rows: [row] } }); return; }
+      rows.push(row);
+    });
+    // a card saves when it has something to save: a section of buttons only acts at once, and has no footer
+    const saves = !!(section.saveButton && !section.saveButton.hidden && section.onSave) && rows.some(r => r.item.element !== 'button');
+    if (!rows.length && !section.description) { return; }
+    cards.push({ section, card: { key, id: section.id, label: sectionLabel(sc, String(section.label || '')), icon: (sc && sc.icon) || (section.icon ? pluginIcon(section.icon, 'settings') : 'settings'), description: section.description ? plainText(String(section.description)) : undefined, rows, save: saves ? String(section.saveButton.label || 'Save') : null } });
+  });
+  const all = cards.concat(moved);
+  const isAppearance = pluginName === 'miscellanea-appearance';
+  // the page's name: the settings menu's for Volumio's own pages, the plugin's own name for a plugin; the
+  // page's longer title under it when it says more
+  const title = menuName || (plugin && plugin.prettyName) || String(page.label || '');
+  const subtitle = plugin && page.label && !same(page.label, title) ? String(page.label) : '';
+  const author = storeEntry && storeEntry.author ? String(storeEntry.author) : '';
+  const meta = plugin ? [plugin.version ? 'v' + plugin.version : '', author].filter(Boolean).join(' · ') : '';
+  const enabled = !!plugin && (plugin.enabled === true || plugin.enabled === 'true');
   return (
     <div className="container-fluid"><div className="row"><div className="col-xs-24" id="pluginWrapper">
-      <PageHead variant="settings" back={() => nav('/settings')} backLabel="Settings" nav={<Crumbs root="Settings" current={page.label || ''} onHome={() => nav('/settings')} />} />
-      <div className="box">
-        <div className="boxHeader"><div className="title">
-          <h2><a className="btn btn-primary" onClick={() => nav('/settings')}><i className="fa fa-arrow-left"><Icon name="arrow_back" /></i></a>{' ' + (page.label || '')}</h2>
-          {params.get('isPluginSettings') ? <button type="button" className="btn btn-link btn-xs" onClick={() => window.history.back()}><Icon name="chevron_left" /> <span>Back</span></button> : null}
-        </div></div>
-        {page.description ? <h4 className="pluginDescription">{page.description}</h4> : null}
-        {(obj.sections || []).filter((s: any) => !s.hidden).map((section: any, si: number) => {
-          const Core = section.coreSection ? CORE[section.coreSection] : null;
-          return (
-            <div className="panel panel-default" key={si} data-section-id={section.id}>
-              {Core ? <div><Core /></div> : null}
-              {!section.coreSection ? (
-                <div className="panel-heading"><h3 className="panel-title">
-                  {section.icon ? <i className={'fa ' + section.icon} /> : null}
-                  {!section.icon && section.image ? <img src={HOST + '/albumart?sectionimage=' + section.image} className="section-image" alt="" /> : null} {section.label}
-                </h3></div>
-              ) : null}
-              {!section.coreSection ? (
-                <div className="panel-body">
-                  {section.description ? <h4 className="sectionDescription">{section.description}</h4> : null}
-                  {section.content ? (
-                    <div><form onSubmit={(e) => e.preventDefault()}>
-                      {(section.content || []).map((item: any, ii: number) => visible(item, section) ? (
-                        <div className="form-group" key={item.id || ii}>
-                          <label htmlFor={item.id} className="plugin-label control-label">{item.label}</label>
-                          {item.element !== 'equalizer' ? (
-                            <div className="control-item"><div>
-                              {item.element === 'input' ? <input id={item.id} type={item.type} className="form-control" value={item.value ?? ''} onChange={(e) => { item.value = item.type === 'number' ? (e.target.value === '' ? '' : Number(e.target.value)) : e.target.value; rerender(); }} {...inputAttrs(item.attributes)} /> : null}
-                              {item.element === 'switch' ? <Switch on={item.value === true || item.value === 'true'} onChange={(v) => { item.value = v; rerender(); }} label={item.label} /> : null}
-                              {item.element === 'select' ? (
-                                // two or three choices as a segment, but only for a value one of them carries: a segment
-                                // cannot show anything else, the select shows the value's own label (as Volumio does)
-                                item.options && item.options.length > 1 && item.options.length <= 3 && item.options.some((o: any) => same(item.value, o) || (item.value && typeof item.value === 'object' && o && typeof o === 'object' && o.label === item.value.label))
-                                  ? <Segment value={item.value} options={item.options} onChange={(o) => { item.value = o; rerender(); }} label={item.label} />
-                                  : <Select value={item.value} options={item.options || []} onChange={(o) => { item.value = o; rerender(); }} label={item.label} placeholder="Enter an address..." byLabel={item.id === 'i2sid'} />
-                              ) : null}
-                              {item.element === 'button' ? <button id={item.id} type="button" className="btn btn-info" name={item.id} plugin-attributes="" onClick={() => saveButton(item)}>{item.button_label !== undefined ? item.button_label : item.label}</button> : null}
-                            </div></div>
-                          ) : (
-                            <div className="equalizer-plugin"><div><div className="equalizer-bars">
-                              {((item.config && item.config.bars) || []).map((bar: any, bi: number) => (
-                                <div className={'equalizer ' + ((item.config && item.config.orientation) || 'vertical')} key={bi}>
-                                  <label className="equalizer-label">{bar.ticksLabels && bar.ticksLabels[0]}</label>
-                                  <input type="range" min={bar.min} max={bar.max} step={bar.step} value={bar.value} onChange={(e) => { bar.value = Number(e.target.value); rerender(); }} aria-label={bar.ticksLabels && bar.ticksLabels[0]} />
-                                </div>
-                              ))}
-                            </div></div></div>
-                          )}
-                          {showDoc && item.doc ? <div className="control-doc"><a onClick={() => useModal.getState().open('gotit', { message: item.doc })}><i className="fa fa-info-circle"><Icon name="info" /></i></a></div> : null}
-                          {showDesc && item.description ? <div className="control-description">{item.description}</div> : null}
-                          <div style={{ clear: 'both' }} />
-                        </div>
-                      ) : null)}
-                      {section.saveButton && !section.saveButton.hidden ? <div className="form-group"><div className="control-buttons"><button type="button" className="btn btn-info" onClick={() => saveSection(section)}>{section.saveButton.label}</button></div></div> : null}
-                    </form></div>
-                  ) : null}
-                </div>
-              ) : null}
+      {back}
+      <div className="aw-sp">
+        <header className="aw-sp-head">
+          {underPlugins ? <button type="button" className="aw-sp-head__back" onClick={() => nav(parent.path)}><Icon name="chevron_left" /><span>{parent.label}</span></button> : null}
+          <div className="aw-sp-head__row">
+            <div className="aw-sp-head__text">
+              <h2 className="aw-sp-head__title">{title}</h2>
+              {subtitle || meta ? <div className="aw-sp-head__sub">{subtitle ? <span className="aw-sp-head__subtitle">{subtitle}</span> : null}{meta ? <span className="aw-sp-head__meta mono">{meta.toUpperCase()}</span> : null}</div> : null}
             </div>
-          );
-        })}
+            {help ? <button type="button" className="aw-sp-help" onClick={() => saveButton(help)}><Icon name="help" /><span>Help</span></button> : null}
+            {plugin ? (
+              <div className="aw-sp-enabled">
+                <span className="aw-sp-enabled__label">Enabled</span>
+                <Switch on={enabled} onChange={() => emit('pluginManager', { name: plugin.name, category: plugin.category, action: plugin.active ? 'disable' : 'enable' })} label={'Enabled: ' + title} noLabel />
+              </div>
+            ) : null}
+          </div>
+          {page.description ? <p className="aw-sp-head__desc">{plainText(String(page.description))}</p> : null}
+        </header>
+        <div className="aw-sp-cards">
+          {all.map(({ card, section }) => {
+            const snap = snaps.current.get(section);
+            const was: any[] = snap ? JSON.parse(snap) : [];
+            const now: any[] = JSON.parse(valuesOf(section));
+            card.rows.forEach((r) => { const i = (section.content || []).indexOf(r.item); r.changed = i > -1 && JSON.stringify(was[i]) !== JSON.stringify(now[i]); });
+            const dirty = !card.core && !!card.save && snaps.current.has(section) && snaps.current.get(section) !== valuesOf(section);
+            return <SettingsCard key={card.key} card={card} dirty={dirty} onChange={rerender} onButton={saveButton} onSave={() => saveSection(section)} onCancel={() => { const v = snaps.current.get(section); if (v) { restore(section, v); rerender(); } }} />;
+          })}
+          {isAppearance ? <AppearanceSlot /> : null}
+        </div>
       </div>
-      {isAppearance ? <AppearanceSlot /> : null}
     </div></div></div>
   );
+}
+
+// Volumio's own sections drawn by the theme, as cards: the card's header in place of theirs. The network's two
+// status tiles are cards themselves and go without a frame.
+const CORE_CARDS: Record<string, { label: string; icon: string }> = {
+  'system-version': { label: 'System version', icon: 'info' },
+  'my-music': { label: 'My Music', icon: 'library_music' },
+  'my-music-plugin-enabler': { label: 'Functionalities', icon: 'toggle_on' },
+  'network-drives': { label: 'Network drives', icon: 'lan' },
+  wifi: { label: 'Wireless networks', icon: 'wifi' },
+  'ui-settings': { label: 'Theme settings', icon: 'brush' },
+  'firmware-upload': { label: 'Update firmware via file', icon: 'upload' },
+};
+
+// a plugin's help (FusionDsp's "Help" button, a link out): the page header carries it, not a row
+function helpItem(obj: any): any {
+  for (const s of (obj && obj.sections) || []) {
+    if (s.hidden) { continue; }
+    const f = (s.content || []).find((c: any) => c && c.id === 'help' && c.element === 'button' && c.onClick && c.onClick.type === 'openUrl' && !c.hidden);
+    if (f) { return f; }
+  }
+  return null;
 }

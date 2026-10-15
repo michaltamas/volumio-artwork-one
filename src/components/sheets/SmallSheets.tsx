@@ -1,6 +1,7 @@
 /** Volumio's small modals in the theme's dress: confirm, got it, password, the plugin installer, the updater, the NAS password. */
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import Spinner from '../Spinner';
 import Icon from '../Icon';
 import { on, emit } from '../../core/socket';
 import { useModal } from '../../core/store/modal';
@@ -126,6 +127,12 @@ export function UpdaterSheet() {
     <>
       <div className="modal-header"><h3 className="modal-title"><i className="fa fa-refresh"><Icon name="refresh" /></i> {data.title}</h3></div>
       <div className="modal-body">
+        {data.status === 'updateWait' ? (
+          <div className="aw-upd-wait">
+            {!data.timedOut ? <Spinner size={18} /> : null}
+            <span>{data.timedOut ? 'The updater did not answer. Check again later — playback is not affected.' : String(data.description || '')}</span>
+          </div>
+        ) : null}
         {data.status === 'updateReady' ? <span dangerouslySetInnerHTML={{ __html: String(data.description || '') }} /> : null}
         {data.status === 'updateProgress' ? (
           <div>
@@ -137,12 +144,17 @@ export function UpdaterSheet() {
         {data.status === 'updateDone' ? <h3>{done.message}</h3> : null}
       </div>
       <div className="modal-footer">
+        {data.status === 'updateWait' ? <button type="button" className="btn btn-default" onClick={close}>Close</button> : null}
         {data.status === 'updateReady' ? (ready.updateavailable
           ? <><button type="button" className="btn btn-warning" onClick={close}>Cancel</button> <button type="button" className="btn btn-primary" onClick={update}>Update now</button></>
           : <button type="button" className="btn btn-primary" onClick={close}>OK</button>) : null}
         {data.status === 'updateDone' ? (done.status === 'success'
           ? <button type="button" className="btn btn-primary" onClick={() => { emit('reboot'); close(); }}>Restart system</button>
           : (done.status === 'error' ? <button type="button" className="btn btn-primary" onClick={close}>OK</button> : null)) : null}
+        {/* never a dialog without a way out (a TV with a remote got stuck on it): while the update downloads, or when its
+            end says neither success nor error, Hide closes the window — the player keeps going and reopens it on its next message */}
+        {data.status === 'updateProgress' || (data.status === 'updateDone' && done.status !== 'success' && done.status !== 'error') || (data.status !== 'updateWait' && data.status !== 'updateReady' && data.status !== 'updateProgress' && data.status !== 'updateDone')
+          ? <button type="button" className="btn btn-default" onClick={close}>Hide</button> : null}
       </div>
     </>
   );

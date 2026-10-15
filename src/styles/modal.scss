@@ -46,3 +46,6 @@ body#artwork .aw-sheet--power {
     &:hover { background: var(--fill-06); color: var(--ink); } }
 }
 @media (max-width: 700px) and (orientation: portrait) { body#artwork .modal-dialog { max-width: calc(100vw - 24px); } }
+
+/* the updater's wait: a spinner beside "Please wait" */
+body#artwork .aw-upd-wait { display: flex; align-items: center; gap: 12px; color: var(--ink-2); }

@@ -33,7 +33,14 @@ on('modalDone', (d: any) => { if (progressing()) { useModal.setState({ data: { .
 // Volumio's updater, as its own interfaces show it: "Checking for updates" (updateWaitMsg), the answer
 // (updateReady: a new version to install, or "already on the latest"), then the download (updateProgress)
 // and the end (updateDone) in the same dialog. Settings → System → Check Updates, and the player's own check.
-on('updateWaitMsg', (d: any) => useModal.getState().open('updater', { ...(d || {}), status: 'updateReady', ready: d || {} }));
+// "Checking for updates": a wait, not an answer — its own state, with Close. The player answers with updateReady;
+// when it never does (the updater daemon is busy or down), the window says so after a minute instead of waiting forever.
+let waitTimer = 0;
+on('updateWaitMsg', (d: any) => {
+  useModal.getState().open('updater', { ...(d || {}), status: 'updateWait' });
+  window.clearTimeout(waitTimer);
+  waitTimer = window.setTimeout(() => { const m = useModal.getState(); if (m.name === 'updater' && m.data && m.data.status === 'updateWait') { useModal.setState({ data: { ...m.data, timedOut: true } }); } }, 60000);
+});
 on('updateReady', (d: any) => useModal.getState().open('updater', { ...(d || {}), status: 'updateReady', ready: d || {} }));
 const updating = () => { const m = useModal.getState(); return m.name === 'updater' && m.data && m.data.status; };
 on('updateProgress', (d: any) => { if (updating()) { useModal.setState({ data: { ...useModal.getState().data, status: 'updateProgress', progressInfo: d || {} } }); } });

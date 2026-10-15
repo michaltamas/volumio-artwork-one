@@ -13,7 +13,6 @@ export default function Transport({ compact }: { compact?: boolean }) {
   const prev = <button key="prev" type="button" id="prev-button" className="btn btn-link" onClick={p.prev} title="Previous track" disabled={disabled}><Icon name="skip_previous" /></button>;
   const play = <button key="play" type="button" className={'btn btn-link playPause' + (playing ? ' active' : ' play')} onClick={p.togglePlay} title={playing ? 'Pause' : 'Play'} disabled={disabled}><Icon name={playing ? (st.trackType === 'webradio' ? 'stop' : 'pause') : 'play_arrow'} /></button>;
   const next = <button key="next" type="button" id="next-button" className="btn btn-link" onClick={p.next} title="Next track" disabled={disabled}><Icon name="skip_next" /></button>;
-  // the mini player reads shuffle · prev · play · next · repeat; Now Playing repeat · prev · play · next · shuffle
-  const order = compact ? [shuffle, prev, play, next, repeat] : [repeat, prev, play, next, shuffle];
-  return <div id="playerButtons" className={compact ? 'footer-control' : 'mobile-playback'}>{order}</div>;
+  // one order in both bars (handoff 16D): shuffle · prev · play · next · repeat
+  return <div id="playerButtons" className={compact ? 'footer-control' : 'mobile-playback'}>{[shuffle, prev, play, next, repeat]}</div>;
 }

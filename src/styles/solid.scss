@@ -1,0 +1,28 @@
+/* Transparency off (core/transparency.ts sets data-aw-solid on the root): no surface blurs what is under it.
+   The bars, panels and menus draw nearly solid instead, the page head darkens the top with a plain gradient,
+   and the blurred cover behind everything stays (it is drawn once per track, not on every scroll frame). */
+:root[data-aw-solid] *, :root[data-aw-solid] *::before, :root[data-aw-solid] *::after { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+:root[data-aw-solid] .aw-head .aw-hblur { display: none; }
+
+@mixin aw-solid-dark {
+  --glass-1-fill: rgba(11, 13, 16, .94); --rail-fill: rgba(11, 13, 16, .94);
+  --bar-fill: rgba(11, 13, 16, .94); --bar-veil: rgba(11, 13, 16, .94);
+  --panel-fill: rgba(16, 18, 21, .98); --panel-dock: rgba(14, 16, 19, .97); --panel-dock-top: rgba(14, 16, 19, .9);
+  --panel-sheet: rgba(16, 18, 21, .99); --panel-deep: rgba(10, 12, 14, .98);
+  --menu-fill: #22252a; --glass-3-fill: rgba(16, 18, 21, .97);
+  --scrim-page: rgba(5, 6, 8, .62);
+  --head-tint-1: rgba(8, 10, 12, .97); --head-tint-2: rgba(8, 10, 12, .84);
+}
+@mixin aw-solid-light {
+  --glass-1-fill: rgba(250, 248, 245, .95); --rail-fill: rgba(250, 248, 245, .95);
+  --bar-fill: rgba(250, 248, 245, .95); --bar-veil: rgba(250, 248, 245, .95);
+  --panel-fill: rgba(252, 251, 249, .99); --panel-dock: rgba(252, 251, 249, .98); --panel-dock-top: rgba(252, 251, 249, .92);
+  --panel-sheet: rgba(252, 251, 249, .995); --panel-deep: rgba(252, 251, 249, .99);
+  --menu-fill: #fcfbf9; --glass-3-fill: rgba(252, 251, 249, .98);
+  --scrim-page: rgba(24, 20, 14, .36);
+  --head-tint-1: rgba(250, 248, 245, .98); --head-tint-2: rgba(250, 248, 245, .88);
+}
+:root[data-aw-solid] { @include aw-solid-dark; }
+/* the light theme's own values first, then the solid ones over them (same keys, higher specificity) */
+:root[data-aw-solid][data-aw-theme="light"] { @include aw-solid-light; }
+@media (prefers-color-scheme: light) { :root[data-aw-solid][data-aw-theme="system"] { @include aw-solid-light; } }

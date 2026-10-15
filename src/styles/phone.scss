@@ -2,14 +2,14 @@
    stacks the cover over the text with tiles under it and a transport bar along the bottom. The
    theme's rules, one to one; the notch and the home indicator pad the bars, never the art. */
 @media (max-width: 700px) and (orientation: portrait) {
-  :root { --rail-w: 0px; --sa-t: env(safe-area-inset-top, 0px); --sa-b: env(safe-area-inset-bottom, 0px); --mini-h: calc(80px + var(--sa-b)); --pad-screen: 20px; --pad-top: calc(14px + var(--sa-t)); --phone-top: calc(22px + var(--sa-t)); }
+  :root { --rail-w: 0px; --mini-h: calc(80px + var(--sa-b)); --pad-screen: 20px; --pad-top: calc(14px + var(--sa-t)); --phone-top: calc(22px + var(--sa-t)); }
   html, body#artwork { background: var(--ground); }
   body#artwork { background-color: var(--aw-band, var(--ground)) !important; background-image: none !important; }
   /* the page's top edge in the mini player's colour: solid over the safe area, fading into the art.
      Currently inert: the frame's clearfix makes this pseudo a zero-width table, so it never
      paints — status-bar tinting is handled by the `theme-color` meta tag instead (palette.ts). */
-  body#artwork #layout-container::before { content: ''; display: table; position: fixed; top: 0; left: 0; right: 0; height: calc(env(safe-area-inset-top, 0px) + 52px); z-index: 2; pointer-events: none;
-    background: linear-gradient(to bottom, var(--aw-band, var(--ground)) 0, var(--aw-band, var(--ground)) calc(env(safe-area-inset-top, 0px) + 8px), transparent 100%); }
+  body#artwork #layout-container::before { content: ''; display: table; position: fixed; top: 0; left: 0; right: 0; height: calc(var(--sa-t) + 52px); z-index: 2; pointer-events: none;
+    background: linear-gradient(to bottom, var(--aw-band, var(--ground)) 0, var(--aw-band, var(--ground)) calc(var(--sa-t) + 8px), transparent 100%); }
   /* the document itself never scrolls: the screens scroll inside, so Safari keeps its bars still.
      Neither vh unit is right for both browsing modes on iOS: a regular Safari TAB needs `dvh`
      (its address bar shows/hides, and static `vh` — sized for the chrome-hidden case — then
@@ -32,15 +32,16 @@
   body#artwork #footer-content { left: 0; height: calc(80px + var(--sa-b)); padding: 0 16px var(--sa-b); background: var(--bar-fill); -webkit-backdrop-filter: blur(40px) saturate(1.15); backdrop-filter: blur(40px) saturate(1.15); border-top-color: var(--fill-09); }
   body#artwork #footer-content .artwork-mini { grid-template-columns: minmax(0, 1fr) auto auto; grid-template-rows: auto; column-gap: 12px; align-content: center; }
   body#artwork #footer-content .mini-identity { grid-column: 1; grid-row: 1; }
-  body#artwork #footer-content .mini-transport { grid-column: 2; grid-row: 1; }
+  body#artwork #footer-content .mini-center { grid-column: 2; grid-row: 1; }
   body#artwork #footer-content .mini-right { grid-column: 3; grid-row: 1; gap: 14px; }
-  body#artwork #footer-content .mini-queue, body#artwork #footer-content .mini-seek, body#artwork #footer-content .mini-volume,
+  body#artwork #footer-content .tb-pill--queue, body#artwork #footer-content .mini-seek, body#artwork #footer-content .mini-volume, body#artwork #footer-content .mini-fav,
   body#artwork #footer-content .mini-transport .repeat-button, body#artwork #footer-content .mini-transport .player-action-shuffle, body#artwork #footer-content .mini-transport #prev-button { display: none; }
   body#artwork #footer-content .mini-transport #playerButtons { gap: 14px; }
   body#artwork #footer-content .mini-transport .playPause { width: 44px; height: 44px; .material-symbols-rounded { font-size: 26px; } }
   body#artwork #footer-content .mini-transport .btn-link .material-symbols-rounded { font-size: 26px; }
-  body#artwork #footer-content .mini-zone { padding: 0; height: auto; background: transparent; border: 0; .material-symbols-rounded { font-size: 24px; color: var(--ink-3); } .mini-zone-name { display: none; } }
-  body#artwork #footer-content #trackInfo-compact { grid-template-columns: 52px 1fr; column-gap: 12px; --mini-rows: 18px 16px 15px; --mini-line-gap: 2px; height: auto; min-height: 52px; }
+  body#artwork #footer-content .tb-pill--output { padding: 0; height: auto; background: transparent; border: 0; .material-symbols-rounded { font-size: 24px; color: var(--ink-3); } .tb-pill__name { display: none; } }
+  body#artwork #footer-content #trackInfo-compact { grid-template-columns: 52px 1fr; column-gap: 12px; row-gap: 2px; height: auto; min-height: 52px; }
+  body#artwork #footer-content .mini-byline { flex-direction: column; align-items: flex-start; gap: 2px; }   /* the phone keeps its three lines: title, artist, the quality */
   body#artwork #footer-content .trackInfo-album-art-wrapper { width: 52px; height: 52px; }
   body#artwork #footer-content img.album-art { width: 52px; height: 52px; border-radius: 5px; }
   body#artwork #footer-content #trackInfo-title { font-size: 14px; font-weight: 600; line-height: 1.3; }
@@ -99,10 +100,13 @@
   body#artwork #np #np-seek .artwork-seek__hit { width: 100%; height: 56px; }
   body#artwork #np #np-seek .seek-track { height: 6px; border-radius: 3px; background: rgba(255, 255, 255, .15); box-shadow: inset 0 1px 2px rgba(0, 0, 0, .4); }
   body#artwork #np #np-seek .seek-handle { width: 22px; height: 22px; margin: -11px 0 0 -11px; box-shadow: 0 0 0 4px rgba(255, 255, 255, .15), 0 0 16px rgba(255, 255, 255, .42), 0 2px 7px var(--shadow-soft); }
-  body#artwork #np #np-seek .artwork-seek { grid-template-columns: 1fr auto; grid-template-areas: "track track" "elapsed remaining"; row-gap: 2px; }
+  body#artwork #np #np-seek .artwork-seek { grid-template-columns: 1fr auto; grid-template-areas: "track track" "elapsed remaining"; row-gap: 2px; column-gap: 0; }
+  body#artwork #np #np-seek .artwork-seek__hit { grid-area: track; }
+  body#artwork #np #np-seek .seek-elapsed { grid-area: elapsed; justify-self: start; }
+  body#artwork #np #np-seek .seek-remaining { grid-area: remaining; }
   body#artwork #np #np-seek .seek-time { font-size: 11px; }
   body#artwork #np #np-seek .seek-elapsed { color: var(--ink); }
-  body#artwork #np #np-seek .seek-remaining { justify-self: end; }
+  body#artwork #np #np-seek .seek-remaining { display: block; justify-self: end; }   /* the phone shows the time remaining always */
   body#artwork #np #np-seek .seek-duration { display: none; }
   body#artwork #np #np-footer-row { display: none; }
   body#artwork #np .np-m-bar { display: flex; align-items: center; justify-content: space-between; height: calc(88px + var(--sa-b)); margin: 0 -20px; padding: 0 26px var(--sa-b); flex: none;
@@ -112,7 +116,7 @@
   body#artwork #np .np-m-bar__btn--skip:disabled, body#artwork #np .np-m-bar__play:disabled { opacity: .35; cursor: default; }   /* an outside source drives the player */
   body#artwork #np .np-m-bar__play { width: 66px; height: 66px; border-radius: 50%; border: 0; background: var(--ink); color: var(--on-ink); display: grid; place-items: center; cursor: pointer; .material-symbols-rounded { font-size: 36px; } }
   body#artwork #content.playback { padding-bottom: 0; }
-  body#artwork #np .np-seg, body#artwork #np .np-library { display: none; }
+  body#artwork #np .np-tabrow { display: none; }   /* the face switch and the heart: the phone has its tiles */
   body#artwork #np .np-m-tile--lyrics:disabled { opacity: .35; }
   /* --- the words on the phone (6b): a panel that rises over what plays; its handle drags it away --- */
   body#artwork #np .np-lyrics-host { display: none; }
@@ -185,7 +189,6 @@
   body#artwork .aw-queue__sechead { padding: 22px 20px 0; > .mono { font-size: 10px; color: var(--ink-45); } .aw-queue__hint { display: inline; font-size: 12px; } }
   body#artwork .aw-queue__scroll { padding: 10px 20px calc(var(--mini-h) + 12px); }
   body#artwork .aw-queue__row { height: 64px; gap: 13px; padding: 0 12px; border-radius: 12px; }
-  body#artwork .aw-queue__drag { font-size: 19px; }
   body#artwork .aw-queue__slot { width: 20px; }
   body#artwork .aw-queue__num { font-size: 12px; color: var(--ink-dim); }
   body#artwork .aw-queue__cover { width: 40px; height: 40px; }
@@ -299,27 +302,34 @@
   body#artwork #pluginWrapper { padding-top: var(--phone-top); }
   body#artwork #pluginWrapper .boxHeader .title h2 { min-height: 44px; }
   /* --- Settings: grouped list on the landing; plugin pages full width with their own back --- */
-  body#artwork #contentWrapper.aw-settings-shell, body#artwork #contentWrapper.aw-settings-shell.aw-settings-shell--noside { grid-template-columns: 1fr; grid-template-rows: minmax(0, 1fr); }
+  body#artwork #contentWrapper.aw-settings-shell { grid-template-columns: 1fr; grid-template-rows: minmax(0, 1fr); }
   body#artwork #contentWrapper.aw-settings-shell .aw-snav { display: none; }
   body#artwork #contentWrapper.aw-settings-shell > .aw-settings-side { display: none; }
   body#artwork #contentWrapper.aw-settings-shell .aw-settings-nav { display: block; min-height: 0; overflow-y: auto; }
   body#artwork #contentWrapper.aw-settings-shell .aw-mnav { display: block; padding: var(--phone-top) 20px calc(var(--mini-h) + 20px); color: var(--ink-1); }
   body#artwork #contentWrapper.aw-settings-shell .aw-mnav ~ * { display: none; }
   body#artwork #contentWrapper.aw-settings-shell.aw-state-volumio-settings > #content { display: none; }
-  body#artwork .aw-mnav__head { display: flex; align-items: flex-start; gap: 12px; margin-top: 0; min-height: 44px; }
-  body#artwork .aw-mnav__back { height: 44px; width: 32px; align-self: flex-start; margin-top: 0; border: 0; background: transparent; padding: 0; color: var(--ink-2); display: grid; place-items: center; cursor: pointer; .material-symbols-rounded { font-size: 24px; } }
-  body#artwork .aw-mnav__titles { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; line-height: normal; }
-  body#artwork .aw-mnav__title { font-size: 24px; font-weight: 800; letter-spacing: -.02em; color: var(--ink); }
-  body#artwork .aw-mnav__sub { font-size: 10px; letter-spacing: .1em; color: var(--ink-45); }
-  body#artwork .aw-mnav__eyebrow { font-size: 10px; letter-spacing: .18em; color: var(--ink-45); padding: 14px 2px 8px; line-height: normal; }
-  body#artwork .aw-mnav__card { border-radius: 14px; overflow: hidden; background: var(--fill-05); border: 1px solid var(--fill-10); }
-  body#artwork .aw-mnav__row { display: flex; align-items: center; gap: 13px; height: 52px; padding: 0 14px; border-bottom: 1px solid var(--fill-06); cursor: pointer; text-decoration: none; color: var(--ink-2);
+  /* the landing (15E): the title, the search, the sections in one card; Help and the shop as links under it */
+  body#artwork .aw-mnav__title { padding: 10px 2px 0; font-size: 32px; font-weight: 800; letter-spacing: -.025em; line-height: normal; color: var(--ink); }
+  body#artwork .aw-sfield--landing { height: 48px; margin: 16px 2px 0; padding: 0 14px; gap: 10px;
+    > .material-symbols-rounded { font-size: 20px; } input { font-size: 15px; } .aw-sfield__key { display: none; } }
+  /* the card, the results and the links under them line up with the search field: 22px from the screen's edge */
+  body#artwork .aw-mnav__card { margin: 16px 2px 0; padding: 4px 0; border-radius: 16px; overflow: hidden; background: var(--sc-fill); border: 1px solid var(--sc-line); }
+  body#artwork .aw-mnav__row { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto 22px; gap: 14px; align-items: center; height: 52px; padding: 0 16px; border-bottom: 1px solid var(--sc-row-line); cursor: pointer; text-decoration: none; color: var(--ink);
     &:last-child { border-bottom: 0; } &:hover { background: var(--fill-05); color: var(--ink); }
-    > .material-symbols-rounded:first-child { font-size: 22px; color: var(--ink-3); width: 22px; } }
-  body#artwork .aw-mnav__label { flex: 1; min-width: 0; font-size: 15px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  body#artwork .aw-mnav__value { font-size: 11px; color: var(--ink-55); }
-  body#artwork .aw-mnav__chev { font-size: 20px; color: var(--ink-faint); }
+    > .material-symbols-rounded:first-child { font-size: 21px; color: var(--ink-3); } }
+  body#artwork .aw-mnav__label { grid-column: 2; min-width: 0; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  body#artwork .aw-mnav__value { grid-column: 3; font-size: 13px; color: var(--ink-muted); white-space: nowrap; max-width: 140px; overflow: hidden; text-overflow: ellipsis;
+    &.mono { font-size: 11px; }
+    &--warn { display: flex; align-items: center; gap: 6px; font-size: 10px !important; letter-spacing: .1em; color: var(--sc-unsaved); i { width: 5px; height: 5px; background: var(--sc-unsaved); } } }
+  body#artwork .aw-mnav__chev { grid-column: 4; font-size: 22px; color: var(--ink-dim); }
+  body#artwork .aw-mnav__foot { display: flex; gap: 22px; padding: 18px 2px 0; }
+  body#artwork .aw-mnav__link { display: inline-flex; align-items: center; gap: 4px; font-size: 14px; color: var(--ink-muted); cursor: pointer; text-decoration: none; .material-symbols-rounded { font-size: 15px; } &:hover { color: var(--ink); } }
+  /* the results on the phone: under the field, the card 14px from the screen's edge */
+  body#artwork .aw-mnav .aw-sres { margin-top: 22px;
+    .aw-sres__title { font-size: 24px; line-height: normal; } .aw-sres__list { margin: 14px 2px 0; padding: 4px 6px; } }
   body#artwork #pluginWrapper { padding: var(--phone-top) 20px calc(var(--mini-h) + 20px); }
+  body#artwork #contentWrapper.aw-settings-shell .aw-mnav .aw-sfield { display: flex; }
   body#artwork #pluginWrapper .boxHeader .title h2 { display: flex; align-items: center; gap: 12px; font-size: 24px; letter-spacing: -.02em; line-height: normal; }
   body#artwork #pluginWrapper .boxHeader .title h2 a.btn { display: grid; place-items: center; width: auto; height: auto; padding: 0; margin: 0; background: transparent; border: 0; box-shadow: none; color: var(--ink-2); flex: none;
     /* the glyph box as the frame draws it: a block of 24px text, the symbol inline in it */

@@ -26,7 +26,7 @@ body#artwork #toast-container {
 }
 body#artwork #toast-container > .toast { width: min(394px, calc(100vw - 24px)); }
 @media (max-width: 480px) {
-  html body#artwork #toast-container { left: 12px !important; right: 12px !important; top: calc(12px + env(safe-area-inset-top, 0px)) !important; align-items: stretch; }
+  html body#artwork #toast-container { left: 12px !important; right: 12px !important; top: calc(12px + var(--sa-t)) !important; align-items: stretch; }
   html body#artwork #toast-container > .toast { width: auto !important; }
   body#artwork #toast-container > .toast .toast-message, body#artwork #toast-container > .toast .toast-title { overflow-wrap: anywhere; word-break: break-word; }
 }

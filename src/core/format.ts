@@ -98,3 +98,16 @@ export function runtime(seconds: number): string {
   const h = Math.floor(m / 60), r = m % 60;
   return h ? (r ? `${h} H ${r} MIN` : `${h} H`) : `${m} MIN`;
 }
+
+/** Volumio's build date ("Mon Oct 12 13:56:12 UTC 2026") as the day it names: "12 OCT 2026"; anything else as it came */
+export function buildDay(s?: string | null): string {
+  const t = String(s || '').trim();
+  const m = t.match(/^\w{3}\s+(\w{3})\s+(\d{1,2})\s+[\d:]+\s+\S+\s+(\d{4})$/);
+  return m ? `${m[2]} ${m[1].toUpperCase()} ${m[3]}` : t;
+}
+
+/** a title as a display shows it: a library file named "8 - Shelter" without the track number it carries in its name */
+export function shownTitle(st: PlayerState): string {
+  const t = String(st.title || '');
+  return String(st.service || '') === 'mpd' ? t.replace(/^\d{1,3}\s*[-–.]\s+(?=\S)/, '') : t;
+}

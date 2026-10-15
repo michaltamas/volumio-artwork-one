@@ -133,3 +133,10 @@ test('first start after an installation switches the player to Artwork One, once
   const d = await fresh(JSON.stringify({ theme: { type: 'string', value: 'light' } }));
   assert.equal(d.switched, false);
 });
+
+test('ambient settings keep the remote and transparency options: a boolean kept, anything else dropped', () => {
+  const { ctx } = fakeVolumio();
+  const p = new Plugin(ctx);
+  assert.deepEqual(p.cleanAmbient({ keysWake: false, hideVolume: true, transparency: false }), { keysWake: false, hideVolume: true, transparency: false });
+  assert.deepEqual(p.cleanAmbient({ keysWake: 'no', on: true }), { on: true });
+});

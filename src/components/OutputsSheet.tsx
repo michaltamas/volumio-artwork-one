@@ -3,7 +3,8 @@
  * grouping view. A panel on the right on wide screens, a bottom sheet on the phone whose handle
  * drags it away. The markup keeps Volumio's own names so the theme's dress applies.
  */
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Icon from './Icon';
 import { useUi } from '../core/store/ui';
 import { useOutputs, type Output } from '../core/store/outputs';
@@ -13,6 +14,8 @@ import { useSheetDrag } from '../core/useSheetDrag';
 import { HOST } from '../core/socket';
 import { useLocalPlayback } from '../core/localPlayback';
 import { LocalPlaybackStatus, LocalPlaybackSwitch } from './LocalPlaybackControl';
+import { useDsp, DSP_PAGE } from '../core/store/dsp';
+import { Select } from './settings/controls';
 
 function DeviceVolume({ o }: { o: Output }) {
   const selfVolume = usePlayer(s => s.state.volume);
@@ -48,6 +51,29 @@ function Song({ o }: { o: Output }) {
 }
 
 // another player: the interface follows it there
+/** FusionDsp's quick controls (as Manifest and Nova have them here): effects on/off, the preset, and its page. */
+function DspControls({ onOpenPage }: { onOpenPage: () => void }) {
+  const dsp = useDsp();
+  if (!dsp.available || dsp.active === null) { return null; }
+  return (
+    <div className="aw-dsp">
+      <div className="outputs__subtitle small link">DSP</div>
+      <div className="outputs__device device aw-dsp__row">
+        <div className="aw-local__icon"><Icon name="tune" /></div>
+        <div className="device__info">
+          <div className="device__title"><div className="device__title__text">Fusion DSP</div></div>
+          <div className="aw-local__hint">{dsp.switchOff ? 'Set in the plugin' : dsp.active ? 'Effects on' : 'Effects off'}</div>
+        </div>
+        <button type="button" className="aw-dsp__page" onClick={onOpenPage} title="DSP settings" aria-label="DSP settings"><Icon name="settings" /></button>
+        {!dsp.switchOff ? <button type="button" className={'aw-switch' + (dsp.active ? ' on' : '')} role="switch" aria-checked={!!dsp.active} aria-label="DSP effects" onClick={() => dsp.toggle()}><span className="aw-switch__knob" /></button> : null}
+      </div>
+      {!dsp.presetsOff && dsp.presets.length ? (
+        <Select className="aw-dsp__preset" label="DSP preset" placeholder="Preset" value={dsp.preset ? dsp.preset.value : null} options={dsp.presets.map(p => p.value)} onChange={(o) => { const p = dsp.presets.find(x => x.value === o); if (p) { dsp.choose(p); } }} />
+      ) : null}
+    </div>
+  );
+}
+
 function goTo(o: Output) { if (o.host && o.host !== HOST) { window.location.href = o.host; } }
 
 export default function OutputsSheet() {
@@ -60,6 +86,8 @@ export default function OutputsSheet() {
   const panel = useRef<HTMLDivElement>(null);
   const close = () => useUi.getState().toggleOutputs();
   const drag = useSheetDrag(panel, close);
+  const nav = useNavigate();
+  useEffect(() => { if (open) { useDsp.getState().refresh(); } }, [open]);   // FusionDsp installed or not, and its state now
   if (!open) { return null; }
   const o = useOutputs.getState();
   const available = o.available(), enabled = o.enabled(), groupable = o.groupable();
@@ -102,6 +130,7 @@ export default function OutputsSheet() {
                   </div>
                 </div>
               ) : null}
+              <DspControls onOpenPage={() => { close(); nav(DSP_PAGE); }} />
               {groups.length ? (
                 <div>
                   <div className="outputs__subtitle small link">Active group</div>

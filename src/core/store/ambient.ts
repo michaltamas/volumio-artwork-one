@@ -9,8 +9,8 @@ const KEY = 'aw-ambient';
 export const DELAYS = [-1, 1, 2, 5, 10, 0];   // -1: always — the display rests in ambient; a touch shows the interface for a minute
 export const LAYOUTS = ['cover', 'clock', 'bleed'] as const;
 export type DisplayText = 'm' | 'l' | 'xl' | 's';
-export interface AmbientSettings { on: boolean; delay: number; layout: 'cover' | 'clock' | 'bleed'; clock: '12' | '24'; night: boolean; nightFrom: string; nightTo: string; textSize: DisplayText; hideVolume: boolean }
-const DEFAULTS: AmbientSettings = { on: true, delay: 2, layout: 'cover', clock: '24', night: true, nightFrom: '23:00', nightTo: '07:00', textSize: 'm', hideVolume: false };
+export interface AmbientSettings { on: boolean; delay: number; layout: 'cover' | 'clock' | 'bleed'; clock: '12' | '24'; night: boolean; nightFrom: string; nightTo: string; textSize: DisplayText; hideVolume: boolean; keysWake: boolean; transparency: boolean }
+const DEFAULTS: AmbientSettings = { on: true, delay: 2, layout: 'cover', clock: '24', night: true, nightFrom: '23:00', nightTo: '07:00', textSize: 'm', hideVolume: false, keysWake: true, transparency: true };
 const ACTIVITY = ['pointerdown', 'pointermove', 'keydown', 'wheel', 'touchstart'];
 
 interface AmbientStore {
@@ -25,6 +25,8 @@ function clean(saved: any): AmbientSettings {
   if (s.clock !== '12' && s.clock !== '24') { s.clock = DEFAULTS.clock; }
   if (['s', 'm', 'l', 'xl'].indexOf(s.textSize) < 0) { s.textSize = DEFAULTS.textSize; }
   s.hideVolume = s.hideVolume === true;
+  s.keysWake = s.keysWake !== false;
+  s.transparency = s.transparency !== false;
   return s;
 }
 function read(): AmbientSettings { try { return clean(JSON.parse(localStorage.getItem(KEY) || '{}')); } catch { return { ...DEFAULTS }; } }
@@ -58,6 +60,10 @@ export const useAmbient = create<AmbientStore>((set, get) => ({
 
 const onActivity = (e: Event) => {
   const st = useAmbient.getState();
+  // a remote that types (a Flirc or another USB IR receiver, a Bluetooth or USB keyboard) controls playback, not the
+  // screen: with keysWake off its keys neither bring the interface back nor hold the ambient screen off — a touch
+  // or the mouse still does
+  if (e.type === 'keydown' && !st.settings.keysWake) { return; }
   if (st.active) { if (e.type === 'pointermove') { return; } e.preventDefault(); e.stopPropagation(); st.exit(); return; }
   if (e.type === 'pointermove') { const now = Date.now(); if (now - lastMove < 1000) { return; } lastMove = now; }
   arm();
