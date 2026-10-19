@@ -11,7 +11,7 @@ Artwork One began as a theme of [Volumio2-UI](https://github.com/volumio/Volumio
 | Path | What it is |
 |---|---|
 | `public/myvolumio-tos.html` | The MyVolumio terms of use, shown when signing up to MyVolumio |
-| `public/app/assets-common/` | Icons of Volumio's interface (MyVolumio avatar and badge, checkbox ticks, the collapse indicator) |
+| `public/app/assets-common/` | Icons of Volumio's interface (MyVolumio avatar and badge, checkbox ticks, the collapse indicator) and its format icons (`format-icons/`), which the Now Playing plugin loads from the active interface |
 | `public/assets/wifi-icons/` | Volumio's Wi-Fi signal icons |
 | `src/core/myvolumio/firebase.ts` | The public client configuration of Volumio's MyVolumio service, as Volumio's own interface ships it |
 

@@ -6,6 +6,26 @@ All notable changes to this project are documented here. The format is based on
 
 Versions 1.x and 2.x were published in [volumio-artwork-theme](https://github.com/michaltamas/volumio-artwork-theme).
 
+## [3.2.6] - 2026-10-19
+
+### Added
+
+- **Sources in the menu.** Appearance › Menu lists the library's sources with a *Show in menu* switch each — Randomizer, Tidal, Web Radio, Music Library, Albums… — and they appear in the rail and the phone's menu after Home and Music. Drag a row to change their order. Playlists and Favourites stay on unless switched off. The choice is kept on the player, for every screen.
+
+### Changed
+
+- **Searching a Music Library folder** searches the whole library with Volumio's search, as Manifest does, instead of filtering the folder's own rows. Artists, Albums and Genres still filter.
+- **Text size on the display** now applies to the ambient screen too (all three layouts), not only to Now Playing; the large clocks keep their size.
+- **The whole mini player track area** opens Now Playing, the empty space before the controls included.
+- **Phone settings landing** shows the output on Playback Options again, and the connection on Network (Wired, or the Wi-Fi network's name).
+- **The zone name** in the phone's Now Playing top bar sits beside the minimise chevron.
+
+### Fixed
+
+- **A browser's forced dark mode** (Opera's dark web pages, Chrome's auto dark mode) no longer inverts the white controls into dark ones: the theme declares its own colour scheme.
+- **Format icons in the Now Playing plugin.** The plugin loads them from the active interface; Artwork One now ships them.
+- **Menu logos** of streaming services are drawn in the menu's ink at the icons' size, readable in the light theme.
+
 ## [3.2.5] - 2026-10-15
 
 ### Changed
@@ -191,6 +211,10 @@ Artwork One rebuilt from the ground up in React. Same look, same features, a new
 - Built with React and Vite instead of AngularJS: the release is a quarter of the size (1.8 MB instead of 7.8 MB), faster to open, with one stylesheet per part instead of layered theme overrides.
 - The release archive is now `artwork-one.tar.gz`; the installer puts it in the same place as before, so 1.x and 2.x are replaced in place.
 
+[3.2.6]: https://github.com/michaltamas/volumio-artwork-one/releases/tag/v3.2.6
+[3.2.5]: https://github.com/michaltamas/volumio-artwork-one/releases/tag/v3.2.5
+[3.2.4]: https://github.com/michaltamas/volumio-artwork-one/releases/tag/v3.2.4
+[3.2.3]: https://github.com/michaltamas/volumio-artwork-one/releases/tag/v3.2.3
 [3.2.2]: https://github.com/michaltamas/volumio-artwork-one/releases/tag/v3.2.2
 [3.2.1]: https://github.com/michaltamas/volumio-artwork-one/releases/tag/v3.2.1
 [3.2.0]: https://github.com/michaltamas/volumio-artwork-one/releases/tag/v3.2.0
