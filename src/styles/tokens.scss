@@ -1,4 +1,7 @@
 :root {
+  /* the theme draws its own dark and light: a browser's forced dark mode (Opera's, Chrome's "dark web pages") leaves it alone
+     instead of inverting the white controls into dark ones */
+  color-scheme: dark;
   /* the system bars a screen draws under (iPhone notch, Android status and navigation bars): what the browser reports.
      Volumio's Android app is the exception: its WebView reports the phone's bars although the app draws them itself
      above and below it, so there the theme leaves no room for them (core/insets.ts sets the class). */
@@ -172,3 +175,5 @@
   :root[data-aw-theme="system"] { @include aw-light; }
 }
 :root.aw-android-app { --sa-t: 0px; --sa-b: 0px; }
+
+html.aw-is-light { color-scheme: only light; }

@@ -140,3 +140,27 @@ test('ambient settings keep the remote and transparency options: a boolean kept,
   assert.deepEqual(p.cleanAmbient({ keysWake: false, hideVolume: true, transparency: false }), { keysWake: false, hideVolume: true, transparency: false });
   assert.deepEqual(p.cleanAmbient({ keysWake: 'no', on: true }), { on: true });
 });
+
+test('menu: a source shown or hidden in the rail is kept by its uri, a choice merges into the others, anything else is dropped', () => {
+  const { ctx } = fakeVolumio();
+  const p = new Plugin(ctx);
+  p.onVolumioStart();
+  assert.equal(p.snapshot().menu, undefined);
+  p.setSettings({ menu: { randomizer: true, favourites: false, bad: 'yes', '': true } });
+  assert.deepEqual(p.snapshot().menu, { randomizer: true, favourites: false });
+  const r = p.setSettings({ menu: { randomizer: false, tidal: true } });
+  assert.deepEqual(r.payload.menu, { randomizer: false, favourites: false, tidal: true });
+  p.setSettings({ menu: 'nonsense' });
+  assert.deepEqual(p.snapshot().menu, { randomizer: false, favourites: false, tidal: true });
+});
+
+test('menu order: the sources\' uris in the order the menu shows them, each once, anything else dropped', () => {
+  const { ctx } = fakeVolumio();
+  const p = new Plugin(ctx);
+  p.onVolumioStart();
+  assert.equal(p.snapshot().menuOrder, undefined);
+  p.setSettings({ menuOrder: ['tidal', 'playlists', 'tidal', 7, '', 'favourites'] });
+  assert.deepEqual(p.snapshot().menuOrder, ['tidal', 'playlists', 'favourites']);
+  p.setSettings({ menuOrder: 'nonsense' });
+  assert.deepEqual(p.snapshot().menuOrder, ['tidal', 'playlists', 'favourites']);
+});

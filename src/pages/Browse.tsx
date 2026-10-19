@@ -102,6 +102,9 @@ export default function Browse({ dedicated }: { dedicated?: boolean }) {
     // (a user's own lists — My Web Radios, Favorite Radios — are short, and filtered as any list)
     const u = String(r.uri);
     if (u === 'radio' || (u.indexOf('radio/') === 0 && u !== 'radio/myWebRadio' && u !== 'radio/favourites')) { return b.sources.find(s => s.uri === 'radio') || null; }
+    // the music folders are searched too, as Manifest does: Volumio's search goes through the whole library, the subfolders with it
+    // (Artists, Albums and Genres stay filtered: their rows are the whole answer already)
+    if (u === 'music-library' || u.indexOf('music-library/') === 0) { return b.sources.find(s => s.uri === 'music-library') || { name: 'Music Library', uri: 'music-library', plugin_name: 'mpd', plugin_type: 'music_service' }; }
     return streamingOf(b.sources).find(s => (s.plugin_name && (s.plugin_name === r.plugin_name || s.plugin_name === r.service)) || (s.service && s.service === r.service) || (s.uri && String(r.uri) === s.uri) || (s.uri && String(r.uri).indexOf(s.uri + '/') === 0) || (s.uri && String(r.uri).indexOf(s.uri + ':') === 0)) || null;
   }, [request, b.sources]);
   const placeholder = service ? 'Search ' + (service.name || service.title || '') : 'Filter ' + String(listTitle || '').toLowerCase();

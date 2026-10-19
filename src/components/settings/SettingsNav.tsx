@@ -24,6 +24,7 @@ export default function SettingsNav() {
   const items = useMenu(s => s.items);
   const systemInfo = useMenu(s => s.systemInfo);
   const network = useSettings(s => s.network);
+  const alsa = useSettings(s => s.alsa);
   const searching = useSettings(s => !!s.searchQuery.trim());
   const isActive = useSettings(s => s.isActive);
   const inMenu = useSettings(s => s.inMenu);
@@ -51,8 +52,11 @@ export default function SettingsNav() {
   }, [results, items]); // eslint-disable-line react-hooks/exhaustive-deps
   const value = (item: MenuItem): { text: string; mono?: boolean; warn?: boolean } | null => {
     const k = itemKey(item);
-    const net = Array.isArray(network) ? network.find((n: any) => n && n.ssid) : null;
-    if (k === 'network' && net) { return { text: String(net.ssid) }; }
+    // the connection the player is reached by comes first: a cable by its type, Wi-Fi by its network
+    // (a Wi-Fi listed after the cable is the player's own hotspot, not how it is connected)
+    const net = Array.isArray(network) ? network[0] : network;
+    if (k === 'network' && net && (net.ssid || net.type)) { return { text: String(net.type === 'Wireless' && net.ssid ? net.ssid : net.type) }; }
+    if (k === 'playback' && alsa && alsa.output) { return { text: String(alsa.output) }; }
     if (k === 'system' && systemInfo && systemInfo.systemversion) { return { text: String(systemInfo.systemversion), mono: true }; }
     if (k === 'plugins' && updates) { return { text: String(updates), mono: true, warn: true }; }
     return null;

@@ -299,7 +299,7 @@ body#artwork #np.np--empty {
   }
 }
 
-/* Now Playing's text size, a screen's own choice (Appearance → This screen): the meta column scaled, the cover untouched */
+/* Now Playing's text size on the player's own display (Appearance → Text size on the display): the meta column scaled, the cover untouched */
 html[data-aw-text="s"] body#artwork #np .np-title { font-size: calc(var(--np-title) * .85); }
 html[data-aw-text="s"] body#artwork #np .np-artist, html[data-aw-text="s"] body#artwork #np .np-album { font-size: .9em; }
 html[data-aw-text="l"] body#artwork #np .np-title { font-size: calc(var(--np-title) * 1.25); }
@@ -310,7 +310,7 @@ html[data-aw-text="xl"] body#artwork #np .np-artist { font-size: clamp(25px, 2.5
 html[data-aw-text="xl"] body#artwork #np .np-album { font-size: clamp(20px, 1.9vw, 28px); }
 html[data-aw-text="l"] body#artwork #np .np-chip, html[data-aw-text="xl"] body#artwork #np .np-chip { height: 44px; .np-chip-num { font-size: 15px; } .np-chip-unit { font-size: 12px; } }
 html[data-aw-text="l"] body#artwork #np .np-format, html[data-aw-text="xl"] body#artwork #np .np-format, html[data-aw-text="l"] body#artwork #np .np-signalpath, html[data-aw-text="xl"] body#artwork #np .np-signalpath { font-size: 13px; }
-/* the volume control hidden (Appearance → This screen): whoever sets it on the amplifier */
+/* the volume control hidden on the player's own display (Appearance → Hide the volume on the display): whoever sets it on the amplifier */
 html.aw-no-volume body#artwork .np-volume, html.aw-no-volume body#artwork .mini-volume { display: none !important; }
 /* larger text on a low screen: the meta column may not fit the hero's height — it scrolls there, under the seek bar never */
 html[data-aw-text="l"] body#artwork #np #np-meta, html[data-aw-text="xl"] body#artwork #np #np-meta { overflow-y: auto; scrollbar-width: none; }

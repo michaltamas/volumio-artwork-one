@@ -1,6 +1,6 @@
 /**
  * The settings the player keeps for every screen (the Artwork One Companion plugin): the theme,
- * the ambient display, the pins. Asked for when the socket comes up, followed on every push,
+ * the ambient display, the pins, the sources in the menu. Asked for when the socket comes up, followed on every push,
  * written back on change. Without the plugin nothing answers and the browser remembers for itself.
  *
  *   callMethod <plugin> getSettings {}    -> pushArtworkSettings (to us)
@@ -14,12 +14,13 @@ import socket, { on, emit } from '../socket';
 import { useTheme, type ThemeMode } from './theme';
 import { usePins, readPins } from './pins';
 import { useAmbient } from './ambient';
+import { useMenuSources } from './menuSources';
 
 const ENDPOINTS = ['user_interface/artwork_one', 'miscellanea/artwork_companion'];
 let endpoint = ENDPOINTS[0];
 
 export interface AmbientSettings { on: boolean; delay: number; layout: 'cover' | 'clock' | 'bleed'; clock: '12' | '24'; night: boolean; nightFrom: string; nightTo: string }
-interface Settings { version?: number; plugin?: string; theme?: ThemeMode; ambient?: Partial<AmbientSettings>; pins?: any[] }
+interface Settings { version?: number; plugin?: string; theme?: ThemeMode; ambient?: Partial<AmbientSettings>; pins?: any[]; menu?: Record<string, boolean>; menuOrder?: string[] }
 
 interface CompanionStore {
   available: boolean;
@@ -48,6 +49,8 @@ on('pushArtworkSettings', (data: Settings) => {
   const writer = (list: any[]) => useCompanion.getState().set({ pins: list });
   if (Array.isArray(data.pins)) { usePins.getState().adopt(data.pins, writer); }
   else if (!usePins.getState().remote) { usePins.getState().adopt(readPins(), writer); }
+  // the sources in the menu: the player's choices over this browser's (a plugin without the key yet changes nothing here)
+  useMenuSources.getState().adopt(data.menu && typeof data.menu === 'object' ? data.menu : null, data.menuOrder, (patch) => useCompanion.getState().set(patch));
 });
 socket.on('connect', () => useCompanion.getState().ask());
 useCompanion.getState().ask();

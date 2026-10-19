@@ -184,3 +184,12 @@ body#artwork #pluginWrapper .aw-drive { margin-top: 14px;
   &__error { display: flex; align-items: flex-start; gap: 10px; margin: 4px 0 0; padding: 12px 16px; border-radius: 12px; background: var(--err-wash); border: 1px solid var(--err-line); font-size: 14px; color: var(--ink-2); .material-symbols-rounded { font-size: 20px; color: var(--sc-danger); } }
   &__more { margin-right: auto; padding: 0; border: 0; background: transparent; font-family: var(--font-ui); font-size: 14px; color: var(--ink-3); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; &:hover { color: var(--ink); } }
 }
+
+/* Appearance → Menu: the sources' rows dragged into the menu's order by the whole row (core/rowDrag); the grip says so.
+   The row reaches 12px past the card's text column on both sides, so the lifted row's fill has room around its text. */
+body#artwork #pluginWrapper .aw-menu-row { display: flex; align-items: center; gap: 12px; margin: 0 -12px; padding-left: 12px; padding-right: 12px; position: relative; cursor: grab; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; transition: transform .18s ease;
+  .aw-sc-row__text { flex: 1 1 auto; min-width: 0; }
+  .aw-sc-row__control { flex: none; }
+  &.is-dragging { cursor: grabbing; transition: none; z-index: 2; border-radius: 11px; background: var(--fill-10); box-shadow: 0 18px 40px -18px var(--shadow-strong); border-bottom-color: transparent; } }
+body#artwork #pluginWrapper .aw-menu-row__grip { flex: none; margin-left: -4px; font-size: 20px; color: var(--ink-dim); }
+body#artwork #pluginWrapper .aw-menu-rows.is-reordering .aw-menu-row { pointer-events: none; }

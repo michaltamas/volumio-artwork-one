@@ -1,6 +1,6 @@
 /** The rail (spec §5.1): Home, Music, the library's own sources, Now Playing; MyVolumio, zones and
  *  settings below. Icons only, or icons with labels — the toggle at the foot switches, per browser. */
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { goToMyVolumio } from '../core/store/auth';
 import Icon from './Icon';
@@ -9,12 +9,15 @@ import { usePlayer } from '../core/store/player';
 import { useBrowse } from '../core/store/browse';
 import { useMenu } from '../core/store/menu';
 import { useUi } from '../core/store/ui';
+import { useMenuSources, menuSources } from '../core/store/menuSources';
+import SourceGlyph from './SourceGlyph';
+import type { BrowseItem } from '../core/store/browse';
 
-function Item({ icon, label, active, open, onClick }: { icon: string; label: string; active: boolean; open: boolean; onClick: () => void }) {
+function Item({ icon, mark, label, active, open, onClick }: { icon?: string; mark?: React.ReactNode; label: string; active: boolean; open: boolean; onClick: () => void }) {
   return (
     <li>
       <a onClick={onClick} aria-label={label} title={open ? undefined : label} className={active ? 'active' : ''}>
-        <Icon name={icon} /><span className="rail__label">{label}</span>
+        {mark || <Icon name={icon || 'circle'} />}<span className="rail__label">{label}</span>
       </a>
     </li>
   );
@@ -26,15 +29,16 @@ export default function Rail() {
   const sources = useBrowse(s => s.sources);
   const current = useBrowse(s => s.currentUri);
   const myVolumio = useMenu(s => s.hasMyVolumio());
+  useMenuSources(s => s.choices); useMenuSources(s => s.order);   // a switch in Appearance redraws the rail
+  const inMenu = menuSources(sources, useMenuSources.getState().shown, useMenuSources.getState().order);
   const open = useUi(s => s.railOpen);
   // Volumio's own message while it indexes points here: "the icon on bottom left will keep spinning"
   const scanning = usePlayer(s => !!s.state.updatedb);
   // the whole layout (head, page, mini player) follows the rail's width through --rail-w
   useEffect(() => { document.documentElement.classList.toggle('aw-rail-open', open); }, [open]);
   const at = (p: string) => loc.pathname === p;
-  const source = (uri: string) => sources.find(s => s.uri === uri) || null;
   const sourceActive = (uri: string) => at('/browse') && current === uri;
-  const goSource = (uri: string) => { const s = source(uri); if (s) { useBrowse.getState().open(s, true); nav('/browse'); } };
+  const goSource = (s: BrowseItem) => { useBrowse.getState().open(s, true); nav('/browse'); };
   const goMusic = () => { useBrowse.getState().home(); nav('/browse'); };
   return (
     <div id="main-menu">
@@ -44,9 +48,9 @@ export default function Rail() {
       </div>
       <ul className="main-menu-list">
         <Item icon="home" label="Home" open={open} active={at('/home')} onClick={() => nav('/home')} />
-        <Item icon="album" label="Music" open={open} active={at('/browse') && !sourceActive('playlists') && !sourceActive('favourites')} onClick={goMusic} />
-        {source('playlists') && <Item icon="playlist_play" label="Playlists" open={open} active={sourceActive('playlists')} onClick={() => goSource('playlists')} />}
-        {source('favourites') && <Item icon="favorite" label="Favourites" open={open} active={sourceActive('favourites')} onClick={() => goSource('favourites')} />}
+        <Item icon="album" label="Music" open={open} active={at('/browse') && !inMenu.some(s => sourceActive(s.uri))} onClick={goMusic} />
+        {/* the library's sources switched on in Appearance → Menu (Playlists and Favourites unless switched off) */}
+        {inMenu.map(s => <Item key={s.uri} mark={<SourceGlyph source={s} />} label={String(s.name || s.title || s.uri)} open={open} active={sourceActive(s.uri)} onClick={() => goSource(s)} />)}
         <Item icon="graphic_eq" label="Now Playing" open={open} active={at('/playback')} onClick={() => nav('/playback')} />
       </ul>
       <ul className="main-menu-bottom">

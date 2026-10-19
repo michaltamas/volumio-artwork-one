@@ -56,3 +56,12 @@
 /* the library is being indexed (Volumio's message points at "the icon on bottom left"): a spinning ring above Zones */
 body#artwork #main-menu .rail__scan a { color: var(--ink-1); }
 body#artwork #main-menu .rail__scan-icon { display: grid; place-items: center; width: 23px; height: 23px; justify-self: center; }
+
+/* a plugin's source in the menu (Appearance → Menu): its logo as a mask in the glyphs' ink (SourceGlyph trims its margin),
+   fitted into the glyph's own box — a material glyph draws in about 20 of its 24 px */
+body#artwork .aw-src-mark { display: block; flex: none; justify-self: center; width: clamp(20px, 1.6vw, 23px); height: clamp(20px, 1.6vw, 23px); background: currentColor;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position: center;
+  -webkit-mask-size: contain; mask-size: contain; transform: scale(.84);
+  &.is-untrimmed { transform: scale(1.5); } }   /* the logo's own margin, until it is trimmed */
+body#artwork .aw-mm__item .aw-src-mark { width: 23px; height: 23px; color: var(--ink-3); }
+body#artwork .aw-mm__item.active .aw-src-mark { color: var(--ink); }

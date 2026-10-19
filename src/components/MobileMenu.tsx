@@ -11,6 +11,8 @@ import { useMultiroom } from '../core/store/multiroom';
 import { useSignal } from '../core/store/signal';
 import { useMenu } from '../core/store/menu';
 import { useModal } from '../core/store/modal';
+import { useMenuSources, menuSources } from '../core/store/menuSources';
+import SourceGlyph from './SourceGlyph';
 
 export default function MobileMenu() {
   const open = useUi(s => s.menuOpen);
@@ -18,6 +20,8 @@ export default function MobileMenu() {
   const loc = useLocation();
   const sources = useBrowse(s => s.sources);
   const current = useBrowse(s => s.currentUri);
+  useMenuSources(s => s.choices); useMenuSources(s => s.order);   // a switch in Appearance redraws the menu
+  const inMenu = menuSources(sources, useMenuSources.getState().shown, useMenuSources.getState().order);
   const zone = useMultiroom(s => s.zones.find(z => z.isSelf)?.name || '');
   const output = useSignal(s => s.output);
   const shutdown = useMenu(s => s.byKey('shutdown'));
@@ -32,7 +36,6 @@ export default function MobileMenu() {
   const scanning = usePlayer(s => !!s.state.updatedb);
   const go = (p: string) => { hide(); nav(p); };
   const at = (p: string) => loc.pathname === p;
-  const source = (uri: string) => sources.find(s => s.uri === uri) || null;
   const isSource = (uri: string) => at('/browse') && current === uri;
   const isSettings = loc.pathname.startsWith('/settings') || loc.pathname.startsWith('/plugin');
   return (
@@ -50,10 +53,9 @@ export default function MobileMenu() {
         <div className="aw-mm__eyebrow mono">LIBRARY</div>
         <div className="aw-mm__list">
           <a className={'aw-mm__item' + (at('/home') ? ' active' : '')} onClick={() => go('/home')}><Icon name="home" /><span className="aw-mm__label">Home</span></a>
-          <a className={'aw-mm__item' + (at('/browse') && !isSource('playlists') && !isSource('favourites') ? ' active' : '')} onClick={() => { useBrowse.getState().home(); go('/browse'); }}>
+          <a className={'aw-mm__item' + (at('/browse') && !inMenu.some(s => isSource(s.uri)) ? ' active' : '')} onClick={() => { useBrowse.getState().home(); go('/browse'); }}>
             <Icon name="album" /><span className="aw-mm__label">Music</span>{sources.length ? <span className="aw-mm__value mono">{sources.length}</span> : null}</a>
-          {source('playlists') ? <a className={'aw-mm__item' + (isSource('playlists') ? ' active' : '')} onClick={() => { useBrowse.getState().open(source('playlists')!, true); go('/browse'); }}><Icon name="playlist_play" /><span className="aw-mm__label">Playlists</span></a> : null}
-          {source('favourites') ? <a className={'aw-mm__item' + (isSource('favourites') ? ' active' : '')} onClick={() => { useBrowse.getState().open(source('favourites')!, true); go('/browse'); }}><Icon name="favorite" /><span className="aw-mm__label">Favourites</span></a> : null}
+          {inMenu.map(s => <a key={s.uri} className={'aw-mm__item' + (isSource(s.uri) ? ' active' : '')} onClick={() => { useBrowse.getState().open(s, true); go('/browse'); }}><SourceGlyph source={s} /><span className="aw-mm__label">{String(s.name || s.title || s.uri)}</span></a>)}
           <a className={'aw-mm__item' + (at('/playback') ? ' active' : '')} onClick={() => go('/playback')}><Icon name="graphic_eq" /><span className="aw-mm__label">Now Playing</span></a>
         </div>
         <div className="aw-mm__eyebrow mono">SYSTEM</div>
