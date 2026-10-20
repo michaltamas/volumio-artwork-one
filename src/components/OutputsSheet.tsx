@@ -3,7 +3,7 @@
  * grouping view. A panel on the right on wide screens, a bottom sheet on the phone whose handle
  * drags it away. The markup keeps Volumio's own names so the theme's dress applies.
  */
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from './Icon';
 import { useUi } from '../core/store/ui';
@@ -16,25 +16,36 @@ import { useLocalPlayback } from '../core/localPlayback';
 import { LocalPlaybackStatus, LocalPlaybackSwitch } from './LocalPlaybackControl';
 import { useDsp, DSP_PAGE } from '../core/store/dsp';
 import { Select } from './settings/controls';
+import { useVolume, VolumeLevel, VolumeRow, type VolumeTarget } from './VolumeControl';
 
-function DeviceVolume({ o }: { o: Output }) {
-  const selfVolume = usePlayer(s => s.state.volume);
+// a zone card's volume (VolumeControl): this device steps with Volumio's own + and −, another zone by STEP;
+// a device without a mixer (bit-perfect) says FIXED; this device says nothing while a browser plays instead
+function OutputVolume({ o, silent, children }: { o: Output; silent?: boolean; children: (level: React.ReactNode, row: React.ReactNode) => React.ReactNode }) {
+  const selfVolume = usePlayer(s => s.state.volume ?? 0);
   const selfMute = usePlayer(s => !!s.state.mute);
-  const [local, setLocal] = useState<number | null>(null);
-  if (!o.volumeAvailable) { return null; }
-  const muted = o.isSelf ? selfMute : !!(o.state && o.state.mute);
-  const value = local !== null ? local : (o.isSelf ? (selfVolume ?? 0) : (o.state ? o.state.volume || 0 : 0));
-  return (
-    <div className="device__volume">
-      <button type="button" className="outputs__action device__control device__control--volume" onClick={() => useOutputs.getState().toggleMute(o)} title={'Volume ' + value}>
-        <Icon name={muted ? 'volume_off' : 'volume_up'} className="outputs__action__icon" />
-      </button>
-      <div className="volume-control__popover">
-        <input type="range" min={0} max={100} value={value} onChange={(e) => setLocal(Number(e.target.value))}
-          onPointerUp={(e) => { const v = Number((e.target as HTMLInputElement).value); setLocal(null); if (o.isSelf) { usePlayer.getState().setVolume(v); } else { useOutputs.getState().setVolume(o, v); } }} />
-      </div>
-    </div>
-  );
+  const selfFixed = usePlayer(s => !!s.state.disableVolumeControl);
+  const target: VolumeTarget = o.isSelf
+    ? { value: selfVolume, muted: selfMute, stepsRemote: true, step: (d) => (d > 0 ? usePlayer.getState().volumeUp() : usePlayer.getState().volumeDown()), set: (v) => usePlayer.getState().setVolume(v), toggleMute: () => usePlayer.getState().toggleMute() }
+    : { value: Number(o.state && o.state.volume) || 0, muted: !!(o.state && o.state.mute), step: () => undefined, set: (v) => useOutputs.getState().setVolume(o, v), toggleMute: () => useOutputs.getState().toggleMute(o) };
+  const v = useVolume(target);
+  if (silent) { return <>{children(null, null)}</>; }
+  if (!o.isSelf && !o.volumeAvailable) { return <>{children(null, null)}</>; }   // another zone that does not report a volume: nothing, as before
+  if (!o.volumeAvailable || selfFixed) { return <>{children(<span className="aw-vol__fixed mono" title="No volume to control: the output is bit-perfect">FIXED</span>, null)}</>; }
+  const label = 'the volume of ' + o.name;
+  return <>{children(<VolumeLevel value={v.shown} muted={v.muted} onToggle={target.toggleMute} label={o.name} />, <VolumeRow v={v} label={label} />)}</>;
+}
+
+// this browser's volume while it plays the device's stream (the device mixer never reaches the stream)
+function BrowserVolume({ children }: { children: (level: React.ReactNode, row: React.ReactNode) => React.ReactNode }) {
+  const lp = useLocalPlayback();
+  const before = useRef(100);
+  const target: VolumeTarget = {
+    value: lp.volume, muted: lp.volume === 0, step: () => undefined, set: (n) => lp.setVolume(n),
+    toggleMute: () => { if (lp.volume > 0) { before.current = lp.volume; lp.setVolume(0); } else { lp.setVolume(before.current || 100); } },
+  };
+  const v = useVolume(target);
+  if (!(lp.enabled && lp.mine)) { return <>{children(null, null)}</>; }
+  return <>{children(<VolumeLevel value={v.shown} muted={v.muted} onToggle={target.toggleMute} label="this browser" />, <VolumeRow v={v} label="the browser's volume" />)}</>;
 }
 
 function Song({ o }: { o: Output }) {
@@ -107,27 +118,36 @@ export default function OutputsSheet() {
               {self && !o.hasLeader() ? (
                 <div>
                   <div className="outputs__subtitle small link">This device</div>
-                  <div className="outputs__device device">
-                    {self.state ? <div className="device__thumb"><img src={cover(self)} alt="cover image" /></div> : null}
-                    <div className="device__info">
-                      <div className="device__title"><div className="device__title__text clickable">{self.name}</div></div>
-                      <DeviceVolume o={self} />
-                      <Song o={self} />
+                  <OutputVolume o={self} silent={lp.enabled}>{(level, row) => (
+                    <div className="outputs__device device aw-vcard">
+                      <div className="aw-vcard__head">
+                        {self.state ? <div className="device__thumb"><img src={cover(self)} alt="cover image" /></div> : null}
+                        <div className="device__info">
+                          <div className="device__title"><div className="device__title__text clickable">{self.name}</div></div>
+                          {lp.enabled ? <div className="device__meta"><span className="device__meta__song">{lp.mine ? 'Silent while this browser plays' : 'Silent while a browser plays'}</span></div> : <Song o={self} />}
+                        </div>
+                        {level}
+                      </div>
+                      {row}
                     </div>
-                  </div>
+                  )}</OutputVolume>
                 </div>
               ) : null}
               {lp.available ? (
                 <div>
                   <div className="outputs__subtitle small link">This browser</div>
-                  <div className="outputs__device device aw-local">
-                    <div className="aw-local__icon"><Icon name="headphones" /></div>
-                    <div className="device__info">
-                      <div className="device__title"><div className="device__title__text">Play in this browser</div></div>
-                      <div className="aw-local__hint"><LocalPlaybackStatus /></div>
+                  <BrowserVolume>{(level, row) => (
+                    <div className={'outputs__device device aw-local' + (row ? ' has-volume' : '')}>
+                      <div className="aw-local__icon"><Icon name="headphones" /></div>
+                      <div className="device__info">
+                        <div className="device__title"><div className="device__title__text">Play in this browser</div></div>
+                        <div className="aw-local__hint"><LocalPlaybackStatus /></div>
+                      </div>
+                      {level}
+                      <LocalPlaybackSwitch />
+                      {row}
                     </div>
-                    <LocalPlaybackSwitch />
-                  </div>
+                  )}</BrowserVolume>
                 </div>
               ) : null}
               <DspControls onOpenPage={() => { close(); nav(DSP_PAGE); }} />
@@ -139,17 +159,31 @@ export default function OutputsSheet() {
                       <div className="device__thumb" onClick={() => goTo(g.leader)}><img src={cover(g.leader)} alt="cover image" /></div>
                       <div className="device__info"><Song o={g.leader} /></div>
                       <div className="device__group">
-                        <div className="device__group__item">
-                          <div className="device__title"><div className="device__title__text" onClick={() => goTo(g.leader)}>{g.leader.name}</div></div>
-                          <DeviceVolume o={g.leader} />
-                          <div className="device__meta">{self && g.leader.id === self.id ? 'This device' : 'Group leader'}</div>
-                        </div>
-                        {g.children.map(c => (
-                          <div key={c.id} className="device__group__item">
-                            <div className="device__title"><div className="device__title__text" onClick={() => goTo(c)}>{c.name}</div></div>
-                            <DeviceVolume o={c} />
-                            <div className="device__meta"><button type="button" onClick={() => o.disable(c.id)} className="outputs__action outputs__action--primary">Remove</button></div>
+                        <OutputVolume o={g.leader} silent={g.leader.isSelf && lp.enabled}>{(level, row) => (
+                          <div className="device__group__item aw-vcard">
+                            <div className="aw-vcard__head">
+                              <div className="device__info">
+                                <div className="device__title"><div className="device__title__text" onClick={() => goTo(g.leader)}>{g.leader.name}</div></div>
+                                <div className="device__meta">{self && g.leader.id === self.id ? 'This device' : 'Group leader'}</div>
+                              </div>
+                              {level}
+                            </div>
+                            {row}
                           </div>
+                        )}</OutputVolume>
+                        {g.children.map(c => (
+                          <OutputVolume key={c.id} o={c}>{(level, row) => (
+                            <div className="device__group__item aw-vcard">
+                              <div className="aw-vcard__head">
+                                <div className="device__info">
+                                  <div className="device__title"><div className="device__title__text" onClick={() => goTo(c)}>{c.name}</div></div>
+                                  <div className="device__meta"><button type="button" onClick={() => o.disable(c.id)} className="outputs__action outputs__action--primary">Remove</button></div>
+                                </div>
+                                {level}
+                              </div>
+                              {row}
+                            </div>
+                          )}</OutputVolume>
                         ))}
                       </div>
                       <div className="device__group__action"><button type="button" onClick={() => o.removeAll()} className="outputs__action">Remove all devices<Icon name="speaker_group" className="outputs__action__icon device__group__remove-icon" /></button></div>
@@ -161,14 +195,19 @@ export default function OutputsSheet() {
                 <div>
                   <div className="outputs__subtitle small link">Available devices</div>
                   {available.map(x => (
-                    <div key={x.id} className="outputs__device device">
-                      {x.state ? <div className="device__thumb" onClick={() => goTo(x)}><img src={cover(x)} alt="cover image" /></div> : null}
-                      <div className="device__info">
-                        <div className="device__title"><div className="device__title__text" onClick={() => goTo(x)}>{x.name}</div></div>
-                        <DeviceVolume o={x} />
-                        <Song o={x} />
+                    <OutputVolume key={x.id} o={x}>{(level, row) => (
+                      <div className="outputs__device device aw-vcard">
+                        <div className="aw-vcard__head">
+                          {x.state ? <div className="device__thumb" onClick={() => goTo(x)}><img src={cover(x)} alt="cover image" /></div> : null}
+                          <div className="device__info">
+                            <div className="device__title"><div className="device__title__text" onClick={() => goTo(x)}>{x.name}</div></div>
+                            <Song o={x} />
+                          </div>
+                          {level}
+                        </div>
+                        {row}
                       </div>
-                    </div>
+                    )}</OutputVolume>
                   ))}
                 </div>
               ) : null}
