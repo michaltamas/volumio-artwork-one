@@ -6,6 +6,13 @@ All notable changes to this project are documented here. The format is based on
 
 Versions 1.x and 2.x were published in [volumio-artwork-theme](https://github.com/michaltamas/volumio-artwork-theme).
 
+## [3.2.8] - 2026-10-20
+
+### Fixed
+
+- **Play in this browser:** the switch sits top-right with the volume under it, so the name keeps its line on a narrow phone even at 100; the icon and the texts start at the top.
+- **Zones & outputs:** only the content scrolls — the sheet's handle on the phone (the close button on wider screens) stays put.
+
 ## [3.2.7] - 2026-10-20
 
 ### Changed
@@ -220,6 +227,7 @@ Artwork One rebuilt from the ground up in React. Same look, same features, a new
 - Built with React and Vite instead of AngularJS: the release is a quarter of the size (1.8 MB instead of 7.8 MB), faster to open, with one stylesheet per part instead of layered theme overrides.
 - The release archive is now `artwork-one.tar.gz`; the installer puts it in the same place as before, so 1.x and 2.x are replaced in place.
 
+[3.2.8]: https://github.com/michaltamas/volumio-artwork-one/releases/tag/v3.2.8
 [3.2.7]: https://github.com/michaltamas/volumio-artwork-one/releases/tag/v3.2.7
 [3.2.6]: https://github.com/michaltamas/volumio-artwork-one/releases/tag/v3.2.6
 [3.2.5]: https://github.com/michaltamas/volumio-artwork-one/releases/tag/v3.2.5
