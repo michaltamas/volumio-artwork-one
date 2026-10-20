@@ -6,6 +6,15 @@ All notable changes to this project are documented here. The format is based on
 
 Versions 1.x and 2.x were published in [volumio-artwork-theme](https://github.com/michaltamas/volumio-artwork-theme).
 
+## [3.2.7] - 2026-10-20
+
+### Changed
+
+- **Volume on the phone.** The cards in Zones & outputs get − and + either side of the slider, and the exact level top-right — a tap mutes. On this device − and + use Volumio's own *Volume steps* and *Max volume level*; holding one repeats. The slider drags from where it is — a tap on the track never jumps the volume — and the number follows at once without jumping back. Arrow keys step, Page Up/Down move by 10.
+- **Play in this browser:** while the browser plays, its card carries the volume (the browser's own) and the device card says it is silent.
+- **Bit-perfect** outputs (no mixer) show *FIXED* instead of a slider that does nothing.
+- The cards' second line takes two lines before it shortens; the DSP card's settings button and preset follow the same sizes.
+
 ## [3.2.6] - 2026-10-19
 
 ### Added
@@ -211,6 +220,7 @@ Artwork One rebuilt from the ground up in React. Same look, same features, a new
 - Built with React and Vite instead of AngularJS: the release is a quarter of the size (1.8 MB instead of 7.8 MB), faster to open, with one stylesheet per part instead of layered theme overrides.
 - The release archive is now `artwork-one.tar.gz`; the installer puts it in the same place as before, so 1.x and 2.x are replaced in place.
 
+[3.2.7]: https://github.com/michaltamas/volumio-artwork-one/releases/tag/v3.2.7
 [3.2.6]: https://github.com/michaltamas/volumio-artwork-one/releases/tag/v3.2.6
 [3.2.5]: https://github.com/michaltamas/volumio-artwork-one/releases/tag/v3.2.5
 [3.2.4]: https://github.com/michaltamas/volumio-artwork-one/releases/tag/v3.2.4
