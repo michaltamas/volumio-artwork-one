@@ -109,6 +109,7 @@ export default function OutputsSheet() {
       <div id="sideMenu">
         <div role="group" className="outputs__menu" ref={panel}>
           <button type="button" className="outputs__grab" onPointerDown={drag.onPointerDown} onClick={drag.onClick} aria-label="Close" />
+          <div className="outputs__body">
           {!grouping ? (
             <div className="outputs__overview">
               <div className="outputs__title align-items-center">
@@ -248,6 +249,7 @@ export default function OutputsSheet() {
               </div>
             </div>
           )}
+          </div>
         </div>
       </div>
     </>

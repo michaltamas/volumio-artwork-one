@@ -4,12 +4,13 @@ body#artwork {
   #sideMenuScrim { position: fixed; inset: 0; z-index: 399; background: var(--scrim-page); -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); }
   .outputs__menu {
     position: fixed; z-index: 400; top: 12px; right: 12px; bottom: 12px; left: auto; width: min(350px, calc(100vw - 24px)); max-height: calc(100vh - 91px);   /* what Volumio's own frame left the sheet with */
-    padding: 20px 20px calc(20px + var(--sa-b));
-    overflow-y: auto; -webkit-overflow-scrolling: touch; border-radius: 18px;
+    display: flex; flex-direction: column; padding: 0; overflow: hidden; border-radius: 18px;
     background: var(--panel-deep); -webkit-backdrop-filter: blur(34px) saturate(1.1); backdrop-filter: blur(34px) saturate(1.1);
     border: 1px solid var(--fill-10); box-shadow: 0 30px 70px -24px var(--shadow-strong); color: var(--ink-1);
     opacity: 1; transform: none; animation: aw-outputs-in .22s ease-out;
   }
+  /* the content scrolls inside the sheet: the handle (the close button on wide screens) stays put */
+  .outputs__body { flex: 1 1 auto; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; padding: 20px 20px calc(20px + var(--sa-b)); }
   .outputs__grab {
     position: absolute; top: 10px; right: 14px; width: 32px; height: 32px; padding: 0; border: 0; border-radius: 50%; background: var(--fill-08); color: var(--ink-3); cursor: pointer;
     &::after { content: 'close'; font-family: 'Material Symbols Rounded'; font-size: 18px; line-height: 32px; }
@@ -50,8 +51,9 @@ body#artwork {
 @keyframes aw-outputs-in { from { transform: translateY(12px); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes aw-outputs-up { from { transform: translateY(100%); } to { transform: none; } }
 @media (max-width: 700px) and (orientation: portrait) {
-  body#artwork .outputs__menu { top: auto; right: 0; left: 0; bottom: 0; width: auto; max-height: 72vh; border-radius: 20px 20px 0 0; border-bottom: 0; padding-top: 26px; animation: aw-outputs-up .22s ease-out; will-change: transform; }
-  body#artwork .outputs__grab { top: 0; left: 0; right: 0; width: auto; height: 26px; border-radius: 20px 20px 0 0; background: transparent; touch-action: none;
+  body#artwork .outputs__menu { top: auto; right: 0; left: 0; bottom: 0; width: auto; max-height: 72vh; border-radius: 20px 20px 0 0; border-bottom: 0; animation: aw-outputs-up .22s ease-out; will-change: transform; }
+  body#artwork .outputs__body { padding-top: 0; }
+  body#artwork .outputs__grab { position: relative; flex: none; top: 0; left: 0; right: 0; width: auto; height: 26px; border-radius: 20px 20px 0 0; background: transparent; touch-action: none;
     &::after { content: ''; position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 38px; height: 4px; border-radius: 2px; background: var(--fill-30); }
     &:hover { background: transparent; &::after { background: var(--fill-30); } } }
 }
@@ -100,13 +102,16 @@ body#artwork .aw-vol__slider { flex: 1 1 0; min-width: 0; height: 48px; display:
 body#artwork .aw-vol__track { position: relative; width: 100%; height: 6px; border-radius: 3px; background: var(--fill-14); }
 body#artwork .aw-vol__fill { position: absolute; top: 0; bottom: 0; left: 0; border-radius: 3px; background: var(--ink-1); }
 body#artwork .aw-vol__knob { position: absolute; top: 50%; width: 22px; height: 22px; margin: -11px 0 0 -11px; border-radius: 50%; background: var(--ink); box-shadow: 0 1px 4px rgba(0, 0, 0, .6); }
-/* Play in this browser while it plays here: the level before the switch, the row across the card */
 /* the card's second line (the track, a hint) takes two lines before it shortens */
 body#artwork .outputs__menu .aw-vcard .device__meta__song, body#artwork .outputs__menu .aw-local__hint, body#artwork .outputs__menu .aw-dsp__row .aw-local__hint {
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; white-space: normal; text-wrap: pretty; font-size: 13px; line-height: 1.35; color: var(--ink-muted); }
-body#artwork .outputs__menu .aw-local.has-volume { grid-template-columns: 44px minmax(0, 1fr) auto auto;
-  .device__title__text { white-space: normal; line-height: 1.25; }   /* the name wraps beside the level, as in the mockup */
-  .aw-vol__row { grid-column: 1 / -1; } }
+/* Play in this browser while it plays here: the switch top-right and the level under it, so the name keeps
+   its line on a narrow phone; the icon and the texts from the top; the row across the card */
+body#artwork .outputs__menu .aw-local.has-volume { grid-template-columns: 44px minmax(0, 1fr) auto; grid-template-areas: 'icon info switch' 'icon info level' 'row row row'; row-gap: 2px;
+  .aw-local__icon { grid-area: icon; align-self: start; } .device__info { grid-area: info; align-self: start; padding-top: 1px; }
+  .aw-switch, .aw-local__busy { grid-area: switch; justify-self: end; align-self: end; }
+  .aw-vol__level { grid-area: level; justify-self: end; margin-right: -4px; }
+  .aw-vol__row { grid-area: row; margin-top: 10px; } }
 
 /* the sheet's cards as the volume handoff (v2, final) draws them: 16px corners, 14px in (12 on the left) */
 body#artwork .outputs__menu .outputs__device { padding: 14px 14px 14px 12px; border-radius: 16px; border-color: var(--fill-13); }
