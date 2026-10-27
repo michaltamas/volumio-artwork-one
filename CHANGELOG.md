@@ -6,6 +6,31 @@ All notable changes to this project are documented here. The format is based on
 
 Versions 1.x and 2.x were published in [volumio-artwork-theme](https://github.com/michaltamas/volumio-artwork-theme).
 
+## [3.2.9] - 2026-10-27
+
+### Added
+
+- **Phones on their side.** A window no taller than 520px gets its own layout:
+  - Now Playing puts the cover beside the text, with the seek bar and the transport under the text — every control on one screen, nothing scrolled away.
+  - The mini player is one row.
+  - The rail is denser and scrolls instead of cutting its last entries.
+  - The page heads are lower and the Home hero is a row.
+  - The notch and the home indicator are kept clear, by the sheets and the menu too.
+  - On a very low screen (a phone app with its own bar on top), the album line, the chip, shuffle and repeat step aside.
+- **Place in the queue** (Appearance › Ambient display): turn off the #21 after the album on the ambient screen, for mixed queues and compilations. Kept on the player.
+
+### Changed
+
+- **A tablet upright:** the cover on Now Playing takes the room the text and the bar leave.
+- **Zones:** the columns share a narrower window's width instead of overflowing it. On a phone on its side the track gives way to the name and the volume.
+
+### Fixed
+
+- **Bit-perfect** shows next to the quality chip on the phone too.
+- **Lyrics:** when LRCLIB could not be reached, the track was marked as having no words until the page was reloaded. It is now asked again after 20, 40 and 60 s.
+- **Qobuz and Roon** keep their last track after a stop. Once the queue is empty too, Now Playing, the mini player and the background show nothing playing.
+- **Settings** opened empty when Volumio sent its menu late. They now open on the first section once it arrives.
+
 ## [3.2.8] - 2026-10-20
 
 ### Fixed
@@ -227,6 +252,7 @@ Artwork One rebuilt from the ground up in React. Same look, same features, a new
 - Built with React and Vite instead of AngularJS: the release is a quarter of the size (1.8 MB instead of 7.8 MB), faster to open, with one stylesheet per part instead of layered theme overrides.
 - The release archive is now `artwork-one.tar.gz`; the installer puts it in the same place as before, so 1.x and 2.x are replaced in place.
 
+[3.2.9]: https://github.com/michaltamas/volumio-artwork-one/releases/tag/v3.2.9
 [3.2.8]: https://github.com/michaltamas/volumio-artwork-one/releases/tag/v3.2.8
 [3.2.7]: https://github.com/michaltamas/volumio-artwork-one/releases/tag/v3.2.7
 [3.2.6]: https://github.com/michaltamas/volumio-artwork-one/releases/tag/v3.2.6
