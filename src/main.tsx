@@ -26,6 +26,7 @@ import './styles/modal.scss';
 import './styles/sheets.scss';
 import './styles/ambient.scss';
 import './styles/phone.scss';
+import './styles/landscape.scss';
 import './styles/solid.scss';
 import './core/store/theme';
 import './core/store/companion';

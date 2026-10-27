@@ -41,6 +41,7 @@
   .np-chip { display: inline-flex; align-items: center; gap: 7px; height: 30px; padding: 0 11px; border-radius: var(--r-pill); background: var(--tb-pill); border: 1px solid var(--tb-pill-line); }
   .np-chip-num { font-size: 11px; font-weight: 700; color: var(--ink-2); }
   .np-chip-unit { font-size: 10px; letter-spacing: .14em; color: var(--ink-3); text-transform: uppercase; }
+  .np-bp { display: none; }   /* the phone's (phone.scss): the top bar's badge stands for it elsewhere */
   .np-signalpath { margin-top: 26px; display: flex; align-items: center; gap: 10px; text-transform: uppercase; font-size: 11px; letter-spacing: .14em; color: var(--ink-3); }
   .np-arrow { color: var(--ink-faint); }
   .np-node-final { color: var(--ink); }
@@ -232,20 +233,12 @@ body#artwork #np.np--cramped .np-seg { display: none; }   /* beside the docked q
 @media (max-aspect-ratio: 3/4), (max-width: 760px) {
   body#artwork #np { height: auto; min-height: 100%; overflow: visible; }
   body#artwork #np #np-hero { flex-direction: column; align-items: flex-start; flex: 1 0 auto; }
-  body#artwork #np #np-cover { height: auto; width: min(100%, 36vh); max-width: none; }
+  body#artwork #np #np-cover { height: auto; width: min(100%, max(36vh, calc(100vh - 560px))); max-width: none; }   /* a tablet upright: what the text and the bar leave */
   body#artwork #np #np-meta { padding-top: 0; }
   body#artwork #np .np-title { font-size: clamp(26px, 7.5vw, 54px); }
   body#artwork #np .np-upnext-films, body#artwork #np .np-upnext-label { display: none; }
 }
-@media (max-height: 520px) and (orientation: landscape) {
-  body#artwork #np { height: auto; min-height: 100%; overflow: visible; }
-  body#artwork #np #np-hero { flex: none; container-type: normal; }   /* size containment collapsed it to 0 here: the page scrolls, the hero is as tall as its text */
-  body#artwork #np #np-cover { height: auto; width: min(46vh, 40%); }
-  body#artwork #np #np-footer { padding-top: 18px; }
-  body#artwork #np .np-seg { display: none; }   /* no headroom for the switch in a short window: Cover only */
-  /* below this the title tracks the window's height, not its width — it keeps shrinking as the window gets shorter still */
-  body#artwork #np .np-title { font-size: clamp(20px, 6.5vh, 48px); }
-}
+/* a short landscape window (a phone on its side): landscape.scss */
 
 /* Now Playing opens as a sheet sliding up from the mini player and slides back down on the chevron */
 @keyframes aw-np-in { from { transform: translateY(100%); } to { transform: none; } }
@@ -314,11 +307,6 @@ html[data-aw-text="l"] body#artwork #np .np-format, html[data-aw-text="xl"] body
 html.aw-no-volume body#artwork .np-volume, html.aw-no-volume body#artwork .mini-volume { display: none !important; }
 /* larger text on a low screen: the meta column may not fit the hero's height — it scrolls there, under the seek bar never */
 html[data-aw-text="l"] body#artwork #np #np-meta, html[data-aw-text="xl"] body#artwork #np #np-meta { overflow-y: auto; scrollbar-width: none; }
-@media (max-height: 520px) and (orientation: landscape) {
-  html[data-aw-text="s"] body#artwork #np .np-title { font-size: clamp(17px, 5.5vh, 41px); }
-  html[data-aw-text="l"] body#artwork #np .np-title { font-size: clamp(25px, 8.1vh, 60px); }
-  html[data-aw-text="xl"] body#artwork #np .np-title { font-size: clamp(31px, 10vh, 74px); }
-}
 html[data-aw-text="l"] body#artwork #np #np-meta::-webkit-scrollbar, html[data-aw-text="xl"] body#artwork #np #np-meta::-webkit-scrollbar { display: none; }
 
 /* the cover face's byline (16B): the artist on its own line, then the album · year with the quality chip

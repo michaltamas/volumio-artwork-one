@@ -33,3 +33,13 @@ body#artwork .aw-zones { padding: 0 var(--pad-screen) 48px; color: var(--ink-1);
     &:hover { background: var(--fill-06); } &:focus-visible { outline: 2px solid var(--ink-1); outline-offset: 2px; } }
   .aw-zone__group { appearance: none; -webkit-appearance: none; padding-right: 15px; option { color: var(--on-ink); } }
 }
+
+/* a narrower window (a tablet upright, a phone on its side): the columns share the width instead of overflowing it */
+@media (max-width: 1100px) and (min-width: 701px), (max-width: 1100px) and (orientation: landscape) {
+  body#artwork .aw-zones .aw-zones__cols, body#artwork .aw-zones .aw-zone { grid-template-columns: 44px minmax(110px, 1fr) minmax(0, 1.3fr) minmax(120px, 170px) auto; gap: 16px; }
+}
+@media (max-width: 760px) and (orientation: landscape) {
+  /* a phone on its side: the track gives way to the name and the volume */
+  body#artwork .aw-zones .aw-zones__cols, body#artwork .aw-zones .aw-zone { grid-template-columns: 44px minmax(0, 1fr) minmax(120px, 170px) auto; }
+  body#artwork .aw-zones .aw-zones__cols > :nth-child(3), body#artwork .aw-zones .aw-zone__np { display: none; }
+}

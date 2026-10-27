@@ -6,6 +6,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSettings } from '../core/store/settings';
+import { useMenu } from '../core/store/menu';
 import { itemClick } from '../components/settings/nav';
 
 // the phone's settings: the menu is the landing (the same query the shell's stylesheet uses)
@@ -14,6 +15,7 @@ export const LAST_KEY = 'aw-settings-last';
 
 export default function Settings() {
   const nav = useNavigate();
+  useMenu(s => s.items);   // redrawn when the menu arrives: it may come after this page opens, and the selector below reads it from another store
   const first = useSettings(s => s.menu().find(i => i && i.state) || null);
   useEffect(() => {
     let landing = false;

@@ -30,7 +30,7 @@ import { useModal } from '../core/store/modal';
 import { useExternalSource } from '../core/external';
 import NpEmpty from '../components/np/NpEmpty';
 import ClampedTitle from '../components/np/ClampedTitle';
-import { useHeldTrack } from '../core/useHeldTrack';
+import { useHeldTrack, leftOver } from '../core/useHeldTrack';
 
 type View = 'cover' | 'info' | 'lyrics';
 const VIEW_KEY = 'aw-np-view';
@@ -155,7 +155,7 @@ export default function NowPlaying() {
   // over the page beneath (shown at once, as when leaving) and on release goes or springs back.
   // Not from the seek bar, the volume or the lyrics sheet — those drag for themselves.
   const [dragging, setDragging] = useState(false);
-  const empty = !st.title && st.status !== 'play' && !ext;
+  const empty = (!st.title || leftOver(st, !queue.length)) && st.status !== 'play' && !ext;
   useEffect(() => {
     const np = document.getElementById('np');
     if (!np || lyricsOn) { return; }
@@ -269,6 +269,8 @@ export default function NowPlaying() {
                     {fmt && !ext ? <span className="np-chip-unit">{fmt}</span> : null}
                   </div>
                 ) : null}
+                {/* the phone has no top bar badge: bit-perfect beside the chip, as on the ambient screen */}
+                {bitPerfect && !ext ? <span className="np-bp"><span className="np-dot" /><span className="mono">BIT PERFECT</span></span> : null}
               </div>
               {ext ? (
                 <div className={'np-external np-external--' + ext.kind}>

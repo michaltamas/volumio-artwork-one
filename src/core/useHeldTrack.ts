@@ -10,6 +10,9 @@ import { usePlayer } from './store/player';
 export const HOLD_MS = 4000;
 
 const isStopped = (s: any) => !s.status || s.status === 'stop' || !s.title;
+// a service that keeps its last track in the state after a stop (Qobuz, Roon): once the queue is empty too,
+// that track is left over, not what plays — the screens show nothing playing
+export const leftOver = (s: any, queueEmpty: boolean) => s.status === 'stop' && queueEmpty && !s.disableUiControls;
 
 export function useHeldTrack() {
   const live = usePlayer(s => s.state);

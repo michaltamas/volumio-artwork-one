@@ -9,8 +9,8 @@ const KEY = 'aw-ambient';
 export const DELAYS = [-1, 1, 2, 5, 10, 0];   // -1: always — the display rests in ambient; a touch shows the interface for a minute
 export const LAYOUTS = ['cover', 'clock', 'bleed'] as const;
 export type DisplayText = 'm' | 'l' | 'xl' | 's';
-export interface AmbientSettings { on: boolean; delay: number; layout: 'cover' | 'clock' | 'bleed'; clock: '12' | '24'; night: boolean; nightFrom: string; nightTo: string; textSize: DisplayText; hideVolume: boolean; keysWake: boolean; transparency: boolean }
-const DEFAULTS: AmbientSettings = { on: true, delay: 2, layout: 'cover', clock: '24', night: true, nightFrom: '23:00', nightTo: '07:00', textSize: 'm', hideVolume: false, keysWake: true, transparency: true };
+export interface AmbientSettings { on: boolean; delay: number; layout: 'cover' | 'clock' | 'bleed'; clock: '12' | '24'; night: boolean; nightFrom: string; nightTo: string; textSize: DisplayText; hideVolume: boolean; keysWake: boolean; transparency: boolean; queueNo: boolean }
+const DEFAULTS: AmbientSettings = { on: true, delay: 2, layout: 'cover', clock: '24', night: true, nightFrom: '23:00', nightTo: '07:00', textSize: 'm', hideVolume: false, keysWake: true, transparency: true, queueNo: true };
 const ACTIVITY = ['pointerdown', 'pointermove', 'keydown', 'wheel', 'touchstart'];
 
 interface AmbientStore {
@@ -27,6 +27,7 @@ function clean(saved: any): AmbientSettings {
   s.hideVolume = s.hideVolume === true;
   s.keysWake = s.keysWake !== false;
   s.transparency = s.transparency !== false;
+  s.queueNo = s.queueNo !== false;
   return s;
 }
 function read(): AmbientSettings { try { return clean(JSON.parse(localStorage.getItem(KEY) || '{}')); } catch { return { ...DEFAULTS }; } }

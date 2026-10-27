@@ -1,7 +1,8 @@
 /**
  * The words of the track that plays, from LRCLIB (free, open, no key, CORS open). Asked once per
  * track, 300 ms after the track settles, kept; `synced` (timestamped lines), `plain`, `none`, or
- * `loading`. Nothing is asked for web radio, or while nothing plays. Volumio's local titles often
+ * `loading`. Only an answer is kept: when LRCLIB cannot be reached the track shows no words and is
+ * asked again a little later. Nothing is asked for web radio, or while nothing plays. Volumio's local titles often
  * carry the track number ("1 - Liberty"); that is stripped before asking.
  */
 import { create } from 'zustand';
@@ -22,6 +23,8 @@ const cache: Record<string, Entry> = {};
 const order: string[] = [];
 let currentKey = '';
 let pending: number | null = null;
+const RETRIES = 3, RETRY_AFTER = 20000;   // a failed ask: again after 20, 40 and 60 s while the track plays
+let tries = 0;
 const NONE: Entry = { state: 'none', lines: [], plain: '' };
 
 export const useLyrics = create<LyricsStore>((_set, get) => ({
@@ -56,30 +59,46 @@ function parse(rec: any): Entry {
   if (rec.plainLyrics && String(rec.plainLyrics).trim()) { return { state: 'plain', lines: [], plain: String(rec.plainLyrics).trim() }; }
   return NONE;
 }
-async function get(path: string, params: Record<string, string>) { const r = await fetch(API + path + '?' + new URLSearchParams(params).toString(), { headers: { 'Lrclib-Client': CLIENT } }); if (!r.ok) { throw new Error(String(r.status)); } return r.json(); }
+// a 404 is LRCLIB's "no such track"; anything else (no network, a timeout, a busy server) is a failed ask
+class NotFound extends Error {}
+async function get(path: string, params: Record<string, string>) {
+  const r = await fetch(API + path + '?' + new URLSearchParams(params).toString(), { headers: { 'Lrclib-Client': CLIENT } });
+  if (r.status === 404) { throw new NotFound('404'); }
+  if (!r.ok) { throw new Error(String(r.status)); }
+  return r.json();
+}
 
 async function fetchLyrics(k: string, st: any) {
   const params: Record<string, string> = { artist_name: st.artist || '', track_name: cleanTitle(st.title), duration: String(Math.round(st.duration)) };
   if (st.album) { params.album_name = st.album; }
   const settle = (e: Entry) => { remember(k, e); if (currentKey === k) { show(e); } };
+  // an ask that failed is not an answer: the track shows no words for now, nothing is remembered, and it is asked again
+  const failed = () => {
+    if (currentKey !== k) { return; }
+    show(NONE);
+    if (tries < RETRIES) { tries++; pending = window.setTimeout(() => { pending = null; if (currentKey === k) { fetchLyrics(k, st); } }, RETRY_AFTER * tries); }
+  };
+  let exactFailed = false;
   try {
     // the exact lookup needs an artist (400 without one): a track with none goes straight to the search
-    if (!params.artist_name) { throw new Error('no artist'); }
+    if (!params.artist_name) { throw new NotFound('no artist'); }
     settle(parse(await get('/get', params)));
-  } catch {
-    try {
-      const list = await get('/search', { artist_name: params.artist_name, track_name: params.track_name });
-      const arr = Array.isArray(list) ? list : [];
-      const hit = arr.find((r: any) => r.syncedLyrics) || arr.find((r: any) => r.plainLyrics) || arr[0];
-      settle(hit ? parse(hit) : NONE);
-    } catch { settle(NONE); }
-  }
+    return;
+  } catch (e) { exactFailed = !(e instanceof NotFound); }
+  try {
+    const list = await get('/search', { artist_name: params.artist_name, track_name: params.track_name });
+    const arr = Array.isArray(list) ? list : [];
+    const hit = arr.find((r: any) => r.syncedLyrics) || arr.find((r: any) => r.plainLyrics) || arr[0];
+    // nothing found, but the exact ask never got an answer: it may still have the words
+    if (!hit && exactFailed) { failed(); return; }
+    settle(hit ? parse(hit) : NONE);
+  } catch { failed(); }
 }
 function schedule() {
   const k = trackKey();
   if (k === currentKey) { return; }
   if (pending) { window.clearTimeout(pending); pending = null; }
-  currentKey = k;
+  currentKey = k; tries = 0;
   if (!k) { show(NONE); return; }
   if (cache[k]) { show(cache[k]); return; }
   const st: any = usePlayer.getState().state || {};

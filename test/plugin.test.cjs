@@ -134,11 +134,13 @@ test('first start after an installation switches the player to Artwork One, once
   assert.equal(d.switched, false);
 });
 
-test('ambient settings keep the remote and transparency options: a boolean kept, anything else dropped', () => {
+test('ambient settings keep the remote, transparency and queue-number options: a boolean kept, anything else dropped', () => {
   const { ctx } = fakeVolumio();
   const p = new Plugin(ctx);
   assert.deepEqual(p.cleanAmbient({ keysWake: false, hideVolume: true, transparency: false }), { keysWake: false, hideVolume: true, transparency: false });
   assert.deepEqual(p.cleanAmbient({ keysWake: 'no', on: true }), { on: true });
+  assert.deepEqual(p.cleanAmbient({ queueNo: false }), { queueNo: false });
+  assert.deepEqual(p.cleanAmbient({ queueNo: 1, on: false }), { on: false });
 });
 
 test('menu: a source shown or hidden in the rail is kept by its uri, a choice merges into the others, anything else is dropped', () => {

@@ -56,12 +56,13 @@ export default function AmbientDisplay() {
   }, [trackKey, active]);
   if (!active) { return null; }
 
-  const layout = settings.layout;
+  const layout = settings.layout, queueNo = settings.queueNo;
   const night = useAmbient.getState().isNight();
   const paused = st.status === 'pause';
   const stopped = !st.status || st.status === 'stop' || !st.title;
   const cover = st.albumart ? albumart(st.albumart) : '';
-  const trackNo = queue.length > 1 && typeof st.position === 'number' ? '#' + (st.position + 1) : '';
+  // the place in the queue (#21): the album's track number for one album, but not for a mixed queue — Appearance › Ambient display
+  const trackNo = queueNo && queue.length > 1 && typeof st.position === 'number' ? '#' + (st.position + 1) : '';
   let next = '';
   { const n: any = typeof st.position === 'number' ? queue[st.position + 1] : null;
     if (n && (n.name || n.title)) { const title = n.name || n.title, artist = n.artist && n.artist !== st.artist ? n.artist : ''; next = artist ? title + ' · ' + artist : title; } }

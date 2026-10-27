@@ -1,0 +1,107 @@
+/* A phone on its side (a window no taller than 520px, wider than tall): the rail and the pages as on a
+   wide screen, but everything fits the height. The rail is denser and scrolls rather than cutting its
+   last entries; the mini player is one row; Now Playing puts the cover beside the text with the seek
+   bar and the transport under the text, all on one screen — the page never scrolls its controls away.
+   The notch and the home indicator (viewport-fit=cover) pad the rail, the bar and the pages. */
+@media (max-height: 520px) and (orientation: landscape) {
+  :root { --rail-item: 36px; --rail-w: calc(var(--rail-w-closed) + var(--sa-l)); --mini-h: calc(60px + var(--sa-b)); --pad-screen: max(16px, calc(var(--sa-r) + 8px)); --pad-top: 12px; }
+  html.aw-rail-open { --rail-w: calc(var(--rail-w-open) + var(--sa-l)); }
+  :root { --t-h1: clamp(24px, 7.5vh, 32px); --t-h1-lg: clamp(26px, 8vh, 34px); --t-h1-xl: clamp(28px, 9vh, 38px); }
+
+  /* --- the pages: a lower head, smaller titles, the Home hero a row instead of a poster --- */
+  body#artwork .aw-head { --head-pad: 14px; padding-bottom: 8px; }
+  body#artwork .aw-head .aw-search { width: clamp(150px, 26vw, 240px); }   /* the tabs and the search keep one row */
+  body#artwork .aw-head .aw-search .aw-search-label { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  body#artwork .aw-browse-title { font-size: clamp(26px, 8vh, 34px); }
+  body#artwork #artwork-home {
+    .home-hero { margin-top: 12px; gap: 20px; flex-wrap: nowrap; align-items: center; }
+    .home-hero-cover img { width: clamp(88px, 30vh, 140px); height: clamp(88px, 30vh, 140px); }
+    .home-hero-title { margin-top: 8px; }
+    .home-hero-actions { margin-top: 12px; }
+    .home-resume { height: 40px; }
+    .home-shelf { margin-top: 24px; } }
+
+  /* --- the rail: tighter, scrolls when it is still too tall --- */
+  body#artwork #main-menu { padding: 8px 0 calc(8px + var(--sa-b)) var(--sa-l); overflow-y: auto; scrollbar-width: none;
+    &::-webkit-scrollbar { display: none; }
+    .brand-row { margin-bottom: 6px; }
+    .brand { width: 30px; height: 30px; }
+    .main-menu-list, .main-menu-bottom { gap: 2px; }
+    .main-menu-list { flex: none; }
+    .main-menu-bottom { padding-top: 8px; }
+    a { border-radius: 11px; .material-symbols-rounded { font-size: 21px; } } }
+  html.aw-rail-open body#artwork #main-menu { padding-left: calc((var(--rail-w-closed) - var(--rail-item)) / 2 + var(--sa-l)); }
+
+  /* --- the mini player: one row, the seek bar left to Now Playing --- */
+  body#artwork #footer-content { padding: 0 max(12px, calc(var(--sa-r) + 4px)) var(--sa-b) 14px;
+    .mini-center { gap: 0; }
+    .mini-seek { display: none; }
+    .mini-transport .player-action-shuffle, .mini-transport .repeat-button { display: none; }   /* on Now Playing and in the queue: room for the track */
+    .mini-transport .playPause { width: 42px; height: 42px; .material-symbols-rounded { font-size: 26px; } }
+    .mini-transport .btn-link .material-symbols-rounded { font-size: 26px; }
+    #trackInfo-compact { grid-template-columns: 42px minmax(0, 1fr); column-gap: 12px; }
+    .trackInfo-album-art-wrapper, img.album-art { width: 42px; height: 42px; border-radius: 5px; }
+    #trackInfo-title { font-size: 14px; }
+    .tb-pill { height: 36px; padding: 0 11px; } }
+
+  /* --- Now Playing: the cover the screen's height on the left; the bar, the text, the seek bar and the
+     transport on the right. #np is the size container, so the cover is a square of its whole height. --- */
+  body#artwork #np { height: 100%; min-height: 0; overflow: hidden; container-type: size;
+    display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto; column-gap: clamp(16px, 3.4vw, 36px);
+    padding: 12px var(--pad-screen) calc(10px + var(--sa-b)) clamp(16px, 2.4vw, 28px); }
+  body#artwork #np #np-topbar { grid-column: 2; grid-row: 1; min-height: 36px; gap: 10px;
+    .np-chevron { width: 36px; height: 36px; }
+    .np-zone { max-width: none; }
+    .np-topbar-left { flex: 1 1 auto; }
+    #np-badge-slot { flex: none; }
+    .np-zone { flex: 0 1 auto; min-width: 0; }
+    .np-badge { flex: none; white-space: nowrap; height: 30px; padding: 0 11px; gap: 8px; font-size: 10px; } }
+  body#artwork #np #np-hero { display: contents; }
+  body#artwork #np #np-cover { grid-column: 1; grid-row: 1 / -1; align-self: center; width: min(100cqh, 44cqw); height: min(100cqh, 44cqw); }
+  body#artwork #np #np-meta { grid-column: 2; grid-row: 2; align-self: center; position: relative; min-height: 0; overflow: hidden; padding: 4px 48px 0 0; }
+  /* the heart at the text's top right; no face switch, eyebrow or signal path here */
+  body#artwork #np .np-tabrow { position: absolute; top: 4px; right: 0; min-height: 0; margin: 0; }
+  body#artwork #np .np-heart { width: 38px; height: 38px; .material-symbols-rounded { font-size: 21px; } }
+  body#artwork #np .np-seg, body#artwork #np .np-eyebrow, body#artwork #np .np-signalpath { display: none; }
+  body#artwork #np .np-title { font-size: clamp(18px, 7.4vh, 36px); line-height: 1.05; }
+  body#artwork #np:not(.np--info) #np-meta:not(.np-meta--lyrics) {
+    .np-artist { font-size: clamp(14px, 4.2vh, 19px); margin-top: 6px; }
+    .np-album { font-size: clamp(12px, 3.6vh, 15px); margin-top: 3px; }
+    .np-quality { margin-top: 3px; }
+    .np-external { margin-top: 8px; padding: 8px 12px; }
+  }
+  body#artwork #np .np-chip { height: 24px; padding: 0 9px; }
+  body#artwork #np #np-footer { grid-column: 2; grid-row: 3; margin-top: 0; padding-top: 6px; container-type: inline-size; }
+  body#artwork #np #np-seek .artwork-seek { grid-template-columns: 38px minmax(0, 1fr) 38px; column-gap: 10px; }
+  body#artwork #np #np-seek .seek-time { font-size: 11px; }
+  body#artwork #np #np-footer-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 4px; }
+  body#artwork #np #np-upnext, body#artwork #np .np-volume, body#artwork #np .tb-pill__name { display: none; }
+  body#artwork #np #np-transport {
+    #playerButtons { gap: clamp(12px, 2.6vw, 24px); }
+    .btn-link .material-symbols-rounded { font-size: 30px; }
+    .player-action-shuffle .material-symbols-rounded, .repeat-button .material-symbols-rounded { font-size: 22px; }
+    .playPause { width: clamp(44px, 15vh, 56px); height: clamp(44px, 15vh, 56px); .material-symbols-rounded { font-size: 28px; } } }
+  body#artwork #np #np-footer-right { gap: 8px; }
+  /* too narrow beside the cover for shuffle and repeat as well as the zone and the queue: those two are in the queue */
+  @container (max-width: 440px) { body#artwork #np #np-transport .player-action-shuffle, body#artwork #np #np-transport .repeat-button { display: none; } }
+
+  /* --- the notch: the sheets, the menu and the queue page keep clear of it --- */
+  body#artwork .outputs__menu { right: max(12px, var(--sa-r)); }
+  body#artwork .aw-queue { left: max(12px, var(--sa-l)); right: max(12px, var(--sa-r)); top: 10px; bottom: max(10px, var(--sa-b)); }   /* over the mini player: the height is short enough */
+  body#artwork .aw-mm__sheet { left: max(14px, var(--sa-l)); top: 10px; bottom: 10px; }
+  body#artwork #playQueue { padding-right: var(--sa-r); }
+  body#artwork #np .tb-pill { height: 38px; padding: 0 11px; }
+  /* larger text on the display: the title tracks the height here too */
+  html[data-aw-text="s"] body#artwork #np .np-title { font-size: clamp(16px, 6.3vh, 31px); }
+  html[data-aw-text="l"] body#artwork #np .np-title { font-size: clamp(22px, 9.2vh, 45px); }
+  html[data-aw-text="xl"] body#artwork #np .np-title { font-size: clamp(26px, 11.4vh, 56px); }
+}
+/* very low (a phone app with its own bar on top): the album line and the chip step aside for the title */
+@media (max-height: 300px) and (orientation: landscape) {
+  body#artwork #np #np-meta .np-quality, body#artwork #np #np-meta .np-album { display: none; }
+  body#artwork #np #np-transport .player-action-shuffle, body#artwork #np #np-transport .repeat-button { display: none; }
+  /* the queue sheet: the list keeps the room — no actions row (shuffle, repeat, save and clear stay on the queue page) and no footer */
+  body#artwork .aw-queue .aw-queue__chips, body#artwork .aw-queue .aw-queue__foot { display: none; }
+  body#artwork .aw-queue .aw-queue__head { padding-top: 14px; }
+  body#artwork .aw-queue .aw-queue__sechead { margin-top: 10px; }
+}

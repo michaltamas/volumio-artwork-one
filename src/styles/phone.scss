@@ -75,6 +75,7 @@
   body#artwork #np .np-artist:empty + .np-album::before { content: none; }
   body#artwork #np #np-chip-slot { margin-top: 11px; }
   body#artwork #np .np-quality { gap: 9px; justify-content: center; }
+  body#artwork #np .np-bp { display: inline-flex; align-items: center; gap: 7px; .np-dot { width: 6px; height: 6px; } .mono { font-size: 10px; letter-spacing: .14em; color: var(--ok); } }
   body#artwork #np .np-chip { height: 30px; padding: 0 11px; border-radius: 15px; background: var(--fill-12); border: 1px solid var(--fill-14); gap: 5px;
     .np-chip-num { font-size: 11px; font-weight: 700; color: var(--ink); } .np-chip-unit { font-size: 10px; } .np-chip-num--rate { margin-left: 2px; } }
   body#artwork #np .np-format { font-size: 10px; letter-spacing: .14em; color: var(--ink-45); }

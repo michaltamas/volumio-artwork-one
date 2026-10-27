@@ -1,6 +1,8 @@
 /** The full-frame blurred cover behind every screen (spec §4), and the palette sampled from it. */
 import { useEffect } from 'react';
 import { usePlayer } from '../core/store/player';
+import { useQueue } from '../core/store/queue';
+import { leftOver } from '../core/useHeldTrack';
 import { useTheme } from '../core/store/theme';
 import { albumart } from '../core/api';
 import { sampleCover } from '../core/palette';
@@ -12,7 +14,8 @@ const washSaturate = () => parseFloat(getComputedStyle(document.documentElement)
 const washBox = () => Math.max(window.innerWidth, window.innerHeight) * 1.5;   // the 150% box the filter blurs against
 
 export default function ArtStack() {
-  const art = usePlayer(s => s.state.albumart);
+  const queueEmpty = useQueue(s => !s.queue.length);
+  const art = usePlayer(s => leftOver(s.state, queueEmpty) ? '' : s.state.albumart);
   const url = albumart(art);
   const choice = useTheme(s => s.choice);
   const followed = useTheme(s => s.followed);
