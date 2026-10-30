@@ -129,6 +129,54 @@ test('stopped for an update of Artwork One: the interface stays, and the plugin 
   assert.equal(p.config.get('wasActive'), false);
 });
 
+test('an update while another interface showed: the plugin starts again, the player stays where it was', async () => {
+  const { ctx, calls } = fakeVolumio();
+  const p = new Plugin(ctx);
+  const started = [];
+  ctx.coreCommand.pluginManager.startPlugin = (c, n) => { started.push(c + '/' + n); return p.onStart(); };
+  p.onVolumioStart();
+  await p.onStart();
+  fs.writeFileSync(p.paths.ACTIVE_UI, JSON.stringify({ uiPrettyName: 'Manifest', uiName: 'manifest', uiPath: tmp }));
+  fs.mkdirSync(path.dirname(p.paths.DOWNLOAD), { recursive: true }); fs.writeFileSync(p.paths.DOWNLOAD, 'zip');
+  p.packageName = () => 'artwork_one';
+  calls.length = 0;
+  await p.onStop();
+  fs.rmSync(p.paths.DOWNLOAD);
+  await new Promise(r => setTimeout(r, 1300));
+  assert.deepEqual(started, ['user_interface/artwork_one']);
+  assert.ok(!calls.some(c => c[0] === 'exec' && c[3] === 'setVolumio3UI'), 'no switch, no reload');
+  assert.equal(JSON.parse(fs.readFileSync(p.paths.ACTIVE_UI, 'utf8')).uiName, 'manifest');
+});
+
+test('a failed update that left no interface: the player goes to a core interface and the entry is taken out', async () => {
+  const { ctx, calls } = fakeVolumio();
+  const p = new Plugin(ctx);
+  const started = [];
+  ctx.coreCommand.pluginManager.startPlugin = (c, n) => { started.push(c + '/' + n); return p.onStart(); };
+  p.onVolumioStart();
+  await p.onStart();
+  fs.writeFileSync(p.paths.ACTIVE_UI, JSON.stringify(p.uiEntry()));
+  fs.writeFileSync(p.paths.CORE_UI_LIST, JSON.stringify([{ uiPrettyName: 'Manifest', uiName: 'manifest', uiPath: tmp }]));
+  fs.mkdirSync(path.dirname(p.paths.DOWNLOAD), { recursive: true }); fs.writeFileSync(p.paths.DOWNLOAD, 'zip');
+  p.packageName = () => 'artwork_one';
+  await p.onStop();
+  // the core removed the folder and failed before the new one was in place
+  const index = path.join(p.paths.UI_DIR, 'index.html'); fs.renameSync(index, index + '.gone');
+  fs.rmSync(p.paths.DOWNLOAD);
+  calls.length = 0;
+  await new Promise(r => setTimeout(r, 1300));
+  assert.deepEqual(started, [], 'not started without an interface');
+  assert.ok(calls.some(c => c[0] === 'exec' && c[3] === 'setVolumio3UI' && c[4].volumio3_ui.value === 'manifest'));
+  assert.equal(JSON.parse(fs.readFileSync(p.paths.UI_LIST, 'utf8')).filter(u => u.uiName === 'artwork').length, 0, 'entry taken out');
+  fs.renameSync(index + '.gone', index);
+});
+
+test('the package name is read from a real zip (needs miniunzip; skipped where there is none)', { skip: !fs.existsSync('/usr/bin/miniunzip') }, () => {
+  const { ctx } = fakeVolumio();
+  const p = new Plugin(ctx);
+  assert.equal(p.packageName(process.env.ARTWORK_ONE_TEST_ZIP || ''), process.env.ARTWORK_ONE_TEST_ZIP ? 'artwork_one' : '');
+});
+
 test('stopped while another plugin\'s package waits (or none): an ordinary stop', async () => {
   const { ctx, calls } = fakeVolumio();
   const p = new Plugin(ctx);
