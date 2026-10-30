@@ -5,7 +5,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../Icon';
-import { rest, albumart } from '../../core/api';
+import { rest, albumart, IDLE_ART } from '../../core/api';
 import { useBrowse, type BrowseItem } from '../../core/store/browse';
 import { useQueue } from '../../core/store/queue';
 import { usePlayer } from '../../core/store/player';
@@ -33,7 +33,7 @@ export default function NpEmpty() {
   return (
     <div className="np-empty">
       <div className="np-empty__intro">
-        <div className="np-empty__icon"><Icon name="music_note" /></div>
+        <div className="np-empty__icon"><img src={albumart(IDLE_ART)} alt="Volumio" /></div>
         <h1 className="np-empty__title">Nothing playing yet</h1>
         <p className="np-empty__text">Pick an album, a playlist or a station and it shows up here.</p>
         <div className="np-empty__actions">

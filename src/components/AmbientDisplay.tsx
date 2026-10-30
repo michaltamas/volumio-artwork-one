@@ -12,7 +12,7 @@ import { useSignal } from '../core/store/signal';
 import { useMultiroom } from '../core/store/multiroom';
 import { useTrackInfo } from '../core/store/trackInfo';
 import { useSleep } from '../core/store/sleep';
-import { albumart } from '../core/api';
+import { albumart, IDLE_ART } from '../core/api';
 import { signal, format, quality } from '../core/format';
 
 const mmss = (ms: number) => { const s = Math.floor(ms / 1000), m = Math.floor(s / 60), r = s % 60; return m + ':' + (r < 10 ? '0' : '') + r; };
@@ -88,6 +88,7 @@ export default function AmbientDisplay() {
       <div className="aw-amb__group">
         {stopped ? (
           <div className="aw-amb__idle">
+            <img className="aw-amb__idle-cover" src={albumart(IDLE_ART)} alt="Volumio" />
             <div className="aw-amb__clock aw-amb__clock--idle mono">{clockEl}</div>
             <div className="aw-amb__name mono">{playerLine}</div>
           </div>

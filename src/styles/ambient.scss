@@ -112,7 +112,9 @@ body#artwork .aw-amb__name--corner { position: absolute; left: var(--amb-pad); b
 
 /* --- stopped / empty queue: clock and name on plain ground --------------------------------- */
 body#artwork .aw-amb__idle { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: clamp(20px, 5.4vh, 40px); }
-body#artwork .aw-amb__clock--idle { position: static; font-size: clamp(96px, 25vh, 260px); line-height: .9; letter-spacing: -.03em; }
+body#artwork .aw-amb__idle-cover { width: clamp(120px, 26vh, 300px); height: clamp(120px, 26vh, 300px); border-radius: clamp(10px, 1.4vh, 16px); object-fit: cover; box-shadow: 0 24px 60px rgba(0, 0, 0, .45); }   /* Volumio's own cover */
+/* the same in every layout: the layouts place the playing clock (absolute, in a corner or above the track), not this one */
+body#artwork .aw-amb .aw-amb__idle .aw-amb__clock--idle { position: static; inset: auto; transform: none; margin: 0; color: var(--amb-ink, #fff); text-shadow: none; font-size: clamp(64px, 12vh, 132px); line-height: .9; letter-spacing: -.03em; }
 body#artwork .aw-amb__idle .aw-amb__name { font-size: calc(clamp(12px, 1.4vh, 15px) * var(--amb-ts)); letter-spacing: .18em; color: var(--ink-dim); }
 
 /* --- paused: the tag above the title, the hairline in the muted ink ---------------------- */

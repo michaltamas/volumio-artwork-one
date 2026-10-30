@@ -103,6 +103,47 @@ test('stopped while active, the next start brings the interface back (an update,
   assert.ok(!calls.some(c => c[0] === 'exec' && c[3] === 'setVolumio3UI'));
 });
 
+test('stopped for an update of Artwork One: the interface stays, and the plugin starts itself again when the core is done', async () => {
+  const { ctx, calls } = fakeVolumio();
+  const p = new Plugin(ctx);
+  const started = [];
+  ctx.coreCommand.pluginManager.startPlugin = (c, n) => { started.push(c + '/' + n); return p.onStart(); };
+  p.onVolumioStart();
+  await p.onStart();
+  fs.writeFileSync(p.paths.ACTIVE_UI, JSON.stringify(p.uiEntry()));
+  fs.writeFileSync(p.paths.CORE_UI_LIST, JSON.stringify([{ uiPrettyName: 'Manifest', uiName: 'manifest', uiPath: tmp }]));
+  // the core has downloaded the package and is unpacking it
+  fs.mkdirSync(path.dirname(p.paths.DOWNLOAD), { recursive: true }); fs.writeFileSync(p.paths.DOWNLOAD, 'zip');
+  fs.mkdirSync(p.paths.CORE_TEMP, { recursive: true });
+  p.packageName = () => 'artwork_one';
+  calls.length = 0;
+  await p.onStop();
+  assert.ok(!calls.some(c => c[0] === 'exec' && c[3] === 'setVolumio3UI'), 'no switch to Manifest');
+  assert.equal(JSON.parse(fs.readFileSync(p.paths.UI_LIST, 'utf8')).filter(u => u.uiName === 'artwork').length, 1, 'still listed');
+  assert.ok(p.updateTimer, 'waits for the core');
+  // the core is done
+  fs.rmSync(p.paths.DOWNLOAD); fs.rmSync(p.paths.CORE_TEMP, { recursive: true });
+  await new Promise(r => setTimeout(r, 1300));
+  assert.deepEqual(started, ['user_interface/artwork_one']);
+  assert.ok(calls.some(c => c[0] === 'exec' && c[3] === 'setVolumio3UI' && c[4].volumio3_ui.value === 'artwork'), 'the screens reload');
+  assert.equal(p.config.get('wasActive'), false);
+});
+
+test('stopped while another plugin\'s package waits (or none): an ordinary stop', async () => {
+  const { ctx, calls } = fakeVolumio();
+  const p = new Plugin(ctx);
+  p.onVolumioStart();
+  await p.onStart();
+  fs.writeFileSync(p.paths.ACTIVE_UI, JSON.stringify(p.uiEntry()));
+  fs.writeFileSync(p.paths.CORE_UI_LIST, JSON.stringify([{ uiPrettyName: 'Manifest', uiName: 'manifest', uiPath: tmp }]));
+  fs.mkdirSync(path.dirname(p.paths.DOWNLOAD), { recursive: true }); fs.writeFileSync(p.paths.DOWNLOAD, 'zip');
+  p.packageName = () => 'some_other_plugin';
+  await p.onStop();
+  assert.ok(calls.some(c => c[0] === 'exec' && c[3] === 'setVolumio3UI' && c[4].volumio3_ui.value === 'manifest'));
+  assert.ok(!p.updateTimer);
+  fs.rmSync(p.paths.DOWNLOAD);
+});
+
 test('first start after an installation switches the player to Artwork One, once; an update or a later start leaves the choice alone', async () => {
   const conf = path.join(tmp, 'config.json');
   const manifest = { uiPrettyName: 'Manifest', uiName: 'manifest', uiPath: tmp };

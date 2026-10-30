@@ -6,6 +6,8 @@ export function albumart(path?: string | null): string {
   if (path.indexOf('http') > -1) { return path; }
   return HOST + path;
 }
+// Volumio's own cover for "nothing playing" (the Volumio logo), as the stock interface shows it
+export const IDLE_ART = '/albumart';
 
 // the REST API on the player (CORS is open on it)
 export async function rest<T = any>(path: string, params?: Record<string, string>): Promise<T | null> {
