@@ -6,6 +6,20 @@ All notable changes to this project are documented here. The format is based on
 
 Versions 1.x and 2.x were published in [volumio-artwork-theme](https://github.com/michaltamas/volumio-artwork-theme).
 
+## [3.2.10] - 2026-10-30
+
+### Changed
+
+- **Browse on large libraries.** A list of more than 150 items (Albums, Artists, Genres, a big folder or playlist) draws only the rows on screen and a few around them. With 3,000 albums on a slow device the page opened in 0.1 s instead of 4.3 s and scrolled at 60 fps instead of 2. The scrollbar, the alphabet rail, the filter, Z–A and the position a page comes back to work as before. Volumio still sends the whole list in one answer, so the wait for that answer stays.
+- **Nothing playing:** Volumio's own cover in the mini player, on the empty Now Playing and above the clock on the ambient display.
+
+### Fixed
+
+- **An update from the plugin store** left Artwork One switched on but inactive, with the player on Manifest until Volumio restarted. The plugin now keeps the interface during the update, starts itself again when Volumio is done and reloads the screens with the new version. This works for updates *from* 3.2.10 on: the update to 3.2.10 itself still runs the old code, so restart Volumio once after it (or switch the plugin off and on).
+- **The idle clock on the ambient display** was tiny in the Cover layout and off-centre in the Clock layout; it is now the same in every layout.
+- **The mini player** showed the last track's rate when nothing was playing.
+- Scrolling a library page no longer redraws the whole page on every frame.
+
 ## [3.2.9] - 2026-10-27
 
 ### Added
@@ -252,6 +266,7 @@ Artwork One rebuilt from the ground up in React. Same look, same features, a new
 - Built with React and Vite instead of AngularJS: the release is a quarter of the size (1.8 MB instead of 7.8 MB), faster to open, with one stylesheet per part instead of layered theme overrides.
 - The release archive is now `artwork-one.tar.gz`; the installer puts it in the same place as before, so 1.x and 2.x are replaced in place.
 
+[3.2.10]: https://github.com/michaltamas/volumio-artwork-one/releases/tag/v3.2.10
 [3.2.9]: https://github.com/michaltamas/volumio-artwork-one/releases/tag/v3.2.9
 [3.2.8]: https://github.com/michaltamas/volumio-artwork-one/releases/tag/v3.2.8
 [3.2.7]: https://github.com/michaltamas/volumio-artwork-one/releases/tag/v3.2.7
