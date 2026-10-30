@@ -18,6 +18,9 @@ $aw-heart: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' vie
 #browse-page .panel-title { color: var(--ink-1); display: inline-flex; align-items: center; width: 100%; margin-top: 24px; margin-bottom: 0; padding: 0; font-size: 18px; line-height: 20px; }
 .main__list .album__tracks:first-child { padding-top: 12px; }
 .main__list .album__tracks:last-child { padding-bottom: 12px; }
+/* a long list drawn a window at a time (VirtualItems): the list's ends carry that padding, so a row's height is the same wherever the window is */
+body#artwork .main__list.aw-virtual { padding-block: 12px;
+  > .album__tracks:first-child { padding-top: 0; } > .album__tracks:last-child { padding-bottom: 0; } }
 .music-card__wrapper { min-width: 0; }
 
 /* cards */

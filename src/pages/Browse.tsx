@@ -8,6 +8,7 @@ import { createPortal } from 'react-dom';
 import Icon from '../components/Icon';
 import ServiceFilters, { hasServiceFilters, hasServiceSortings } from '../components/browse/ServiceFilters';
 import { searchPlaylists } from '../core/playlistSearch';
+import { jumpVirtual } from '../components/browse/VirtualItems';
 import PageHead from '../components/PageHead';
 import Crumbs from '../components/browse/Crumbs';
 import BrowseLanding, { streamingOf } from '../components/browse/BrowseLanding';
@@ -93,7 +94,8 @@ export default function Browse({ dedicated }: { dedicated?: boolean }) {
     const el = scroller.current; if (!el) { return; }
     el.scrollTop = (uri && b.scroll[uri]) || 0;
   }, [b.stamp]); // eslint-disable-line react-hooks/exhaustive-deps
-  const onScroll = () => { const el = scroller.current; if (el && uri) { useBrowse.setState({ scroll: { ...useBrowse.getState().scroll, [uri]: el.scrollTop } }); } };
+  // kept without a store update: a setState per scroll event redrew the whole page (every tile of a long list) on each frame
+  const onScroll = () => { const el = scroller.current; if (el && uri) { useBrowse.getState().scroll[uri] = el.scrollTop; } };
 
   // the head field: on a streaming service's pages it asks the service (Volumio's search, scoped); elsewhere it filters the rows
   const service = useMemo(() => {
@@ -149,6 +151,7 @@ export default function Browse({ dedicated }: { dedicated?: boolean }) {
     return sortDesc ? out.reverse() : out;
   }, [lists, sortDesc]);
   const jumpTo = (letter: string) => {
+    if (jumpVirtual(letter)) { setActiveLetter(letter); return; }   // a long list: its tiles off screen are not in the page to find
     const nodes = Array.from(document.querySelectorAll<HTMLElement>('#browse-page .music-card__wrapper:not(.placeholder-wrapper):not(.aw-hidden), #browse-page .main__source:not(.aw-artist-albums) .album__tracks:not(.aw-hidden)'));
     const titleOf = (el: HTMLElement) => { const t = el.querySelector('.music-card__label, .item__title'); return t ? (t.textContent || '').trim() : ''; };
     const target = nodes.find(el => norm(titleOf(el)).charAt(0).toUpperCase() === letter);
