@@ -5,12 +5,15 @@
  * ALSA plugin's configuration, read once over the same getUiConfig/pushUiConfig path the
  * Playback Options page uses. Nothing is claimed while the settings are unknown. While the
  * browserPlayback output is on, the path ends in this browser instead: the stream's codec replaces
- * the resample step and it is never bit-perfect.
+ * the resample step and it is never bit-perfect. With FusionDsp on, the ALSA chain runs through
+ * CamillaDSP between the resampling and the volume (asound.conf: volumio → volumioDsp → postDsp →
+ * softvolume → output), whether its effects are on or off: a DSP step, and not bit-perfect either.
  */
 import { create } from 'zustand';
 import '../socket';
 import { askUiConfig, onUiConfig, ALSA_PAGE } from '../uiConfig';
 import { useMultiroom } from './multiroom';
+import { useDsp } from './dsp';
 
 // Volumio 4 keeps the playback options on the MPD page; the ALSA controller's own page is empty
 const MPD_PAGE = 'music_service/mpd';
@@ -21,7 +24,7 @@ interface Alsa {
   bitdepth: string;
   samplerate: string;
   normalization: boolean | null;
-  mixerType: string;
+  mixerType: string;        // 'Hardware' | 'Software' | 'None': the select's value, not its translated label
 }
 
 interface SignalStore {
@@ -30,7 +33,9 @@ interface SignalStore {
   output: string;           // what the path ends in: the device, or this browser
   alsa: Alsa | null;
   resample: () => string;
+  dsp: () => string;        // the DSP step; empty without FusionDsp
   bitPerfect: () => boolean;
+  notBitPerfect: () => string;   // the first reason the path is not bit-perfect ('' when it is)
 }
 
 function flag(v: any): boolean | null {
@@ -65,14 +70,27 @@ export const useSignal = create<SignalStore>((_set, get) => ({
     const t = [a.bitdepth, a.samplerate].filter(Boolean).join(' / ');
     return t ? 'RESAMPLE ' + t : 'RESAMPLE';
   },
-  // untouched to the DAC: no resampling, no software volume, no normalisation
-  bitPerfect: () => {
-    if (get().browser) { return false; }
+  // FusionDsp's step: what it runs ("15 bands Graphic equalizer · Rock"), or that its effects are off
+  dsp: () => {
+    const d = useDsp.getState();
+    if (!d.available) { return ''; }
+    if (d.active === false) { return 'FusionDsp · effects off'; }
+    const preset = d.preset && !d.presetsOff && String(d.preset.value && typeof d.preset.value === 'object' ? d.preset.value.value : d.preset.value) !== 'nopreset' ? d.preset.label : '';
+    return [d.kind || 'FusionDsp', preset].filter(Boolean).join(' · ');
+  },
+  // untouched to the DAC: no resampling, no DSP, no software volume, no normalisation
+  bitPerfect: () => !get().notBitPerfect(),
+  notBitPerfect: () => {
+    if (get().browser) { return 'STREAM'; }
     const a = get().alsa;
-    if (!a || a.resampling === null) { return false; }
+    if (!a || a.resampling === null) { return 'UNKNOWN'; }
+    if (a.resampling) { return 'RESAMPLING'; }
+    if (useDsp.getState().available) { return 'DSP'; }
     const mixer = String(a.mixerType || '').toLowerCase();
-    const softMixer = !(mixer === 'hardware' || mixer === 'none' || mixer === 'disabled');
-    return a.resampling === false && !softMixer && a.normalization !== true;
+    // "undefined": a card without a mixer, the core's literal — no volume control at all
+    if (!(mixer === 'hardware' || mixer === 'none' || mixer === 'disabled' || mixer === 'undefined')) { return 'SOFTWARE VOLUME'; }
+    if (a.normalization === true) { return 'NORMALISATION'; }
+    return '';
   },
 }));
 
@@ -85,6 +103,8 @@ onUiConfig((_page, cfg) => {
     if (!el) { return; }
     const id = String(el.id || '');
     if (id) { const v = el.value; found[id] = (v && typeof v === 'object') ? (v.label !== undefined ? v.label : v.value) : v; }
+    // the mixer type is judged by its value: the label is in the player's language ("Logiciel")
+    if (id === 'mixer_type' && el.value && typeof el.value === 'object' && el.value.value !== undefined) { found.mixer_type = el.value.value; }
     if (el.content) { walk(el.content); }
   });
   try { if (cfg.sections) { cfg.sections.forEach((s: any) => walk(s.content)); } if (cfg.content) { walk(cfg.content); } } catch { return; }
@@ -107,6 +127,10 @@ onUiConfig((_page, cfg) => {
   });
 });
 askUiConfig(ALSA_PAGE).then(() => { if (!useSignal.getState().alsa) { askUiConfig(MPD_PAGE); } });
+useDsp.getState().refresh();   // whether FusionDsp is in the chain (the outputs sheet asks again when opened)
+
+// the DSP's presence or state changed: whoever draws the path reads it again
+useDsp.subscribe((d, prev) => { if (d.available !== prev.available || d.active !== prev.active || d.kind !== prev.kind || d.preset !== prev.preset) { useSignal.setState({ alsa: useSignal.getState().alsa ? { ...useSignal.getState().alsa! } : null }); } });
 
 useMultiroom.subscribe((m) => {
   const o = (m.outputs as any[]).find((x) => x && x.id === 'browserPlayback');

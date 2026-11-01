@@ -2,6 +2,7 @@
 import { useMenu } from '../../core/store/menu';
 import { useSettings } from '../../core/store/settings';
 import { usePlayer } from '../../core/store/player';
+import { useSignal } from '../../core/store/signal';
 import { buildDay } from '../../core/format';
 
 // Volumio names its boards by their build ('pi'); the one everyone knows by a longer name says it
@@ -14,7 +15,11 @@ export default function SettingsSide() {
   const stats = useSettings(s => s.stats);
   const systemInfo = useMenu(s => s.systemInfo);
   const st: any = usePlayer(s => s.state);
+  useSignal(s => s.alsa);   // the badge and the DSP step follow the signal store (FusionDsp's state included)
   if (!key) { return null; }
+  const dsp = useSignal.getState().dsp();
+  // the badge says why the path is not bit-perfect: resampling, the DSP, a software volume, normalisation
+  const why = useSignal.getState().notBitPerfect();
   const num = (s: any) => { const m = String(s || '').match(/^([\d.]+)/); return m ? m[1] : ''; };
   const fmt = String(st.trackType || st.stream || '').toUpperCase();
   const b = num(st.bitdepth), r = num(st.samplerate);
@@ -29,10 +34,11 @@ export default function SettingsSide() {
       {key === 'playback' ? (
         <div>
           <div className="aw-sside__eyebrow mono">LIVE SIGNAL PATH</div>
-          {resampling !== null ? <div className="aw-badge"><span className={'aw-badge__dot' + (resampling ? ' aw-badge__dot--warn' : '')} /><span className="mono">{resampling ? 'RESAMPLING' : 'BIT PERFECT'}</span></div> : null}
+          {resampling !== null && why !== 'UNKNOWN' ? <div className="aw-badge"><span className={'aw-badge__dot' + (why ? ' aw-badge__dot--warn' : '')} /><span className="mono">{why || 'BIT PERFECT'}</span></div> : null}
           <ol className="aw-path">
             {source ? <li><div className="aw-path__name">Source</div><div className="aw-path__val mono">{source}</div></li> : null}
             {resampling !== null ? <li><div className="aw-path__name">Resampling</div><div className="aw-path__val mono">{resampling ? (alsa && alsa.resamplingTarget ? 'ON · ' + alsa.resamplingTarget : 'ON') : 'NONE · PASSTHROUGH'}</div></li> : null}
+            {dsp ? <li><div className="aw-path__name">DSP</div><div className="aw-path__val mono">{dsp}</div></li> : null}
             {mixer ? <li><div className="aw-path__name">Volume</div><div className="aw-path__val mono">{mixer}</div></li> : null}
             {alsa && alsa.output ? <li><div className="aw-path__name">Output</div><div className="aw-path__val mono">{alsa.output}</div></li> : null}
           </ol>

@@ -266,7 +266,8 @@ body#artwork #np .np-external {
 body#artwork #np.np--empty {
   .np-empty { flex: 1 1 auto; min-height: 0; display: flex; align-items: center; justify-content: center; gap: clamp(32px, 6vw, 96px); padding: clamp(16px, 4vh, 40px) 0; overflow-y: auto; }
   .np-empty__intro { flex: 0 1 500px; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; }
-  .np-empty__icon { width: clamp(96px, 11vw, 136px); aspect-ratio: 1; border-radius: 16px; overflow: hidden; background: var(--fill-10); border: 1px solid var(--fill-13); margin-bottom: 24px;
+  /* Volumio's own cover at a cover's size: a share of the width, never more than the height leaves for the words under it */
+  .np-empty__icon { width: min(clamp(160px, 24vw, 340px), 40vh); aspect-ratio: 1; border-radius: var(--r-cover); overflow: hidden; background: var(--fill-10); box-shadow: var(--shadow-cover); margin-bottom: 28px;   /* as #np-cover: no frame */
     img { display: block; width: 100%; height: 100%; object-fit: cover; } }   /* Volumio's own cover: nothing playing */
   .np-empty__title { margin: 0; font-family: var(--font-ui); font-size: clamp(30px, 3vw, 44px); line-height: 1.02; letter-spacing: -.03em; font-weight: 800; color: var(--ink); }
   .np-empty__text { margin: 12px 0 0; font-size: 15px; line-height: 1.45; color: var(--ink-3); text-wrap: pretty; }
@@ -289,6 +290,7 @@ body#artwork #np.np--empty {
   body#artwork #np.np--empty {
     .np-empty { flex-direction: column; align-items: stretch; justify-content: flex-start; gap: 36px; }
     .np-empty__intro, .np-empty__recent { flex: none; }
+    .np-empty__icon { width: min(56vw, 34vh); }   /* a phone or a tablet upright: most of the width, the words still under it */
   }
 }
 

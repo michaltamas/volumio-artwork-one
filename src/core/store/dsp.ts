@@ -22,6 +22,7 @@ interface DspStore {
   preset: DspPreset | null;
   presetsOff: boolean;         // a DSP without presets (convolution filter, CamillaDSP GUI)
   switchOff: boolean;          // the CamillaDSP GUI: no switch either
+  kind: string;                // the DSP chosen, as the plugin names it ("15 bands Graphic equalizer")
   refresh: () => void;
   toggle: () => void;
   choose: (p: DspPreset) => void;
@@ -30,7 +31,7 @@ interface DspStore {
 const label = (o: any) => o && typeof o === 'object' ? String(o.label ?? o.value ?? '') : String(o ?? '');
 
 export const useDsp = create<DspStore>((set, get) => ({
-  available: false, active: null, presets: [], preset: null, presetsOff: false, switchOff: false,
+  available: false, active: null, presets: [], preset: null, presetsOff: false, switchOff: false, kind: '',
   refresh: () => { emit('getInstalledPlugins'); },
   toggle: () => {
     const on = !!get().active;
@@ -48,14 +49,14 @@ export const useDsp = create<DspStore>((set, get) => ({
 on('pushInstalledPlugins', (list: any) => {
   if (!Array.isArray(list)) { return; }
   const has = list.some((p: any) => p && p.name === 'fusiondsp' && p.enabled);
-  useDsp.setState(has ? { available: true } : { available: false, active: null, presets: [], preset: null });
+  useDsp.setState(has ? { available: true } : { available: false, active: null, presets: [], preset: null, kind: '' });
   if (has) { emit('getDSPUiConfig'); }
 });
 
 on('pushDSPUiConfig', (conf: any) => {
   const sections: any[] = conf && Array.isArray(conf.sections) ? conf.sections : [];
   if (!sections.length) { return; }
-  let active: boolean | null = null, presets: DspPreset[] = [], preset: DspPreset | null = null, presetsOff = false, switchOff = false;
+  let active: boolean | null = null, presets: DspPreset[] = [], preset: DspPreset | null = null, presetsOff = false, switchOff = false, kind = '';
   sections.forEach((s: any) => {
     const content: any[] = s && Array.isArray(s.content) ? s.content : [];
     if (s.id === 'main') { content.forEach((c: any) => { if (c && c.id === 'enableeffect') { active = false; } if (c && c.id === 'disableeffect') { active = true; } }); }
@@ -68,8 +69,8 @@ on('pushDSPUiConfig', (conf: any) => {
       });
     }
     if (s.id === 'choosedsp') {
-      content.forEach((c: any) => { if (c && c.id === 'selectedsp') { const d = c.value && typeof c.value === 'object' ? c.value.value : c.value; presetsOff = d === 'convfir' || d === 'purecgui'; switchOff = d === 'purecgui'; } });
+      content.forEach((c: any) => { if (c && c.id === 'selectedsp') { const d = c.value && typeof c.value === 'object' ? c.value.value : c.value; presetsOff = d === 'convfir' || d === 'purecgui'; switchOff = d === 'purecgui'; kind = label(c.value); } });
     }
   });
-  useDsp.setState({ active, presets, preset, presetsOff, switchOff });
+  useDsp.setState({ active, presets, preset, presetsOff, switchOff, kind });
 });

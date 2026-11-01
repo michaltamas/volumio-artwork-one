@@ -3,7 +3,10 @@ body#artwork .aw-zones { padding: 0 var(--pad-screen) 48px; color: var(--ink-1);
   .aw-listhead { margin: 26px 0 18px; }   /* as the library's lists under their head */
   .aw-menu-btn { display: none; }
   .aw-zones__empty { font-size: 15px; color: var(--ink-muted); margin-top: 12px; }
-  .aw-zones__cols, .aw-zone { display: grid; grid-template-columns: 44px 1fr 300px 220px 200px; align-items: center; gap: 20px; }
+  .aw-zones__cols, .aw-zone { display: grid; align-items: center; gap: 20px;
+    /* the mockup's columns (name · 300 track · 220 volume · 200 actions) where they fit; a row never grows past the card:
+       the three shrink before the name does, and the name keeps room for a word (a phone on its side with its rail and notch) */
+    grid-template-columns: 44px minmax(110px, 1fr) minmax(0, 300px) minmax(120px, 220px) minmax(auto, 200px); }
   .aw-zones__cols { padding: 16px 14px 12px; font-size: 10px; letter-spacing: .16em; color: var(--ink-dim); }
   .aw-zone { padding: 14px; border-radius: 12px; border-top: 1px solid var(--fill-06);
     &.aw-zone--self { background: var(--fill-06); border-top: 0; }

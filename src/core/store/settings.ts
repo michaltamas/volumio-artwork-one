@@ -133,7 +133,9 @@ function readAlsa(cfg: any) {
   // and leaves its old value in place (HDMI Out) — that value no longer says where the music goes
   const i2s = found.i2s === true || found.i2s === 'true';
   const output = i2s && found.i2sid ? found.i2sid : found.output_device;
-  useSettings.setState({ alsa: { output: output ? String(output) : '', mixerType: found.mixer_type ? String(found.mixer_type) : '', mixer: found.mixer ? String(found.mixer) : '',
+  // a card without a mixer leaves the literal "undefined" in the type (the core's config): no volume step, not that word
+  const mixerType = found.mixer_type && String(found.mixer_type) !== 'undefined' ? String(found.mixer_type) : '';
+  useSettings.setState({ alsa: { output: output ? String(output) : '', mixerType, mixer: found.mixer ? String(found.mixer) : '',
     resampling: (res === true || res === 'true') ? true : ((res === false || res === 'false') ? false : null), resamplingTarget: [found.resampling_target_bitdepth, found.resampling_target_samplerate].filter(Boolean).join(' / ') } });
 }
 // a page's sections and their rows as the page shows them: the theme's names where it has its own (settingsCopy),

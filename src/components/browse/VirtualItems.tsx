@@ -31,6 +31,7 @@ export default function VirtualItems({ className, grid, count, render, tail, let
   const [m, setM] = useState<Metrics>({ cols: grid ? 6 : 1, row: grid ? 260 : 64, gap: 0 });
   const [range, setRange] = useState<[number, number]>([0, grid ? 6 : 20]);
   const live = useRef({ m, count, letterOf }); live.current = { m, count, letterOf };
+  const seen = useRef('');   // the width, columns and length the row height was measured for
 
   // where the list's first row sits from the scroller's top edge (negative once scrolled past)
   const offset = (el: HTMLElement, sc: HTMLElement) => el.getBoundingClientRect().top - sc.getBoundingClientRect().top + (parseFloat(getComputedStyle(el).paddingTop) || 0);
@@ -53,7 +54,12 @@ export default function VirtualItems({ className, grid, count, render, tail, let
     const sample = grid ? cells.slice(0, cols) : cells.filter(c => c !== el.firstElementChild && c !== el.lastElementChild).slice(0, 3);
     const row = (sample.length ? sample : cells.slice(0, 1)).reduce((h, c) => Math.max(h, c.getBoundingClientRect().height), 0) || live.current.m.row;
     const cur = live.current.m;
-    if (cols !== cur.cols || gap !== cur.gap || Math.abs(row - cur.row) > 0.25) { setM({ cols, row, gap }); return true; }
+    // rows can differ (an artist's "7 albums" arrives later, an album without an artist): the height decides which rows
+    // are drawn, so a smaller sample further down would move the window back to a taller row and so on, a render loop.
+    // For the same width, columns and length the height only grows; it is measured afresh when one of them changes.
+    const k = cols + ':' + Math.round(el.clientWidth) + ':' + live.current.count;
+    const fresh = k !== seen.current; if (cells.length) { seen.current = k; }   // an empty window measures nothing: the next one is still the first
+    if (cols !== cur.cols || gap !== cur.gap || (fresh ? Math.abs(row - cur.row) > 0.25 : row > cur.row + 0.25)) { setM({ cols, row, gap }); return true; }
     return false;
   };
 

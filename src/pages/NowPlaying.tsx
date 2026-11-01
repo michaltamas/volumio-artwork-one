@@ -56,6 +56,7 @@ export default function NowPlaying() {
   const output = useSignal(s => s.output);
   const alsa = useSignal(s => s.alsa);
   const resample = useSignal.getState().resample();
+  const dsp = useSignal.getState().dsp();
   const bitPerfect = useSignal.getState().bitPerfect();
   const queueDocked = useUi(s => isQueueDocked(s, true));
   const queueOpen = useUi(s => queueDocked || (s.queueOpen && !canDockQueue(s, true)));
@@ -285,6 +286,7 @@ export default function NowPlaying() {
                 <div className="np-signalpath mono">
                   <span>SOURCE {signal(st)}</span>
                   {resample ? <><span className="np-arrow">→</span><span>{resample}</span></> : null}
+                  {dsp ? <><span className="np-arrow">→</span><span>{/effects off/.test(dsp) ? 'DSP OFF' : 'DSP'}</span></> : null}
                   {output ? <><span className="np-arrow">→</span><span className="np-node-final">{output}</span></> : null}
                 </div>
               ) : null}

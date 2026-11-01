@@ -21,6 +21,8 @@ $aw-heart: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' vie
 /* a long list drawn a window at a time (VirtualItems): the list's ends carry that padding, so a row's height is the same wherever the window is */
 body#artwork .main__list.aw-virtual { padding-block: 12px;
   > .album__tracks:first-child { padding-top: 0; } > .album__tracks:last-child { padding-bottom: 0; } }
+/* and a tile keeps its meta line while it is empty (an artist's "7 albums" still on its way, an album without an artist): every row is as tall */
+body#artwork .main__row.aw-virtual .music-card__meta { min-height: 15px; }
 .music-card__wrapper { min-width: 0; }
 
 /* cards */
