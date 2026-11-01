@@ -6,6 +6,19 @@ All notable changes to this project are documented here. The format is based on
 
 Versions 1.x and 2.x were published in [volumio-artwork-theme](https://github.com/michaltamas/volumio-artwork-theme).
 
+## [3.2.11] - 2026-11-01
+
+### Fixed
+
+- **Artists (and any long list) crashed on an iPad** with "Something went wrong" (React error #185) in 3.2.10. Rows of a long list can differ in height for a moment (an artist's album count arrives a little later, an album without an artist has no second line), and the windowed list measured the rows again on every change and kept moving its window. The row height is now measured once per width and only ever grows, and a tile keeps its second line while it is empty.
+- **Live Signal Path with FusionDsp.** The path showed Source → Resampling → Volume and the BIT PERFECT badge while FusionDsp was in the chain. It now shows a DSP step (the equalizer and the preset FusionDsp runs, or "effects off") between Resampling and Volume, on the Playback settings and on Now Playing, and the badge says DSP. Reported by balbuze.
+- **A card without a mixer** showed "Volume: UNDEFINED" in the path; the step is left out.
+- **Zones:** a row keeps its columns inside its card on every width; the player's name no longer disappears when the columns do not fit.
+
+### Changed
+
+- **Nothing playing:** the Volumio cover on the empty Now Playing is as big as an album's cover, sized to the screen (a phone, a tablet, a desktop), without a frame.
+
 ## [3.2.10] - 2026-10-30
 
 ### Changed
