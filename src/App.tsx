@@ -8,7 +8,6 @@ import MobileMenu from './components/MobileMenu';
 import ModalHost from './components/ModalHost';
 import NowPlaying from './pages/NowPlaying';
 import Home from './pages/Home';
-import PlayQueue from './pages/PlayQueue';
 import Wizard from './pages/Wizard';
 import Browse from './pages/Browse';
 import Zones from './pages/Zones';
@@ -88,7 +87,7 @@ function Shell() {
               <Route path="/browse" element={<Browse />} />
               <Route path="/search" element={<Browse dedicated />} />
               <Route path="/playback" element={<Home />} />
-              <Route path="/queue" element={<PlayQueue />} />
+              <Route path="/queue" element={<QueueRoute />} />
               <Route path="/wizard" element={<Wizard />} />
               <Route path="/multi-room" element={<Zones />} />
               <Route path="/settings" element={<Settings />} />
@@ -118,6 +117,16 @@ function Shell() {
       <ConnectionLost />
     </>
   );
+}
+
+// the frame's queue page (volumio.queue from a plugin's modal or a typed address): there is one queue, the panel —
+// opened over Now Playing, or the docked one brought back when it is pinned beside it
+function QueueRoute() {
+  useEffect(() => {
+    const u = useUi.getState();
+    if (u.queuePinned && u.dockRoom) { useUi.setState({ dockHidden: false, outputsOpen: false }); } else { u.showQueue(); }
+  }, []);
+  return <Navigate to="/playback" replace />;
 }
 
 export default function App() {

@@ -18,7 +18,6 @@ import './styles/plugin.scss';
 import './styles/settings-cards.scss';
 import './styles/myvolumio.scss';
 import './styles/queue.scss';
-import './styles/queue-page.scss';
 import './styles/wizard.scss';
 import './styles/outputs.scss';
 import './styles/menu.scss';
