@@ -2,6 +2,7 @@
  * The floating queue panel (mockup "Queue — floating overlay panel"): header, chips,
  * NOW & NEXT rows, each dragged by itself to reorder, a footer with what happens at the end.
  * On Now Playing in a wide window it can be pinned: then it is docked beside the page, full height.
+ * As a page (/queue, the frame's queue state) the same panel is laid out in the page: static, its width, scrolling with it.
  */
 import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -21,12 +22,12 @@ function fmt(sec: any): string {
   return m + ':' + (r < 10 ? '0' + r : r);
 }
 
-export default function QueuePanel() {
-  const onPlayback = useLocation().pathname === '/playback';
-  const docked = useUi(s => isQueueDocked(s, onPlayback));
+export default function QueuePanel({ page }: { page?: boolean }) {
+  const onPlayback = !page && useLocation().pathname === '/playback';
+  const docked = useUi(s => !page && isQueueDocked(s, onPlayback));
   const canPin = useUi(s => s.dockRoom) && onPlayback;
   // pinned on Now Playing the queue is only ever the docked one, never the floating sheet as well
-  const open = useUi(s => docked || (s.queueOpen && !canDockQueue(s, onPlayback)));
+  const open = useUi(s => !!page || docked || (s.queueOpen && !canDockQueue(s, onPlayback)));
   const queue = useQueue(s => s.queue);
   const st = usePlayer(s => s.state);
   const elapsedMs = usePlayer(s => s.elapsedMs);
@@ -55,24 +56,24 @@ export default function QueuePanel() {
     if (!open) { return; }
     const el = root.current?.querySelector('.aw-queue__row.is-current');
     if (el) { el.scrollIntoView({ block: 'nearest' }); }
-    if (docked) { return; }   // docked it is part of the page: Escape does not take it away
+    if (docked || page) { return; }   // docked (or the page) it is part of the page: Escape does not take it away
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') { useUi.getState().hideQueue(); } };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [open, docked]);
+  }, [open, docked, page]);
 
   // drag to reorder, by the whole row (core/rowDrag): on release the player gets moveQueue and re-renders the new order
   const onRowDown = (e: React.PointerEvent<HTMLDivElement>) => rowDrag(e, '.aw-queue__row', (from, to) => useQueue.getState().move(from, to));
 
   return (
-    <div className={'aw-queue' + (open ? ' open' : '') + (onPlayback ? ' on-playback' : '') + (docked ? ' is-docked' : '')} role={docked ? 'complementary' : 'dialog'} aria-label="Queue" aria-hidden={!open} ref={root}>
+    <div className={'aw-queue' + (open ? ' open' : '') + (onPlayback ? ' on-playback' : '') + (docked ? ' is-docked' : '') + (page ? ' aw-queue--page' : '')} role={docked || page ? 'complementary' : 'dialog'} aria-label="Queue" aria-hidden={!open} ref={root}>
       <div className="aw-queue__head">
         <div className="aw-queue__titles">
           <div className="aw-queue__title">Queue</div>
           <div className="aw-queue__sub mono">{queue.length} TRACKS{minutesLeft !== null ? <span>&nbsp;· {minutesLeft} MIN LEFT</span> : null}</div>
         </div>
         {canPin ? <button type="button" className={'aw-queue__pin' + (docked ? ' active' : '')} onClick={() => useUi.getState().toggleQueuePin()} aria-pressed={docked} aria-label={docked ? 'Unpin' : 'Pin beside the cover'} title={docked ? 'Unpin' : 'Pin beside the cover'}><Icon name="push_pin" /></button> : null}
-        {docked ? null : <button type="button" className="aw-queue__close" onClick={() => useUi.getState().hideQueue()} aria-label="Close" title="Close"><Icon name="close" /></button>}
+        {docked || page ? null : <button type="button" className="aw-queue__close" onClick={() => useUi.getState().hideQueue()} aria-label="Close" title="Close"><Icon name="close" /></button>}
       </div>
       <div className="aw-queue__chips">
         <button type="button" className={'aw-queue__chip' + (st.random ? ' active' : '')} onClick={() => usePlayer.getState().shuffle()} title="Shuffle"><Icon name="shuffle" /><span>Shuffle</span></button>

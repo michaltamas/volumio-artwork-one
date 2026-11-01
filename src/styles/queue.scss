@@ -103,5 +103,16 @@ body#artwork { --queue-dock-w: 440px; }
 @media (prefers-reduced-motion: reduce) { body#artwork .aw-queue, body#artwork .aw-queue__pin .material-symbols-rounded { transition: none; } }
 @media (max-width: 600px) { body#artwork .aw-queue .aw-queue__hint { display: none; } body#artwork .aw-queue__row { gap: 10px; padding: 0 10px; } }
 
+/* the queue page (/queue): the same panel laid out in the page — static, the page's width between its paddings, scrolling with
+   the page under the fixed head (its spacer carries the top, as the list pages); every measure inside is the panel's own */
+body#artwork .aw-qpage { padding: 0 var(--pad-screen) 48px; }
+body#artwork .aw-queue.aw-queue--page { position: static; width: auto; border-radius: 0; border: 0; box-shadow: none; background: transparent; -webkit-backdrop-filter: none; backdrop-filter: none;
+  opacity: 1; transform: none; visibility: visible; pointer-events: auto; transition: none;
+  .aw-queue__head { padding: 26px 0 0; }
+  .aw-queue__chips { padding: 18px 0 16px; }
+  .aw-queue__sechead { padding: 0; }
+  .aw-queue__scroll { flex: none; overflow: visible; padding: 12px 0 0; }
+  .aw-queue__foot { padding: 16px 0 0; } }
+
 /* shared by library and queue rows: the playing row while this browser loads the stream */
 body#artwork .aw-loading-spin { display: block; color: var(--ink); }
