@@ -3,7 +3,7 @@
  * the time remaining and back (remembered in this browser; the phone's Now Playing shows the
  * remaining time always).
  * The whole hit area scrubs by pointer; the fill and the label follow the finger and the seek
- * is sent once on release. The arrow keys step by five seconds.
+ * is sent once on release. The arrow keys step by ten seconds, as the shortcuts do.
  */
 import { useRef, useState } from 'react';
 import { usePlayer } from '../core/store/player';
@@ -45,8 +45,8 @@ export default function SeekBar() {
   };
   const onKey = (e: React.KeyboardEvent) => {
     const cur = elapsedMs / 1000;
-    if (e.key === 'ArrowRight') { e.preventDefault(); seekTo(Math.min(duration, cur + 5)); }
-    if (e.key === 'ArrowLeft') { e.preventDefault(); seekTo(Math.max(0, cur - 5)); }
+    if (e.key === 'ArrowRight') { e.preventDefault(); seekTo(Math.min(duration, cur + 10)); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); seekTo(Math.max(0, cur - 10)); }
   };
   return (
     <div className={'artwork-seek' + (remain ? ' is-remain' : '')}>

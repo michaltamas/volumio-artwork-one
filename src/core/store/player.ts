@@ -91,8 +91,13 @@ on('pushState', (data: PlayerState) => {
   st.disableUi = !!st.disableUiControls || st.service === 'analogin';
   usePlayer.setState({ state: st, elapsedMs: (st.seek || 0), ready: true });
   if (st.status === 'play') { startClock(); } else { stopClock(); }
-  // the page's own title: what plays, the way Volumio's interface does it
-  try { document.title = st.title ? `${st.title}${st.artist ? ' · ' + st.artist : ''}` : 'Volumio'; } catch { /* no document */ }
+  // the page's own title: what plays, the way Volumio's interface does it; the tab's icon turns green while music plays
+  try {
+    document.title = st.title ? `${st.title}${st.artist ? ' · ' + st.artist : ''}` : 'Volumio';
+    const icon = document.querySelector('link[rel="icon"][type="image/svg+xml"]');
+    const href = st.status === 'play' ? '/favicon-playing.svg' : '/favicon.svg';
+    if (icon && icon.getAttribute('href') !== href) { icon.setAttribute('href', href); }
+  } catch { /* no document */ }
 });
 on('urifavourites', (data: Favourite) => usePlayer.setState({ favourite: data || { favourite: false } }));
 
