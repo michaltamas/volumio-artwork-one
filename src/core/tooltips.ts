@@ -84,6 +84,7 @@ document.addEventListener('pointerdown', (e) => {
 // a finger lifted before the long press: no tip (and a tip from an earlier press goes); after one, it stays its 2.5 s
 document.addEventListener('pointerup', (e) => { if (e.pointerType === 'mouse') { return; } const shown = !!(target && tip && tip.classList.contains('is-on')); window.clearTimeout(pressTimer); if (!shown) { hide(); } }, { capture: true });
 ['pointercancel', 'scroll', 'wheel', 'keydown'].forEach(ev => document.addEventListener(ev, hide, { passive: true, capture: true }));
-document.addEventListener('focusin', (e) => { const t = e.target as HTMLElement; if (t && t.title && t.matches(':focus-visible')) { show(t, false); } });
+// a field keeps its title to itself: a focused input always matches :focus-visible, and a tip over the text being typed is in the way
+document.addEventListener('focusin', (e) => { const t = e.target as HTMLElement; if (t && t.title && t.matches(':focus-visible') && !t.matches('input, textarea, select')) { show(t, false); } });
 document.addEventListener('focusout', hide);
 useUi.subscribe(hide);   // a sheet opening, a page changing: the tip has nothing under it any more

@@ -10,6 +10,7 @@ import PageHead from '../PageHead';
 import { albumart, rest } from '../../core/api';
 import { useBrowse, type BrowseItem } from '../../core/store/browse';
 import { useUi } from '../../core/store/ui';
+import { useRecentSearches } from '../../core/store/recentSearches';
 
 // Settings → Sources (Volumio's My Music page): network drives, USB, the library's sources
 const SOURCES_SETTINGS = '/plugin/miscellanea-my_music';
@@ -25,6 +26,7 @@ export default function BrowseLanding({ dedicated }: { dedicated?: boolean }) {
   const searchField = useBrowse(s => s.searchField);
   const isSearching = useBrowse(s => s.isSearching);
   const lists = useBrowse(s => s.lists);
+  const recent = useRecentSearches(s => s.list);
   const [home, setHome] = useState<Home>({ stats: null, albumsArt: [], artistsArt: [], playlistArt: null, counts: {} });
   const [logoFail, setLogoFail] = useState<Record<string, boolean>>({});
   const input = useRef<HTMLInputElement>(null);
@@ -54,6 +56,24 @@ export default function BrowseLanding({ dedicated }: { dedicated?: boolean }) {
   const h = s ? parseInt(String(s.playtime || '').split(':')[0], 10) : NaN;
   const statsLine = s ? `${s.artists} ARTISTS · ${s.albums} ALBUMS` + (isNaN(h) ? '' : ` · ${h} H`) : '';
   const landingSearch = isSearching;
+  const recents = (
+    <>
+      {searchField.length === 1 ? <div className="aw-recent__hint">Keep typing: the search starts at two characters.</div> : null}
+      {recent.length && !searchField.length ? (
+        <div className="aw-recent">
+          <div className="aw-recent__head"><span className="mono">RECENT SEARCHES</span><button type="button" className="aw-recent__clear" onClick={() => useRecentSearches.getState().clear()}>Clear all</button></div>
+          <div className="aw-recent__chips">
+            {recent.map(q => (
+              <span className="aw-recent__chip" key={q}>
+                <button type="button" className="aw-recent__run" onClick={() => useBrowse.getState().search(q)}><Icon name="history" /><span>{q}</span></button>
+                <button type="button" className="aw-recent__x" onClick={() => useRecentSearches.getState().remove(q)} aria-label={'Forget ' + q} title="Forget"><Icon name="close" /></button>
+              </span>
+            ))}
+          </div>
+        </div>
+      ) : null}
+    </>
+  );
   const searchCount = (lists || []).reduce((n, l) => n + ((l.items || []).length), 0);
 
   return (
@@ -76,13 +96,15 @@ export default function BrowseLanding({ dedicated }: { dedicated?: boolean }) {
           </label>} />
       ) : null}
 
-      {landingSearch ? (
+      {landingSearch && searchField.length < 2 ? <div className="aw-recent__under">{recents}</div> : null}
+      {landingSearch && searchField.length >= 2 ? (
         <div className="aw-listhead aw-listhead--search">
           <h1 className="aw-listhead__title">Results</h1>
           {searchCount ? <span className="aw-listhead__count mono">{searchCount}</span> : null}
         </div>
-      ) : (
+      ) : landingSearch ? null : (
         <div>
+          {recents}
           <div className="aw-browse-head">
             <h1 className="aw-browse-title">Browse</h1>
             {statsLine ? <div className="aw-browse-stats mono">{statsLine}</div> : null}

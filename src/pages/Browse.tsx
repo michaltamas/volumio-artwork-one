@@ -8,6 +8,7 @@ import { createPortal } from 'react-dom';
 import Icon from '../components/Icon';
 import ServiceFilters, { hasServiceFilters, hasServiceSortings } from '../components/browse/ServiceFilters';
 import { searchPlaylists } from '../core/playlistSearch';
+import Dropdown, { type MenuEntry } from '../components/Dropdown';
 import { jumpVirtual } from '../components/browse/VirtualItems';
 import PageHead from '../components/PageHead';
 import Crumbs from '../components/browse/Crumbs';
@@ -15,9 +16,10 @@ import BrowseLanding, { streamingOf } from '../components/browse/BrowseLanding';
 import AlbumHead, { AlbumPageHead, useCrumbs, goCrumb, isPlaylistInfo } from '../components/browse/AlbumHead';
 import ArtistHead, { artistLists, norm } from '../components/browse/ArtistHead';
 import BrowseLists from '../components/browse/BrowseLists';
+import SearchResults from '../components/browse/SearchResults';
 import { albumart } from '../core/api';
 import { emit } from '../core/socket';
-import { useBrowse } from '../core/store/browse';
+import { useBrowse, type BrowseItem } from '../core/store/browse';
 
 export default function Browse({ dedicated }: { dedicated?: boolean }) {
   const b = useBrowse();
@@ -110,6 +112,11 @@ export default function Browse({ dedicated }: { dedicated?: boolean }) {
     return streamingOf(b.sources).find(s => (s.plugin_name && (s.plugin_name === r.plugin_name || s.plugin_name === r.service)) || (s.service && s.service === r.service) || (s.uri && String(r.uri) === s.uri) || (s.uri && String(r.uri).indexOf(s.uri + '/') === 0) || (s.uri && String(r.uri).indexOf(s.uri + ':') === 0)) || null;
   }, [request, b.sources]);
   const placeholder = service ? 'Search ' + (service.name || service.title || '') : 'Filter ' + String(listTitle || '').toLowerCase();
+  // the sources the search page can be limited to: the library, the radio directory and the streaming services
+  const searchable = useMemo(() => {
+    const lib = b.sources.find(x => x.uri === 'music-library'), radio = b.sources.find(x => x.uri === 'radio');
+    return ([lib ? { ...lib, service: 'mpd', plugin_name: 'mpd', plugin_type: 'music_service' } : null, radio || null] as (BrowseItem | null)[]).concat(streamingOf(b.sources)).filter(Boolean) as BrowseItem[];
+  }, [b.sources]);
   // the Playlists list: the field also finds the songs inside the playlists (Volumio lists only their names)
   const [inPlaylists, setInPlaylists] = useState<any>(null);
   useEffect(() => {
@@ -184,7 +191,11 @@ export default function Browse({ dedicated }: { dedicated?: boolean }) {
                   <input type="search" id="search-input-form" ref={searchInput} className="form-control" value={b.searchField} onChange={(e) => b.search(e.target.value)} placeholder="Search ..." title="Search" spellCheck={false} />
                 </form>
                 <button type="button" className="search-icon" onMouseDown={(e) => { if (b.searchField.length) { e.preventDefault(); b.search(''); } }}><Icon name={b.searchField.length ? 'cancel' : 'search'} /></button>
-              </div></div>} />
+              </div>
+              {/* where to look: every source, or one of them (its own search, as on its pages) */}
+              <Dropdown className="hamburgerMenu aw-scope" toggleClass="aw-scope__btn" toggle={<><span className="aw-scope__label">{b.searchScope ? (b.searchScope.name || b.searchScope.title) : 'All sources'}</span><Icon name="expand_more" /></>}
+                entries={[{ label: 'All sources', onClick: () => b.setSearchScope(null) } as MenuEntry].concat(searchable.map(s => ({ label: String(s.name || s.title || ''), onClick: () => b.setSearchScope(s) })))} />
+              </div>} />
             ) : null}
 
             {!b.isBrowsing ? <BrowseLanding dedicated={dedicated} /> : null}
@@ -228,7 +239,9 @@ export default function Browse({ dedicated }: { dedicated?: boolean }) {
             {isTrackList ? <div className="aw-cols mono aw-cols--fav" aria-hidden="true"><span>#</span><span /><span className="aw-cols__info"><span>TITLE</span><span>ALBUM</span></span><span className="aw-cols__duration">DURATION</span><span /><span /></div> : null}
 
             <div id="browse-page">
-              {(b.isBrowsing || b.isSearching) && b.lists ? <BrowseLists lists={listsShown} filter={filter} sortDesc={sortDesc} isArtist={isArtist} artistsPage={artistsPage} serviceSearch={!!service} activeMenu={activeMenu} onMenuOpen={onMenuOpen} /> : null}
+              {(b.isBrowsing || b.isSearching) && b.lists ? (isLandingSearch
+                ? <SearchResults lists={listsShown} filter="" sortDesc={sortDesc} isArtist={false} artistsPage={false} serviceSearch={false} activeMenu={activeMenu} onMenuOpen={onMenuOpen} />
+                : <BrowseLists lists={listsShown} filter={filter} sortDesc={sortDesc} isArtist={isArtist} artistsPage={artistsPage} serviceSearch={!!service} activeMenu={activeMenu} onMenuOpen={onMenuOpen} />) : null}
             </div>
 
             {isPlainList && letters.length > 1 ? (

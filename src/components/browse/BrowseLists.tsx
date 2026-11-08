@@ -8,9 +8,10 @@ import MusicRow from './MusicRow';
 import { artistLists, norm } from './ArtistHead';
 import VirtualItems, { VIRTUAL_FROM } from './VirtualItems';
 
-export interface ListsProps { lists: BrowseList[]; filter: string; sortDesc: boolean; isArtist: boolean; artistsPage: boolean; serviceSearch: boolean; activeMenu: string | null; onMenuOpen: (key: string, open: boolean) => void }
+export interface ListsProps { lists: BrowseList[]; filter: string; sortDesc: boolean; isArtist: boolean; artistsPage: boolean; serviceSearch: boolean; activeMenu: string | null; onMenuOpen: (key: string, open: boolean) => void; base?: number }
 
-export default function BrowseLists({ lists, filter, sortDesc, isArtist, artistsPage, serviceSearch, activeMenu, onMenuOpen }: ListsProps) {
+export default function BrowseLists({ lists, filter, sortDesc, isArtist, artistsPage, serviceSearch, activeMenu, onMenuOpen, base }: ListsProps) {
+  const at = base || 0;   // the lists' place among the page's (the search page draws them shelf by shelf): keys and ids stay distinct
   const gridFor = useBrowse(s => s.gridFor);
   useBrowse(s => s.showGridView); useBrowse(s => s.showGridViewTracks);   // a change of either redraws
   const fav = useBrowse(s => s.favourites);
@@ -29,12 +30,12 @@ export default function BrowseLists({ lists, filter, sortDesc, isArtist, artists
     rank = {}; all.forEach((x, i) => { rank![x.key] = i + 1; });
   }
   const cell = (li: number, ii: number, items: BrowseItem[], asGrid: boolean, hidden: boolean, order: number | undefined) => {
-    const item = items[ii], key = li + ':' + ii;
+    const item = items[ii], key = (at + li) + ':' + ii;
     const u = normUri(item.uri);
     const playing = !!playingUri && u === playingUri;
     return asGrid
-      ? <MusicCard key={key} item={item} list={items} listIndex={li} itemIndex={ii} hidden={hidden} order={order} artistCounts={artistsPage} onMenuOpen={(o) => onMenuOpen(key, o)} />
-      : <MusicRow key={key} item={item} list={items} listIndex={li} itemIndex={ii} hidden={hidden} order={order} playing={playing} paused={playing && paused} fav={!!fav[u]} active={activeMenu === key} onMenuOpen={(o) => onMenuOpen(key, o)} />;
+      ? <MusicCard key={key} item={item} list={items} listIndex={at + li} itemIndex={ii} hidden={hidden} order={order} artistCounts={artistsPage} onMenuOpen={(o) => onMenuOpen(key, o)} />
+      : <MusicRow key={key} item={item} list={items} listIndex={at + li} itemIndex={ii} hidden={hidden} order={order} playing={playing} paused={playing && paused} fav={!!fav[u]} active={activeMenu === key} onMenuOpen={(o) => onMenuOpen(key, o)} />;
   };
   return (
     <>
@@ -43,7 +44,7 @@ export default function BrowseLists({ lists, filter, sortDesc, isArtist, artists
         const items = list.items || [];
         const cls = isArtist ? (albumsIdx.indexOf(li) > -1 ? ' aw-artist-albums' : songsIdx.indexOf(li) > -1 ? ' aw-artist-tracks' : '') : '';
         return (
-          <div className={'main__source' + cls} key={li}>
+          <div className={'main__source' + cls} key={at + li}>
             <h3 className={'main__source__title panel-title' + (!list.title ? ' hidden' : '')}>{list.title || ''}</h3>
             {!isArtist && items.length > VIRTUAL_FROM
               ? <LongList items={items} grid={asGrid} q={(list as any).awNoFilter ? '' : q} sortDesc={sortDesc} cell={(ii) => cell(li, ii, items, asGrid, false, undefined)} />
@@ -51,7 +52,8 @@ export default function BrowseLists({ lists, filter, sortDesc, isArtist, artists
                 <div className={asGrid ? 'main__row' : 'main__list'}>
                   {items.map((item, ii) => {
                     const key = li + ':' + ii;
-                    const hidden = !!q && !(list as any).awNoFilter && !matches(item, q);
+                    const limit = (list as any).awLimit;   // the search page's shelves: the first few, the rest behind "Show all"
+                    const hidden = (!!q && !(list as any).awNoFilter && !matches(item, q)) || (typeof limit === 'number' && ii >= limit);
                     return cell(li, ii, items, asGrid, hidden, rank ? rank[key] : undefined);
                   })}
                   {asGrid ? placeholders : null}

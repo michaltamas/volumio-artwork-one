@@ -10,6 +10,7 @@ import { create } from 'zustand';
 import { plainLists, plainItem } from '../plainText';
 import { on, emit } from '../socket';
 import { searchPlaylists } from '../playlistSearch';
+import { useRecentSearches } from './recentSearches';
 import { rest } from '../api';
 
 export interface BrowseItem {
@@ -62,6 +63,8 @@ interface BrowseStore {
   showGridView: boolean;
   showGridViewTracks: boolean;
   searchField: string;
+  searchScope: BrowseItem | null;      // the search page's one source, or every source
+  setSearchScope: (s: BrowseItem | null) => void;
   favourites: Record<string, boolean>;
   scroll: Record<string, number>;
   stamp: number;                   // bumps on every answered page, for the scroll restore
@@ -125,6 +128,7 @@ export const useBrowse = create<BrowseStore>((set, get) => ({
   showGridView: readGrid(),
   showGridViewTracks: readGridTracks(),
   searchField: '',
+  searchScope: null,
   favourites: {},
   scroll: {},
   stamp: 0,
@@ -163,11 +167,17 @@ export const useBrowse = create<BrowseStore>((set, get) => ({
     if (searchTimer) { window.clearTimeout(searchTimer); searchTimer = null; }
     if (value && value.length >= 2) {
       set({ isSearching: true });
-      searchTimer = window.setTimeout(() => { pendingPlaylists = searchPlaylists(value).catch(() => null); emit('search', { type: 'any', value }); }, 600);
+      searchTimer = window.setTimeout(() => {
+        const sc = get().searchScope;
+        // one source: that source's own search (as the field on its pages does); every source: Volumio's, plus the playlists' tracks
+        if (sc) { pendingPlaylists = null; emit('search', { type: 'any', value, service: sc.service || sc.plugin_name, plugin_name: sc.plugin_name, plugin_type: sc.plugin_type || 'music_service', uri: sc.uri }); }
+        else { pendingPlaylists = searchPlaylists(value).catch(() => null); emit('search', { type: 'any', value }); }
+      }, 600);
     } else if (!value) {
       get().clearSearch();
     }
   },
+  setSearchScope: (sc) => { set({ searchScope: sc }); const v = get().searchField; if (v && v.length >= 2) { get().search(v); } },
   clearSearch: () => {
     if (searchTimer) { window.clearTimeout(searchTimer); searchTimer = null; }
     set({ searchField: '', isSearching: false, lists: get().isBrowsing ? get().lists : null });
@@ -204,11 +214,12 @@ on('pushBrowseLibrary', (data: any) => {
   // plugins that dress titles as HTML for Volumio's Angular interfaces (Bandcamp, …): plain text here, as Nova shows them
   const raw: BrowseList[] = plainLists(data.navigation.lists || []);
   const lists: BrowseList[] = st.request && st.request.uri === 'Last_100' ? oncePerFile(raw) : raw;
-  // a search's answer: the playlists' matches are added as one more list once they are in
+  // a search's answer: what was typed joins the recent searches; the playlists' matches are added as one more list once they are in
+  if (st.isSearching && !st.isBrowsing) { useRecentSearches.getState().add(st.searchField); }
   if (st.isSearching && !st.isBrowsing && pendingPlaylists) {
     const p = pendingPlaylists; pendingPlaylists = null;
     // placed after the library's own lists ("Found … Album / Track"), before the services
-    p.then((pl) => { const cur = useBrowse.getState(); if (!pl || !cur.isSearching || cur.lists !== lists) { return; } let at = 0; while (at < lists.length && /^Found /.test(String(lists[at].title || ''))) { at++; } useBrowse.setState({ lists: [...lists.slice(0, at), pl, ...lists.slice(at)], stamp: cur.stamp + 1 }); });
+    p.then((pl) => { const cur = useBrowse.getState(); if (!pl || !cur.isSearching || cur.lists !== lists) { return; } let at = 0; while (at < lists.length && /^Found /.test(String(lists[at].title || ''))) { at++; } useBrowse.setState({ lists: [...lists.slice(0, at), { ...pl, awSource: 'Playlists' }, ...lists.slice(at)], stamp: cur.stamp + 1 }); });   // awSource: the search page names the shelf
   }
   const info = data.navigation.info ? plainItem(data.navigation.info) : null;
   const patch: Partial<BrowseStore> = { lists, info, prev: data.navigation.prev || null, loading: false, stamp: st.stamp + 1 };
