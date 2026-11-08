@@ -61,7 +61,9 @@
   .np-lyrics-host { display: contents; }
   &.np--lyrics #np-hero, &.np--info #np-hero { align-items: stretch; }
   &.np--info #np-meta { display: flex; flex-direction: column; min-height: 0; }
-  &.np--info .np-about { flex: 1 1 auto; }
+  &.np--info .np-about { flex: 1 1 auto; max-width: 900px; }
+  /* the Info face reads: the cover takes a third of the hero, the words two thirds (the Cover face keeps the half) */
+  &.np--info #np-cover { width: min(100cqh, 33.3cqw); height: min(100cqh, 33.3cqw); }
   .np-meta--lyrics { align-self: stretch; }
   /* ---- the Info face (12B–12D) ---- */
   @at-root body#artwork #np.np--info {
