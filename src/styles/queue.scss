@@ -127,4 +127,3 @@ body#artwork .aw-queue__more { flex: none; display: grid; place-items: center; w
 body#artwork .aw-queue__row:hover .aw-queue__more-btn, body#artwork .aw-queue__row:focus-within .aw-queue__more-btn { opacity: 1; }
 @media (pointer: coarse) { body#artwork .aw-queue__more-btn { opacity: 1; } }
 body#artwork .aw-queue__stop { flex: none; display: grid; place-items: center; color: var(--ink-55); .material-symbols-rounded { font-size: 18px; } }
-body#artwork .aw-queue__row.is-stop-after { box-shadow: inset 3px 0 0 var(--ink-25); }
