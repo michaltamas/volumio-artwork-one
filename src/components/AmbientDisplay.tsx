@@ -57,6 +57,8 @@ export default function AmbientDisplay() {
   if (!active) { return null; }
 
   const layout = settings.layout, queueNo = settings.queueNo;
+  // the aurora: soft colours from the cover drifting behind it; they rest while the music does, and stay away where motion or glass is turned off
+  const aurora = settings.background === 'aurora' && settings.transparency && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const night = useAmbient.getState().isNight();
   const paused = st.status === 'pause';
   const stopped = !st.status || st.status === 'stop' || !st.title;
@@ -84,7 +86,7 @@ export default function AmbientDisplay() {
 
   return (
     <div className={cls} role="presentation">
-      {!stopped && cover ? <div className="aw-amb__bg"><img className="aw-amb__bg-img" src={cover} alt="" /><div className="aw-amb__veil" /></div> : null}
+      {!stopped && cover ? <div className="aw-amb__bg"><img className="aw-amb__bg-img" src={cover} alt="" />{aurora ? <div className={'aw-amb__aurora' + (paused ? ' is-paused' : '')} aria-hidden="true"><i /><i /><i /></div> : null}<div className="aw-amb__veil" /></div> : null}
       <div className="aw-amb__group">
         {stopped ? (
           <div className="aw-amb__idle">

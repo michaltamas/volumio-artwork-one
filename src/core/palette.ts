@@ -54,6 +54,7 @@ export function sampleCover(url: string, light: boolean): void {
       const h = Math.round(hsl[0] * 360);
       const s = Math.round(Math.min(0.16, Math.max(0.05, hsl[1])) * 100);
       const root = document.documentElement.style;
+      root.setProperty('--art-h', String(h));   // the cover's hue alone, for the aurora's own colours
       root.setProperty('--art-1', `hsl(${h}, ${light ? Math.min(s, 22) : s}%, ${light ? 96 : 24}%)`);
       root.setProperty('--art-2', `hsl(${h}, ${light ? Math.min(s, 22) : s}%, ${light ? 93 : 17}%)`);
       const art2 = hslToRgb(h / 360, (light ? Math.min(s, 22) : s) / 100, light ? 0.94 : 0.17);

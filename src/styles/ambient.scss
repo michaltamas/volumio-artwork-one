@@ -225,3 +225,22 @@ body#artwork .aw-amb__sleep { position: absolute; right: clamp(36px, 5vw, 96px);
   background: var(--amb-pill-fill); border: 1px solid var(--amb-pill-line);
   .material-symbols-rounded { font-size: calc(clamp(17px, 2.2vh, 22px) * var(--amb-ts)); color: var(--amb-ink-3); } .mono { font-size: calc(clamp(11px, 1.3vh, 14px) * var(--amb-ts)); letter-spacing: .14em; color: var(--amb-ink); } }
 body#artwork .aw-amb.is-night .aw-amb__sleep { display: none; }
+
+/* --- the aurora: three soft colours from the cover, drifting behind it ----------------------
+   Radial gradients moved by transform only (no blur filter to redraw): a Raspberry Pi keeps up.
+   They rest with the music (is-paused), and stay away where motion is reduced. */
+body#artwork .aw-amb__aurora { position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+  i { position: absolute; width: 70vmax; height: 70vmax; border-radius: 50%; will-change: transform; mix-blend-mode: screen; opacity: .6;
+    background: radial-gradient(closest-side, hsl(var(--art-h, 210) 70% 52% / .9), hsl(var(--art-h, 210) 70% 52% / 0) 70%); }
+  i:nth-child(1) { left: -20vmax; top: -25vmax; animation: aw-aurora-a 52s ease-in-out infinite alternate; }
+  i:nth-child(2) { right: -25vmax; top: -10vmax; animation: aw-aurora-b 67s ease-in-out infinite alternate;
+    background: radial-gradient(closest-side, hsl(calc(var(--art-h, 210) + 40) 70% 50% / .9), hsl(calc(var(--art-h, 210) + 40) 70% 50% / 0) 70%); }
+  i:nth-child(3) { left: 10vmax; bottom: -35vmax; animation: aw-aurora-c 81s ease-in-out infinite alternate;
+    background: radial-gradient(closest-side, hsl(calc(var(--art-h, 210) - 35) 65% 48% / .9), hsl(calc(var(--art-h, 210) - 35) 65% 48% / 0) 70%); }
+  &.is-paused i { animation-play-state: paused; } }
+/* the light theme: paper takes the colours by multiplying, lighter and fainter */
+:root[data-aw-theme="light"] body#artwork .aw-amb__aurora i, html.aw-is-light body#artwork .aw-amb__aurora i { mix-blend-mode: multiply; opacity: .35; }
+@keyframes aw-aurora-a { from { transform: translate(0, 0) scale(1); } to { transform: translate(30vmax, 18vmax) scale(1.15); } }
+@keyframes aw-aurora-b { from { transform: translate(0, 0) scale(1.1); } to { transform: translate(-28vmax, 22vmax) scale(.9); } }
+@keyframes aw-aurora-c { from { transform: translate(0, 0) scale(.95); } to { transform: translate(22vmax, -26vmax) scale(1.2); } }
+@media (prefers-reduced-motion: reduce) { body#artwork .aw-amb__aurora i { animation: none; } }
