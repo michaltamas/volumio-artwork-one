@@ -323,3 +323,19 @@ html[data-aw-text="l"] body#artwork #np #np-meta::-webkit-scrollbar, html[data-a
     .np-external, .np-signalpath { flex-basis: 100%; }
   }
 }
+
+/* --- the Info face's credits and related artists (MusicBrainz, ListenBrainz) --------------- */
+body#artwork .np-about__credits { margin: 10px 0 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px 14px; align-items: baseline;
+  .np-about__credit { display: contents; }
+  dt, dd { margin: 0; }
+  .np-about__role { font-size: 10px; letter-spacing: .14em; color: var(--ink-dim); }
+  .np-about__names { font-size: 13px; color: var(--ink-2); line-height: 1.4; } }
+body#artwork .np-about__related { margin-top: 10px; display: flex; flex-direction: column; gap: 7px;
+  .np-about__role { font-size: 10px; letter-spacing: .14em; color: var(--ink-dim); } }
+body#artwork .np-about__chips { display: flex; flex-wrap: wrap; gap: 6px; }
+body#artwork .np-about__chip { height: 28px; padding: 0 12px; border-radius: 14px; border: 1px solid var(--fill-12); background: var(--fill-06); color: var(--ink-2); font: inherit; font-size: 12px; font-weight: 500; cursor: pointer; line-height: normal; white-space: nowrap;
+  &:hover { background: var(--fill-10); color: var(--ink); } }
+body#artwork .np-about__row--track { margin-top: 14px; align-items: start; }
+body#artwork .np-about__img--track { display: grid; place-items: center; color: var(--ink-dim); .material-symbols-rounded { font-size: 24px; } }
+/* the phone's Info face is a compact list of the artist and the record: the credits and the related artists stay on wider screens */
+@media (max-width: 1100px) { body#artwork .np-about__credits, body#artwork .np-about__related, body#artwork .np-about__row--track { display: none; } }

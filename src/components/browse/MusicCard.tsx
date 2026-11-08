@@ -41,7 +41,8 @@ export default function MusicCard({ item, list, listIndex, itemIndex, hidden, or
           <div className={'music-card__label' + (item.qualityDescription === 'HI_RES' ? ' mr-2' : '')} title={item.title || ''}>{item.title || ''}</div>
           {item.tagImage ? <img className="music-card__extension" src={albumart(item.tagImage)} alt="" /> : null}
         </div>
-        <p className="music-card__meta">{item.meta || countMeta || item.artist || ''}</p>
+        {/* an album's year after its artist, when the source says it (the library, Tidal) */}
+        <p className="music-card__meta">{item.meta || countMeta || [item.artist, item.year].filter(Boolean).join(' · ')}</p>
       </div>
     </div>
   );
