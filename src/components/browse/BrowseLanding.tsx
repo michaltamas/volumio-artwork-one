@@ -6,6 +6,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../Icon';
+import Dropdown, { type MenuEntry } from '../Dropdown';
 import PageHead from '../PageHead';
 import { albumart, rest } from '../../core/api';
 import { useBrowse, type BrowseItem } from '../../core/store/browse';
@@ -17,6 +18,18 @@ const SOURCES_SETTINGS = '/plugin/miscellanea-my_music';
 
 export const BUILT_IN = ['favourites', 'playlists', 'music-library', 'artists://', 'albums://', 'genres://', 'upnp', 'Last_100', 'radio'];
 export const streamingOf = (sources: BrowseItem[]) => sources.filter(s => BUILT_IN.indexOf(s.uri) === -1);
+// the sources a search can be limited to: the library, the radio directory and the streaming services
+export const searchableOf = (sources: BrowseItem[]): BrowseItem[] => {
+  const lib = sources.find(x => x.uri === 'music-library'), radio = sources.find(x => x.uri === 'radio');
+  return ([lib ? { ...lib, service: 'mpd', plugin_name: 'mpd', plugin_type: 'music_service' } : null, radio || null] as (BrowseItem | null)[]).concat(streamingOf(sources)).filter(Boolean) as BrowseItem[];
+};
+// the "All sources ▾" menu beside a search field
+export function SearchScope() {
+  const sources = useBrowse(s => s.sources);
+  const scope = useBrowse(s => s.searchScope);
+  const entries: MenuEntry[] = [{ label: 'All sources', onClick: () => useBrowse.getState().setSearchScope(null) }].concat(searchableOf(sources).map(s => ({ label: String(s.name || s.title || ''), onClick: () => useBrowse.getState().setSearchScope(s) })));
+  return <Dropdown className="hamburgerMenu aw-scope" toggleClass="aw-scope__btn" toggle={<><span className="aw-scope__label">{scope ? (scope.name || scope.title) : 'All sources'}</span><Icon name="expand_more" /></>} entries={entries} />;
+}
 
 interface Home { stats: any; albumsArt: string[]; artistsArt: string[]; playlistArt: string | null; counts: Record<string, number> }
 
@@ -87,13 +100,13 @@ export default function BrowseLanding({ dedicated }: { dedicated?: boolean }) {
             {streaming.map(x => <div key={x.uri} className="aw-tab" onClick={() => fetch(x)}>{x.name}</div>)}
             {source('radio') ? <div className="aw-tab" onClick={() => fetch(source('radio'))}>Radio</div> : null}
           </>}
-          actions={<label className={'aw-search' + (searchField.length ? ' active' : '')}>
+          actions={<><label className={'aw-search' + (searchField.length ? ' active' : '')}>
             <Icon name="search" />
             <input id="aw-search-input" ref={input} type="search" value={searchField} onChange={(e) => useBrowse.getState().search(e.target.value)}
               placeholder={s ? 'Search ' + s.songs + ' tracks' : 'Search everything'} aria-label="Search" autoComplete="off" spellCheck={false} />
             {!searchField.length ? <span className="aw-search-key mono">⌘K</span> : null}
             {searchField.length ? <button type="button" className="aw-search-clear" onClick={() => useBrowse.getState().clearSearch()} aria-label="Clear search"><Icon name="close" /></button> : null}
-          </label>} />
+          </label><SearchScope /></>} />
       ) : null}
 
       {landingSearch && searchField.length < 2 ? <div className="aw-recent__under">{recents}</div> : null}

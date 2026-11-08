@@ -1,11 +1,10 @@
 /** The shared form controls of the settings pages: the switch, the select (segment for ≤3 options), the file field. */
 import Icon from '../Icon';
 
-export function Switch({ on, onChange, label, noLabel }: { on: boolean; onChange: (v: boolean) => void; label?: string; noLabel?: boolean }) {
+// the one switch of the interface (the Appearance sections, the plugin pages, the plugin list): a pill with a knob, role switch
+export function Switch({ on, onChange, label }: { on: boolean; onChange: (v: boolean) => void; label?: string; noLabel?: boolean }) {
   return (
-    <div className={'bootstrap-switch' + (on ? ' bootstrap-switch-on' : '') + (noLabel ? ' bootstrap-switch--bare' : '')}>
-      <input type="checkbox" checked={!!on} onChange={(e) => onChange(e.target.checked)} aria-label={label} />
-    </div>
+    <button type="button" className={'aw-switch' + (on ? ' on' : '')} role="switch" aria-checked={!!on} aria-label={label} onClick={() => onChange(!on)}><span className="aw-switch__knob" /></button>
   );
 }
 

@@ -170,7 +170,7 @@ body#artwork .aw-state-volumio-plugin-manager #content {
       .btn.btn-info { background: transparent; color: var(--ink-2); border: 1px solid var(--fill-18); font-weight: 500; &:hover { background: var(--fill-08); color: var(--ink); } }
       /* a newer version in the store: the one filled button of the row */
       .btn.btn-info.aw-update-btn { background: var(--ink); color: var(--ground); border-color: transparent; font-weight: 600; &:hover { background: var(--ink-1); color: var(--ground); }
-        small { font-size: 11px; opacity: .7; margin-left: 2px; font-weight: 500; } .material-symbols-rounded { font-size: 16px; vertical-align: -3px; margin-right: 4px; } } }
+        small { font-size: 12px; opacity: .85; margin-left: 4px; font-weight: 500; letter-spacing: .01em; } .material-symbols-rounded { font-size: 16px; vertical-align: -3px; margin-right: 4px; } } }
     .pluginDotStatus { width: 7px; height: 7px; margin-right: 7px; vertical-align: 1px; }
     .bootstrap-switch::after { display: none; } }
   /* phone width: the name column's flex:1/min-width:0 above shrinks to 0 (and the icon+name+
