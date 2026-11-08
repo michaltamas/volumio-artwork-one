@@ -145,9 +145,10 @@ body#artwork #browse.browsing-album #browseTablesWrapper {
      other cell — but its own padding-left (built for the full-bleed fixed bar elsewhere) would
      then double up with the column's own inset, landing the back arrow further right than the
      cover under it, so it's reset to 0 here and the vertical padding kept */
-  > .aw-head { grid-column: 1; grid-row: 1; position: static; padding-left: 0; padding-right: 0; }
+  /* the crumb bar spans both columns: its filter sits at the right edge, over the track list, as on every list page */
+  > .aw-head { grid-column: 1 / -1; grid-row: 1; position: static; padding-left: 0; padding-right: 0; }
   > .aw-headwrap { grid-column: 1; grid-row: 2; align-self: stretch; min-height: 0; overflow: visible; }
-  > #browse-page { grid-column: 2; grid-row: 1 / span 2; align-self: stretch; min-height: 0; margin-top: 104px; height: calc(100% - 104px - var(--mini-h) - 18px); overflow-y: auto; overscroll-behavior: contain; padding-bottom: 12px;
+  > #browse-page { grid-column: 2; grid-row: 2; align-self: stretch; min-height: 0; margin-top: 0; height: calc(100% - var(--mini-h) - 18px); overflow-y: auto; overscroll-behavior: contain; padding-bottom: 12px;
     .main__list .album__tracks:first-child { padding-top: 0; }
     .main__source:last-child { margin-bottom: 0; }
     .main__list .album__tracks:last-child { padding-bottom: 0; } }

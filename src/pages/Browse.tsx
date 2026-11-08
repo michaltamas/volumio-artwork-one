@@ -133,7 +133,9 @@ export default function Browse({ dedicated }: { dedicated?: boolean }) {
     if (!sc.from) { sc.from = r; }
     sc.timer = window.setTimeout(() => { sc.searching = true; emit('search', { type: 'any', value: q, service: r.service || service.service || service.plugin_name, plugin_name: service.plugin_name || r.plugin_name, plugin_type: service.plugin_type || r.plugin_type || 'music_service', uri: service.uri }); }, 400);
   };
-  const q = service ? '' : norm(filter).trim();
+  // an album's or a playlist's page filters its own rows whatever the service: the field there is "Filter album", not the service's search
+  const localFilter = !service || !!info;
+  const q = localFilter ? norm(filter).trim() : '';
   const visibleCount = useMemo(() => {
     if (!q) { return null; }
     let n = 0;
@@ -234,7 +236,7 @@ export default function Browse({ dedicated }: { dedicated?: boolean }) {
             <div id="browse-page">
               {(b.isBrowsing || b.isSearching) && b.lists ? (isLandingSearch
                 ? <SearchResults lists={listsShown} filter="" sortDesc={sortDesc} isArtist={false} artistsPage={false} serviceSearch={false} activeMenu={activeMenu} onMenuOpen={onMenuOpen} />
-                : <BrowseLists lists={listsShown} filter={filter} sortDesc={sortDesc} isArtist={isArtist} artistsPage={artistsPage} serviceSearch={!!service} activeMenu={activeMenu} onMenuOpen={onMenuOpen} />) : null}
+                : <BrowseLists lists={listsShown} filter={filter} sortDesc={sortDesc} isArtist={isArtist} artistsPage={artistsPage} serviceSearch={!localFilter} activeMenu={activeMenu} onMenuOpen={onMenuOpen} />) : null}
             </div>
 
             {isPlainList && letters.length > 1 ? (
