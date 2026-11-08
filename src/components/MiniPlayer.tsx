@@ -2,6 +2,7 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import FavIcon from './FavIcon';
 import { useSleep } from '../core/store/sleep';
+import { useStopAfter } from '../core/store/stopAfter';
 import SeekBar from './SeekBar';
 import Transport from './Transport';
 import Volume from './Volume';
@@ -17,6 +18,8 @@ import { useExternalSource } from '../core/external';
 export default function MiniPlayer() {
   const sleepRunning = useSleep(s => s.running());
   const sleepMinutes = useSleep(s => s.minutesLeft());
+  // a stop set after a track: 'this' for the one playing, else its title
+  const stopAfter = useStopAfter(s => { if (!s.mark) { return ''; } const pos = usePlayer.getState().state.position; return s.mark.position === pos ? 'this' : (s.markedTitle() || 'a track'); });
   const live = usePlayer(s => s.state);
   const queueEmpty = useQueue(s => !s.queue.length);
   const st = leftOver(live, queueEmpty) ? { ...live, title: '', artist: '', album: '', albumart: '' } : live;
@@ -47,6 +50,7 @@ export default function MiniPlayer() {
                   {!ext && rates ? <span className="track-info-rate">{rates}</span> : null}
                   {!ext && fmt ? <span className="track-info-type">{fmt}</span> : null}
                   {sleepRunning ? <span className="track-info-sleep">SLEEP {sleepMinutes} MIN</span> : null}
+                  {stopAfter ? <span className="track-info-sleep" title={stopAfter === 'this' ? 'Stops after this track' : 'Stops after ' + stopAfter}>STOP AFTER</span> : null}
                 </div>
               </div>
             </div>

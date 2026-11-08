@@ -116,3 +116,15 @@ body#artwork .aw-queue.aw-queue--page { position: static; width: auto; border-ra
 
 /* shared by library and queue rows: the playing row while this browser loads the stream */
 body#artwork .aw-loading-spin { display: block; color: var(--ink); }
+
+/* a row's ⋯ (play now, play next, stop after this, favourites, playlist, artist, album, remove): shown as the mouse comes over the
+   row, always where there is no mouse; the stop mark sits before the time */
+body#artwork .aw-queue__more { flex: none; display: grid; place-items: center; width: 20px; height: 20px;
+  .hamburgerMenu { position: static; }
+  .aw-queue__more-btn { width: 20px; height: 20px; padding: 0; border: 0; background: transparent; color: var(--ink-faint); display: grid; place-items: center; cursor: pointer; opacity: 0; transition: opacity .12s ease;
+    .material-symbols-rounded { font-size: 20px; } &:hover { color: var(--ink); } }
+  .dropdown.open .aw-queue__more-btn { opacity: 1; color: var(--ink); } }
+body#artwork .aw-queue__row:hover .aw-queue__more-btn, body#artwork .aw-queue__row:focus-within .aw-queue__more-btn { opacity: 1; }
+@media (pointer: coarse) { body#artwork .aw-queue__more-btn { opacity: 1; } }
+body#artwork .aw-queue__stop { flex: none; display: grid; place-items: center; color: var(--ink-55); .material-symbols-rounded { font-size: 18px; } }
+body#artwork .aw-queue__row.is-stop-after { box-shadow: inset 3px 0 0 var(--ink-25); }

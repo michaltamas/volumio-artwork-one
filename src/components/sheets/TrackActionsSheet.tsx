@@ -9,6 +9,7 @@ import { useBrowse } from '../../core/store/browse';
 import { HOST, emit } from '../../core/socket';
 import { addToPlaylist } from '../../core/browseActions';
 import { useLocalPlayback } from '../../core/localPlayback';
+import { useStopAfter } from '../../core/store/stopAfter';
 import Spinner from '../Spinner';
 
 async function metavolumio(data: Record<string, string>): Promise<any> {
@@ -31,6 +32,7 @@ export default function TrackActionsSheet() {
   const close = () => useModal.getState().close();
   const lp = useLocalPlayback();
   const here = lp.enabled && lp.mine;
+  const stopAfter = useStopAfter(s => typeof st.position === 'number' && s.isMarked(st.position));
   const ask = async (key: string, data: Record<string, string>, title: string, credits?: boolean) => {
     setBusy(b => ({ ...b, [key]: true }));
     try { const d = await metavolumio(data); setErr(e => ({ ...e, [key]: false })); useModal.getState().open('credits', credits ? { title, credits: d.value } : { title, story: d.value }); }
@@ -88,6 +90,11 @@ export default function TrackActionsSheet() {
         {lp.available ? (
           <button type="button" className={'aw-track__row' + (here ? ' active' : '')} onClick={() => { lp.toggle(); close(); }}>
             <Icon name="headphones" /><span className="aw-track__label">{here ? 'Stop playing in this browser' : 'Play in this browser'}</span>
+          </button>
+        ) : null}
+        {typeof st.position === 'number' && st.position >= 0 && !st.disableUi ? (
+          <button type="button" className={'aw-track__row' + (stopAfter ? ' active' : '')} onClick={() => { useStopAfter.getState().toggle(st.position); close(); }}>
+            <Icon name="stop_circle" /><span className="aw-track__label">{stopAfter ? "Don't stop after this track" : 'Stop after this track'}</span>
           </button>
         ) : null}
         <div className="aw-track__sep" />
