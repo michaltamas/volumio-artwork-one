@@ -691,3 +691,6 @@ body#artwork .aw-head--home .aw-scope .aw-scope__btn { height: 38px; border-radi
   body#artwork #browse .music-item .item__quality { display: none; }
   body#artwork #browse .music-item .item__duration:has(.aw-q--hires), body#artwork #browse .music-item .item__duration:has(.aw-q--dsd) { color: var(--q-hires-ink); }
 }
+/* the artist page: a picture the service cannot serve gives way to a glyph; the similar artists are round tiles without play or menu */
+body#artwork .aw-artist__img--glyph { display: grid; place-items: center; color: var(--ink-dim); .material-symbols-rounded { font-size: 48px; } }
+body#artwork .aw-artist-album--artist { .aw-artist-album__cover, .aw-artist-album__cover img { border-radius: 50%; } .aw-artist-album__title { text-align: center; } }

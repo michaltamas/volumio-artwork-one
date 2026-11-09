@@ -23,7 +23,9 @@ export function artistLists(lists: BrowseList[] | null, kind: 'songs' | 'albums'
     return kind === 'songs' ? (items.length && songs === items.length) : (items.length && songs === 0);
   });
 }
-export interface ArtistAlbum { item: BrowseItem; uri: string; listIndex: number; itemIndex: number; year: number | null; tracks: number }
+export interface ArtistAlbum { item: BrowseItem; uri: string; listIndex: number; itemIndex: number; year: number | null; tracks: number; kind: 'album' | 'artist' }
+// a service's artist page lists other artists too (Tidal's "Similar artists"): the uri says so, as it does on the search page
+const isArtistItem = (it: BrowseItem) => it.type === 'artist' || /(^|[:/])artists?([:/@]|$)/.test(String(it.uri || '').toLowerCase());
 export function artistAlbums(lists: BrowseList[] | null): ArtistAlbum[] {
   const tracks = ([] as BrowseItem[]).concat(...artistLists(lists, 'songs').map(({ l }) => l.items || []));
   const byAlbum: Record<string, { tracks: number; year: number | null }> = {};
@@ -37,7 +39,7 @@ export function artistAlbums(lists: BrowseList[] | null): ArtistAlbum[] {
   const out: ArtistAlbum[] = [];
   artistLists(lists, 'albums').forEach(({ l, i }) => (l.items || []).forEach((item, j) => {
     const e = byAlbum[norm(item.title)] || {} as any;
-    out.push({ item, uri: item.uri || (i + ':' + j), listIndex: i, itemIndex: j, year: e.year || null, tracks: e.tracks || 0 });
+    out.push({ item, uri: item.uri || (i + ':' + j), listIndex: i, itemIndex: j, year: e.year || null, tracks: e.tracks || 0, kind: isArtistItem(item) ? 'artist' : 'album' });
   }));
   return out;
 }
@@ -48,7 +50,16 @@ export default function ArtistHead({ filter, onFilter, showAll, onShowAll, newes
   const info = useBrowse(s => s.info) || {};
   const lists = useBrowse(s => s.lists);
   const crumbs = useCrumbs();
-  const albums = useMemo(() => artistAlbums(lists), [lists]);
+  const everything = useMemo(() => artistAlbums(lists), [lists]);
+  const albums = useMemo(() => everything.filter(a => a.kind === 'album'), [everything]);
+  const similar = useMemo(() => everything.filter(a => a.kind === 'artist'), [everything]);
+  // a service's page keeps its own groups (Albums, EPs & singles): the first is ALBUMS, the others carry the list's name
+  const groups = useMemo(() => { const seen: number[] = []; albums.forEach(a => { if (seen.indexOf(a.listIndex) < 0) { seen.push(a.listIndex); } }); return seen; }, [albums]);
+  // the artist's picture: a size the service does not serve (Tidal's artists have no 640) is asked for once more at 750, then a glyph stands in
+  const [imgSrc, setImgSrc] = useState<string | null>(null);
+  const [imgTried, setImgTried] = useState(false);
+  const picture = imgSrc === null ? albumart(info.albumart) : imgSrc;
+  const onImgError = () => { if (!imgTried && /\/640x640\./.test(picture)) { setImgTried(true); setImgSrc(picture.replace('/640x640.', '/750x750.')); } else { setImgSrc(''); } };
   const trackCount = useMemo(() => artistLists(lists, 'songs').reduce((n, { l }) => n + (l.items || []).length, 0), [lists]);
   const hasYears = albums.some(a => a.year);
   const sorted = useMemo(() => {
@@ -68,7 +79,7 @@ export default function ArtistHead({ filter, onFilter, showAll, onShowAll, newes
         </label>} />
 
       <div className="aw-artist__hero">
-        <img className="aw-artist__img" src={albumart(info.albumart)} alt="" />
+        {picture ? <img className="aw-artist__img" src={picture} alt="" onError={onImgError} /> : <div className="aw-artist__img aw-artist__img--glyph" aria-hidden="true"><Icon name="person" /></div>}
         <div className="aw-artist__body">
           <div className="aw-artist__eyebrow mono">ARTIST</div>
           <h1 className="aw-artist__name">{info.title}</h1>
@@ -89,29 +100,54 @@ export default function ArtistHead({ filter, onFilter, showAll, onShowAll, newes
         </div>
       </div>
 
-      {albums.length ? (
+      {groups.map((g, gi) => {
+        const inGroup = sorted.filter(a => a.listIndex === g);
+        const title = gi === 0 ? 'ALBUMS' : String((lists || [])[g]?.title || 'MORE').toUpperCase();
+        return (
+          <div key={g}>
+            <div className="aw-artist__sechead">
+              <span className="mono aw-artist__label">{title}</span>
+              <span className="mono aw-artist__count">{inGroup.length}</span>
+              {gi === 0 && hasYears ? <button type="button" className="aw-artist__link" onClick={onToggleOrder}>{newest ? 'Newest first' : 'Oldest first'}</button> : null}
+            </div>
+            <div className="aw-artist__albums">
+              {inGroup.map(a => {
+                const list = (lists || [])[a.listIndex]?.items || [];
+                const hidden = !!q && norm(a.item.title).indexOf(q) === -1;
+                return (
+                  <div key={a.uri} className={'aw-artist-album' + (hidden ? ' aw-hidden' : '') + (openMenu === a.listIndex + ':' + a.itemIndex ? ' is-menu-open' : '')} onClick={() => A.clickListItem(a.item, list, a.itemIndex)}>
+                    <div className="aw-artist-album__cover">
+                      <img src={albumart(a.item.albumart)} alt="" onError={(e) => { e.currentTarget.style.visibility = 'hidden'; }} />
+                      <div className="aw-artist-album__overlay" aria-hidden="true" />
+                      <div className="aw-artist-album__actions" onClick={(e) => e.stopPropagation()}>
+                        <ItemMenu item={a.item} id={`hamburgerMenuBtn-${a.listIndex}-${a.itemIndex}`} toggleClass="ghost-btn action-btn aw-artist-album__more" glyph="more_horiz" onOpenChange={(o) => { setOpenMenu(o ? a.listIndex + ':' + a.itemIndex : null); if (onMenuOpen) { onMenuOpen(a.listIndex + ':' + a.itemIndex, o); } }} />
+                      </div>
+                      <button type="button" className="aw-artist-album__play" onClick={(e) => { e.stopPropagation(); A.playRendered(a.item, list, a.itemIndex); }} aria-label="Play"><Icon name="play_arrow" /></button>
+                    </div>
+                    <div className="aw-artist-album__title">{a.item.title}</div>
+                    {a.year || a.tracks ? <div className="aw-artist-album__sub mono">{a.year ? <span>{a.year}</span> : null}{a.year && a.tracks ? <span> · </span> : null}{a.tracks ? <span>{a.tracks} tracks</span> : null}</div> : null}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
+
+      {similar.length ? (
         <>
           <div className="aw-artist__sechead">
-            <span className="mono aw-artist__label">ALBUMS</span>
-            <span className="mono aw-artist__count">{albums.length}</span>
-            {hasYears ? <button type="button" className="aw-artist__link" onClick={onToggleOrder}>{newest ? 'Newest first' : 'Oldest first'}</button> : null}
+            <span className="mono aw-artist__label">{String((lists || [])[similar[0].listIndex]?.title || 'SIMILAR ARTISTS').toUpperCase()}</span>
+            <span className="mono aw-artist__count">{similar.length}</span>
           </div>
-          <div className="aw-artist__albums">
-            {sorted.map(a => {
+          <div className="aw-artist__albums aw-artist__similar">
+            {similar.map(a => {
               const list = (lists || [])[a.listIndex]?.items || [];
               const hidden = !!q && norm(a.item.title).indexOf(q) === -1;
               return (
-                <div key={a.uri} className={'aw-artist-album' + (hidden ? ' aw-hidden' : '') + (openMenu === a.listIndex + ':' + a.itemIndex ? ' is-menu-open' : '')} onClick={() => A.clickListItem(a.item, list, a.itemIndex)}>
-                  <div className="aw-artist-album__cover">
-                    <img src={albumart(a.item.albumart)} alt="" onError={(e) => { e.currentTarget.style.visibility = 'hidden'; }} />
-                    <div className="aw-artist-album__overlay" aria-hidden="true" />
-                    <div className="aw-artist-album__actions" onClick={(e) => e.stopPropagation()}>
-                      <ItemMenu item={a.item} id={`hamburgerMenuBtn-${a.listIndex}-${a.itemIndex}`} toggleClass="ghost-btn action-btn aw-artist-album__more" glyph="more_horiz" onOpenChange={(o) => { setOpenMenu(o ? a.listIndex + ':' + a.itemIndex : null); if (onMenuOpen) { onMenuOpen(a.listIndex + ':' + a.itemIndex, o); } }} />
-                    </div>
-                    <button type="button" className="aw-artist-album__play" onClick={(e) => { e.stopPropagation(); A.playRendered(a.item, list, a.itemIndex); }} aria-label="Play"><Icon name="play_arrow" /></button>
-                  </div>
+                <div key={a.uri} className={'aw-artist-album aw-artist-album--artist' + (hidden ? ' aw-hidden' : '')} onClick={() => A.clickListItem(a.item, list, a.itemIndex)}>
+                  <div className="aw-artist-album__cover"><img src={albumart(a.item.albumart)} alt="" onError={(e) => { e.currentTarget.style.visibility = 'hidden'; }} /></div>
                   <div className="aw-artist-album__title">{a.item.title}</div>
-                  {a.year || a.tracks ? <div className="aw-artist-album__sub mono">{a.year ? <span>{a.year}</span> : null}{a.year && a.tracks ? <span> · </span> : null}{a.tracks ? <span>{a.tracks} tracks</span> : null}</div> : null}
                 </div>
               );
             })}
