@@ -685,3 +685,9 @@ body#artwork .aw-recent__under { padding-top: 22px; }
 body#artwork #browse.browsing-search .main__row { grid-template-columns: repeat(auto-fill, minmax(clamp(120px, 13vw, 190px), 1fr)); gap: clamp(12px, 1.7vw, 24px); padding: 12px 0 8px; }
 /* the landing's head: the source menu sits beside the search pill at the pill's height */
 body#artwork .aw-head--home .aw-scope .aw-scope__btn { height: 38px; border-radius: 19px; font-size: 13px; padding: 0 8px 0 14px; background: var(--fill-09); border-color: var(--fill-11); }
+/* a phone's rows have no room for the quality pill beside the time: the title would shrink to a letter. The quality
+   stays on Now Playing and in the mini player; the hi-res rows keep the pill's blue on their time instead */
+@media (max-width: 640px) {
+  body#artwork #browse .music-item .item__quality { display: none; }
+  body#artwork #browse .music-item .item__duration:has(.aw-q--hires), body#artwork #browse .music-item .item__duration:has(.aw-q--dsd) { color: var(--q-hires-ink); }
+}
