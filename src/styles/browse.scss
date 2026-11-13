@@ -552,14 +552,7 @@ body#artwork #browseTablesWrapper { padding-bottom: calc(var(--mini-h) + 16px); 
 body#artwork #browse.browsing-artist #browseTablesWrapper { padding-bottom: calc(var(--mini-h) + 48px); }
 body#artwork #browse.browsing-album #browseTablesWrapper > .aw-headwrap { padding-bottom: calc(var(--mini-h) + 24px); }
 body#artwork .aw-browse { padding-bottom: calc(var(--mini-h) + 40px); }
-/* the library's cards: all six in one row on a wide desktop (the tile at the mockup's 72px so the words keep their room),
-   three on a smaller desktop, two on a laptop or a touch display */
-body#artwork .aw-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
-@media (min-width: 1800px) { body#artwork .aw-cards { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 14px; }
-  body#artwork .aw-card { gap: 14px; padding: 14px; } body#artwork .aw-tile { width: 72px; height: 72px; }
-  body#artwork .aw-tile--avatars img { width: 50px; height: 50px; } body#artwork .aw-tile--avatars img:nth-child(2) { margin-left: -22px; }
-  body#artwork .aw-tile--icon .material-symbols-rounded { font-size: 34px; } body#artwork .aw-card-title { font-size: 19px; } body#artwork .aw-card-sub { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } }
-@media (max-width: 1199px) { body#artwork .aw-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+body#artwork .aw-cards { grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: clamp(10px, 1.25vw, 18px); }
 body#artwork .aw-sources { grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); }
 body#artwork .aw-search { width: 320px; min-width: 0; }
 body#artwork #browse.browsing-list .main__row { grid-template-columns: repeat(auto-fill, minmax(clamp(120px, 13vw, 190px), 1fr)); gap: clamp(12px, 1.7vw, 24px); }
