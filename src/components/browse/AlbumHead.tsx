@@ -54,12 +54,26 @@ export default function AlbumHead() {
   const total = runtime(songs.reduce((t, i) => t + (Number(i.duration) || 0), 0));
   const summary = [count ? count + (count === 1 ? ' TRACK' : ' TRACKS') : '', total].filter(Boolean).join(' · ');
   const title = info.title || info.album;
+  // the first four distinct covers among the songs (a playlist's own albumart is Volumio's generic icon)
+  const covers: string[] = []; songs.forEach(i => { const a = i && i.albumart ? String(i.albumart) : ''; if (a && a.indexOf('sourceicon') < 0 && covers.indexOf(a) < 0 && covers.length < 4) { covers.push(a); } });
   const genre = info.genre ? String(info.genre).split(';').join(' · ') : '';
   return (
     <div className={'aw-albumhead' + (isPlaylist ? ' aw-albumhead--playlist' : '')}>
-      <div className={'aw-albumhead__cover' + (String(info.albumart || '').indexOf('sourceicon') > -1 ? ' aw-albumhead__cover--icon' : '')}>
-        {info.albumart ? <img src={albumart(info.albumart)} alt={info.album || ''} /> : null}
-      </div>
+      {isPlaylist ? (
+        // a playlist's cover (the November playlist mockup): the first four covers of its songs as a 2×2 mosaic, one cover alone,
+        // quiet squares for the cells without one, and a tile with the playlist glyph when it has no covers at all
+        covers.length ? (
+          <div className={'aw-albumhead__cover aw-albumhead__cover--mosaic' + (covers.length === 1 ? ' is-one' : '')}>
+            {(covers.length === 1 ? covers : [0, 1, 2, 3].map(i => covers[i] || '')).map((c, i) => c
+              ? <img key={i} src={albumart(c)} alt="" onError={(e) => { e.currentTarget.style.visibility = 'hidden'; }} />
+              : <span key={i} className="aw-albumhead__blank" />)}
+          </div>
+        ) : <div className="aw-albumhead__cover aw-albumhead__cover--glyph" aria-hidden="true"><Icon name="queue_music" /></div>
+      ) : (
+        <div className={'aw-albumhead__cover' + (String(info.albumart || '').indexOf('sourceicon') > -1 ? ' aw-albumhead__cover--icon' : '')}>
+          {info.albumart ? <img src={albumart(info.albumart)} alt={info.album || ''} /> : null}
+        </div>
+      )}
       <div className="aw-albumhead__body">
         <h1 className="aw-albumhead__title">{title}</h1>
         {info.artist ? <div className="aw-albumhead__artist">{info.artist}</div> : null}

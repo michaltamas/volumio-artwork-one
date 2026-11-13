@@ -246,8 +246,15 @@ body#artwork #browse.browsing-artists .music-card__label { font-size: 16px; font
 /* ============ playlist page (mockup 2d) ============ */
 body#artwork #browse.browsing-playlist #browseTablesWrapper { padding-top: 0; }
 .aw-albumhead--playlist {
-  display: grid; grid-template-columns: 260px 1fr; column-gap: 40px; align-items: end;
-  .aw-albumhead__cover { max-width: 260px; grid-row: 2; }
+  /* the playlist mockup (.pl-head / .pl-art): the cover clamp(120px, 13cqw, 208px) beside the words, 32px apart, bottoms aligned */
+  display: grid; grid-template-columns: clamp(120px, 13vw, 208px) 1fr; column-gap: 32px; align-items: end;
+  .aw-albumhead__cover { max-width: none; width: clamp(120px, 13vw, 208px); grid-row: 2; }
+  .aw-albumhead__cover--mosaic { aspect-ratio: 1; border-radius: 6px; overflow: hidden; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; box-shadow: 0 30px 60px -22px rgba(0, 0, 0, .85); background: var(--fill-06);
+    img { width: 100%; height: 100%; min-height: 0; object-fit: cover; display: block; border-radius: 0; box-shadow: none; aspect-ratio: auto; }
+    .aw-albumhead__blank { background: var(--fill-07); }
+    &.is-one { grid-template-columns: 1fr; grid-template-rows: 1fr; } }
+  .aw-albumhead__cover--glyph { aspect-ratio: 1; display: grid; place-items: center; background: var(--fill-08); border: 1px solid var(--fill-08); border-radius: 14px; color: var(--ink-1);
+    .material-symbols-rounded { font-size: clamp(41px, 4.42vw, 71px); font-weight: 300; } }
   .aw-albumhead__title, .aw-albumhead__artist, .aw-albumhead__meta, .aw-albumhead__actions { grid-column: 2; }
   .aw-albumhead__body { grid-column: 2; grid-row: 2; align-self: end; display: flex; flex-direction: column; min-width: 0; padding-bottom: 6px; }
   .aw-albumhead__title { font-size: var(--t-h1-xl); letter-spacing: -.035em; line-height: 1; margin: 0; }
@@ -603,9 +610,11 @@ body#artwork #browse.browsing-album .aw-albumhead__actions { margin-top: clamp(1
   body#artwork #browse.browsing-album #browseTablesWrapper > .aw-head { position: fixed; padding-left: var(--pad-screen); padding-right: var(--pad-screen); }
 }
 @media (max-width: 700px) {
-  body#artwork .aw-albumhead--playlist { grid-template-columns: 1fr; }
-  body#artwork .aw-albumhead--playlist .aw-albumhead__cover { grid-row: auto; max-width: min(260px, 60vw); }
-  body#artwork .aw-albumhead--playlist .aw-albumhead__body { grid-column: 1; grid-row: auto; }
+  /* the phone (the mockup under 700px): the 96px cover beside the words, centred on them */
+  body#artwork .aw-albumhead--playlist { grid-template-columns: 96px 1fr; column-gap: 16px; align-items: center; }
+  body#artwork .aw-albumhead--playlist .aw-albumhead__cover { width: 96px; grid-row: 1; }
+  body#artwork .aw-albumhead--playlist .aw-albumhead__body { grid-column: 2; grid-row: 1; padding-bottom: 0; }
+  body#artwork .aw-albumhead--playlist .aw-albumhead__cover--glyph .material-symbols-rounded { font-size: 33px; }
   body#artwork .aw-cols { display: none; }
   /* every track-list row (playlists, Favourites, Last 100, search…): number · cover · text · heart · ⋯ */
   /* 12px inside the row, as the Mobile mockup's queue rows: the hover / playing fill doesn't end at the number and the ⋯ */
