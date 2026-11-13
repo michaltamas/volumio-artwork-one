@@ -74,7 +74,7 @@ export default function BrowseLanding({ dedicated }: { dedicated?: boolean }) {
       {searchField.length === 1 ? <div className="aw-recent__hint">Keep typing: the search starts at two characters.</div> : null}
       {recent.length && !searchField.length ? (
         <div className="aw-recent">
-          <div className="aw-recent__head"><span className="mono">RECENT SEARCHES</span><button type="button" className="aw-recent__clear" onClick={() => useRecentSearches.getState().clear()}>Clear all</button></div>
+          <span className="aw-recent__label mono">RECENT SEARCHES</span>
           <div className="aw-recent__chips">
             {recent.map(q => (
               <span className="aw-recent__chip" key={q}>
@@ -83,6 +83,7 @@ export default function BrowseLanding({ dedicated }: { dedicated?: boolean }) {
               </span>
             ))}
           </div>
+          <button type="button" className="aw-recent__clear" onClick={() => useRecentSearches.getState().clear()}>Clear all</button>
         </div>
       ) : null}
     </>
@@ -161,7 +162,7 @@ export default function BrowseLanding({ dedicated }: { dedicated?: boolean }) {
             ) : null}
             {source('genres://') ? (
               <div className="aw-card" onClick={() => fetch(source('genres://'))}>
-                <div className="aw-tile aw-tile--icon aw-tile--lines" aria-hidden="true"><i /><i /><i /><Icon name="graphic_eq" className="aw-tile__glyph" /></div>
+                <div className="aw-tile aw-tile--icon"><Icon name="category" /></div>
                 <div className="aw-card-body"><div className="aw-card-title">Genres</div>{home.counts.genres !== undefined ? <div className="aw-card-sub">{home.counts.genres} genres</div> : null}</div>
                 <Icon name="chevron_right" className="aw-card-chev" />
               </div>
