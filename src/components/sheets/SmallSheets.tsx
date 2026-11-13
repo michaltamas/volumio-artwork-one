@@ -1,5 +1,6 @@
 /** Volumio's small modals in the theme's dress: confirm, got it, password, the plugin installer, the updater, the NAS password. */
 import { useNavigate } from 'react-router-dom';
+import { notesHtml } from '../../core/notesHtml';
 import { useEffect, useState } from 'react';
 import Spinner from '../Spinner';
 import Icon from '../Icon';
@@ -133,7 +134,7 @@ export function UpdaterSheet() {
             <span>{data.timedOut ? 'The updater did not answer. Check again later — playback is not affected.' : String(data.description || '')}</span>
           </div>
         ) : null}
-        {data.status === 'updateReady' ? <span dangerouslySetInnerHTML={{ __html: String(data.description || '') }} /> : null}
+        {data.status === 'updateReady' ? <div className="aw-upd-notes" dangerouslySetInnerHTML={{ __html: notesHtml(data.description) }} /> : null}
         {data.status === 'updateProgress' ? (
           <div>
             <h4>{p.status}</h4>

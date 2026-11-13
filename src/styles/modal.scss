@@ -49,3 +49,10 @@ body#artwork .aw-sheet--power {
 
 /* the updater's wait: a spinner beside "Please wait" */
 body#artwork .aw-upd-wait { display: flex; align-items: center; gap: 12px; color: var(--ink-2); }
+/* the system update's release notes: the player's HTML (FIXES / NEW ADDITIONS with their lists), wrapped, scrolling when long */
+body#artwork .aw-upd-notes { max-height: min(52vh, 480px); overflow-y: auto; white-space: normal; overflow-wrap: anywhere; color: var(--ink-2); font-size: 14px; line-height: 1.5; padding-right: 4px;
+  p { margin: 14px 0 6px; font-family: var(--font-mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-dim); &:first-child { margin-top: 0; } }
+  ul, ol { margin: 0; padding-left: 18px; }
+  li { margin: 4px 0; }
+  a { color: var(--ink); text-decoration: underline; }
+  strong { color: var(--ink); font-weight: 600; } }
