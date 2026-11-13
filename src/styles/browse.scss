@@ -186,27 +186,27 @@ body#artwork .aw-browse { padding: var(--pad-top) var(--pad-screen) 40px; color:
 .aw-browse-head { display: flex; align-items: baseline; gap: 16px; margin-top: 26px; margin-bottom: 14px; }
 .aw-browse-title { margin: 0; font-family: var(--font-ui); font-size: 46px; font-weight: 800; letter-spacing: -.03em; line-height: 1; color: var(--ink); }
 .aw-browse-stats { font-size: 12px; letter-spacing: .1em; color: var(--ink-muted); }
-.aw-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 24px; }
-.aw-card { display: flex; align-items: center; gap: 14px; padding: 10px; border-radius: 16px; min-width: 0; background: var(--fill-08); border: 1px solid var(--fill-12); cursor: pointer; transition: background .25s ease; &:hover { background: var(--fill-13); } }
-.aw-tile { width: 50px; height: 50px; border-radius: 8px; overflow: hidden; flex: none; background: var(--card-flat); }
-.aw-tile--mosaic { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 3px; } img:nth-child(n+5) { display: none; } }
+.aw-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 28px; }
+.aw-card { display: flex; align-items: center; gap: 18px; padding: 18px; border-radius: 16px; min-width: 0; background: var(--fill-08); border: 1px solid var(--fill-12); cursor: pointer; transition: background .25s ease; &:hover { background: var(--fill-13); } }
+.aw-tile { width: 96px; height: 96px; border-radius: 8px; overflow: hidden; flex: none; background: var(--card-flat); }
+.aw-tile--mosaic { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 4px; } img:nth-child(n+5) { display: none; } }
 .aw-tile--stack img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.aw-tile--avatars { display: flex; align-items: center; background: none; overflow: visible; img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid var(--ground); flex: none; } img:nth-child(2) { margin-left: -14px; } }
-.aw-tile--icon { display: grid; place-items: center; background: var(--fill-07); .material-symbols-rounded { font-size: 26px; color: var(--ink-1); } }
+.aw-tile--avatars { display: flex; align-items: center; background: none; overflow: visible; img { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; border: 2px solid var(--ground); flex: none; } img:nth-child(2) { margin-left: -30px; } }
+.aw-tile--icon { display: grid; place-items: center; background: var(--fill-07); .material-symbols-rounded { font-size: 44px; color: var(--ink-1); } }
 .aw-tile--lines { display: flex; flex-direction: column; justify-content: center; gap: 9px; padding: 0 16px;
   i { display: block; height: 5px; border-radius: 3px; background: rgba(255, 255, 255, .7); } i:nth-child(2) { width: 78%; background: rgba(255, 255, 255, .5); } i:nth-child(3) { width: 56%; background: rgba(255, 255, 255, .35); } }
 .aw-tile__glyph { display: none; }
 .aw-card-body { min-width: 0; flex: 1; }
-.aw-card-title { font-size: 15px; font-weight: 600; letter-spacing: -.01em; color: var(--ink); }
-.aw-card-sub { font-size: 12px; color: var(--ink-muted); margin-top: 3px; }
+.aw-card-title { font-size: 20px; font-weight: 700; letter-spacing: -.01em; color: var(--ink); }
+.aw-card-sub { font-size: 14px; color: var(--ink-muted); margin-top: 5px; }
 .aw-card-meta { font-size: 11px; letter-spacing: .1em; color: var(--ink-dim); margin-top: 9px; }
-.aw-card-chev { font-size: 20px; color: var(--ink-muted); flex: none; margin-right: 4px; }
-.aw-sources-head { display: flex; align-items: center; gap: 14px; margin-top: 38px; padding-bottom: 10px; border-bottom: 1px solid var(--fill-10); .mono { font-size: 11px; letter-spacing: .18em; color: var(--ink-35); } }
+.aw-card-chev { font-size: 22px; color: var(--ink-muted); flex: none; }
+.aw-sources-head { display: flex; align-items: center; gap: 14px; margin-top: 34px; padding-bottom: 12px; border-bottom: 1px solid var(--fill-10); .mono { font-size: 11px; letter-spacing: .18em; color: var(--ink-35); } }
 .aw-sources-manage { margin-left: auto; font-size: 13px; font-weight: 500; color: var(--ink-3); cursor: pointer; text-decoration: none; &:hover { color: var(--ink-1); } }
-.aw-sources { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 14px; }
-.aw-source { display: flex; align-items: center; gap: 12px; padding: 9px 14px; min-height: 40px; border-radius: 12px; min-width: 0; background: var(--fill-05); cursor: pointer; color: var(--ink-1); text-decoration: none;
-  > .material-symbols-rounded { font-size: 20px; color: var(--ink-2); flex: none; } &:hover { background: var(--fill-09); } }
-.aw-source-logo { width: 20px; height: 20px; flex: none; border-radius: 6px; overflow: hidden; display: grid; place-items: center; }
+.aw-sources { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 18px; }
+.aw-source { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 13px; min-width: 0; background: var(--fill-05); cursor: pointer; color: var(--ink-1); text-decoration: none;
+  > .material-symbols-rounded { font-size: 24px; color: var(--ink-2); flex: none; } &:hover { background: var(--fill-09); } }
+.aw-source-logo { width: 24px; height: 24px; flex: none; border-radius: 6px; overflow: hidden; display: grid; place-items: center; }
 .aw-source-logo__img { width: 100%; height: 100%; object-fit: contain; }
 /* Spotify's own icon file has a huge transparent safe-margin (the mark fills ~43% of the
    canvas vs. ~65-70% for other services' icons) — scale it up so it reads at the same visual
@@ -214,8 +214,8 @@ body#artwork .aw-browse { padding: var(--pad-top) var(--pad-screen) 40px; color:
 .aw-source-logo__img--pad { width: 100%; height: 100%; object-fit: contain; transform: scale(1.35); }
 .aw-source-body { min-width: 0; flex: 1; }
 .aw-source-name { font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.aw-source-sub { font-size: 11px; color: var(--ink-dim); margin-top: 1px; }
-.aw-source-chev { font-size: 18px; color: var(--ink-muted); flex: none; }
+.aw-source-sub { font-size: 12px; color: var(--ink-dim); margin-top: 2px; }
+.aw-source-chev { font-size: 20px; color: var(--ink-muted); flex: none; }
 body#artwork #browse-page { background: transparent; }
 
 /* ============ lists (artists, albums, genres…) ============ */
@@ -552,8 +552,8 @@ body#artwork #browseTablesWrapper { padding-bottom: calc(var(--mini-h) + 16px); 
 body#artwork #browse.browsing-artist #browseTablesWrapper { padding-bottom: calc(var(--mini-h) + 48px); }
 body#artwork #browse.browsing-album #browseTablesWrapper > .aw-headwrap { padding-bottom: calc(var(--mini-h) + 24px); }
 body#artwork .aw-browse { padding-bottom: calc(var(--mini-h) + 40px); }
-/* the landing's grids keep their counts (three cards, four sources) down to a tablet, then halve */
-@media (max-width: 1000px) and (min-width: 701px) { body#artwork .aw-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } body#artwork .aw-sources { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+body#artwork .aw-cards { grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: clamp(10px, 1.25vw, 18px); }
+body#artwork .aw-sources { grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); }
 body#artwork .aw-search { width: 320px; min-width: 0; }
 body#artwork #browse.browsing-list .main__row { grid-template-columns: repeat(auto-fill, minmax(clamp(120px, 13vw, 190px), 1fr)); gap: clamp(12px, 1.7vw, 24px); }
 body#artwork #browse.browsing-artists .main__row { row-gap: clamp(28px, 2.8vw, 40px); }
@@ -665,14 +665,14 @@ body#artwork .aw-found { padding-top: 4px;
   .main__source__title { display: none; }
   .main__source { margin-top: 0; }
 }
-body#artwork .aw-recent { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 14px; padding: 14px 0 0;
-  &__label { font-size: 11px; letter-spacing: .14em; color: var(--ink-muted); flex: none; }
-  &__clear { margin-left: auto; border: 0; background: transparent; color: var(--ink-dim); font: inherit; font-size: 13px; cursor: pointer; padding: 2px 0; flex: none; &:hover { color: var(--ink); } }
-  &__chips { display: flex; flex-wrap: wrap; gap: 8px; min-width: 0; }
-  &__chip { display: inline-flex; align-items: center; height: 26px; border-radius: 13px; background: var(--fill-07); border: 1px solid var(--fill-10); overflow: hidden; }
-  &__run { display: inline-flex; align-items: center; gap: 6px; height: 100%; padding: 0 4px 0 10px; border: 0; background: transparent; color: var(--ink-2); font: inherit; font-size: 13px; cursor: pointer; line-height: normal;
-    .material-symbols-rounded { font-size: 14px; color: var(--ink-faint); } &:hover { color: var(--ink); } }
-  &__x { display: grid; place-items: center; width: 24px; height: 100%; border: 0; background: transparent; color: var(--ink-faint); cursor: pointer; padding: 0; .material-symbols-rounded { font-size: 14px; } &:hover { color: var(--ink); } }
+body#artwork .aw-recent { padding: 6px 0 2px;
+  &__head { display: flex; align-items: center; justify-content: space-between; margin: 0 0 10px; .mono { font-size: 11px; letter-spacing: .1em; color: var(--ink-muted); } }
+  &__clear { border: 0; background: transparent; color: var(--ink-dim); font: inherit; font-size: 12px; cursor: pointer; padding: 2px 0; &:hover { color: var(--ink); } }
+  &__chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  &__chip { display: inline-flex; align-items: center; height: 34px; border-radius: 17px; background: var(--fill-07); border: 1px solid var(--fill-10); overflow: hidden; }
+  &__run { display: inline-flex; align-items: center; gap: 7px; height: 100%; padding: 0 6px 0 12px; border: 0; background: transparent; color: var(--ink-2); font: inherit; font-size: 13px; cursor: pointer; line-height: normal;
+    .material-symbols-rounded { font-size: 16px; color: var(--ink-faint); } &:hover { color: var(--ink); } }
+  &__x { display: grid; place-items: center; width: 28px; height: 100%; border: 0; background: transparent; color: var(--ink-faint); cursor: pointer; padding: 0; .material-symbols-rounded { font-size: 15px; } &:hover { color: var(--ink); } }
   &__hint { padding: 8px 0 14px; font-size: 13px; color: var(--ink-dim); }
 }
 body#artwork .dedicated-search { display: flex; align-items: center; gap: 10px; }
@@ -682,7 +682,7 @@ body#artwork .aw-scope { position: relative; flex: none;
   &.open .aw-scope__btn { background: var(--fill-09); color: var(--ink); }
   .dropdown-menu { right: 0; left: auto; top: 100%; margin-top: 8px; } }
 @media (max-width: 600px) { body#artwork .aw-scope .aw-scope__label { max-width: 90px; overflow: hidden; text-overflow: ellipsis; } body#artwork .aw-scope .aw-scope__btn { padding-left: 12px; height: 42px; } }
-body#artwork .aw-recent__under .aw-recent { padding-top: 20px; }
+body#artwork .aw-recent__under { padding-top: 22px; }
 /* the search page's tiles: the library lists' fluid grid (the row of a shelf is however many fit) */
 body#artwork #browse.browsing-search .main__row { grid-template-columns: repeat(auto-fill, minmax(clamp(120px, 13vw, 190px), 1fr)); gap: clamp(12px, 1.7vw, 24px); padding: 12px 0 8px; }
 /* the landing's head: the source menu sits beside the search pill at the pill's height */
@@ -696,34 +696,3 @@ body#artwork .aw-head--home .aw-scope .aw-scope__btn { height: 38px; border-radi
 /* the artist page: a picture the service cannot serve gives way to a glyph; the similar artists are round tiles without play or menu */
 body#artwork .aw-artist__img--glyph { display: grid; place-items: center; color: var(--ink-dim); .material-symbols-rounded { font-size: 48px; } }
 body#artwork .aw-artist-album--artist { .aw-artist-album__cover, .aw-artist-album__cover img { border-radius: 50%; } .aw-artist-album__title { text-align: center; } }
-
-/* ============ the landing after the 2026-11 mockup (drawn at 2000px): every measure scales with the window between 1000 and 2000px ============ */
-body#artwork .aw-browse {
-  .aw-browse-head { margin-top: clamp(22px, 2.2vw, 44px); margin-bottom: clamp(12px, 1.2vw, 24px); gap: clamp(16px, 1.2vw, 24px); }
-  .aw-browse-title { font-size: clamp(34px, 3.5vw, 70px); }
-  .aw-browse-stats { font-size: clamp(12px, .9vw, 18px); }
-  .aw-recent { padding-top: clamp(14px, 1.4vw, 28px); gap: clamp(10px, 1vw, 20px) clamp(14px, 1.4vw, 28px);
-    .aw-recent__label { font-size: clamp(11px, .9vw, 18px); }
-    .aw-recent__chips { gap: clamp(8px, .8vw, 16px); }
-    .aw-recent__chip { height: clamp(26px, 2.6vw, 52px); border-radius: 999px; }
-    .aw-recent__run { font-size: clamp(13px, 1.3vw, 26px); gap: clamp(6px, .6vw, 12px); padding: 0 clamp(4px, .4vw, 8px) 0 clamp(10px, 1vw, 20px); .material-symbols-rounded { font-size: clamp(14px, 1.3vw, 26px); } }
-    .aw-recent__x { width: clamp(24px, 2.4vw, 48px); .material-symbols-rounded { font-size: clamp(14px, 1.3vw, 26px); } }
-    .aw-recent__clear { font-size: clamp(13px, 1vw, 20px); } }
-  .aw-cards { gap: clamp(12px, 1.2vw, 24px); margin-top: clamp(24px, 2.4vw, 48px); }
-  .aw-card { gap: clamp(14px, 1.1vw, 22px); padding: clamp(10px, 1vw, 20px); border-radius: clamp(12px, 1.6vw, 32px); }
-  .aw-tile { width: clamp(50px, 5vw, 100px); height: clamp(50px, 5vw, 100px); border-radius: clamp(8px, .8vw, 16px); }
-  .aw-tile--avatars img { width: clamp(36px, 3.6vw, 72px); height: clamp(36px, 3.6vw, 72px); } .aw-tile--avatars img:nth-child(2) { margin-left: clamp(-28px, -1.4vw, -14px); }
-  .aw-tile--icon .material-symbols-rounded { font-size: clamp(26px, 2.6vw, 52px); }
-  .aw-card-title { font-size: clamp(15px, 1.5vw, 30px); }
-  .aw-card-sub { font-size: clamp(12px, 1vw, 20px); margin-top: clamp(3px, .3vw, 6px); }
-  .aw-card-chev { font-size: clamp(20px, 1.2vw, 24px); margin-right: clamp(4px, .4vw, 8px); }
-  .aw-sources-head { margin-top: clamp(38px, 3.8vw, 76px); padding-bottom: clamp(10px, 1vw, 20px); .mono { font-size: clamp(11px, .9vw, 18px); } }
-  .aw-sources-manage { font-size: clamp(13px, 1vw, 20px); }
-  .aw-sources { gap: clamp(12px, 1.2vw, 24px); margin-top: clamp(14px, 1.4vw, 28px); }
-  .aw-source { min-height: clamp(40px, 4vw, 80px); padding: clamp(6px, .6vw, 12px) clamp(14px, 1.4vw, 28px); gap: clamp(12px, 1.2vw, 24px); border-radius: clamp(12px, 1.2vw, 24px);
-    > .material-symbols-rounded { font-size: clamp(20px, 1.6vw, 32px); } }
-  .aw-source-logo { width: clamp(20px, 1.6vw, 32px); height: clamp(20px, 1.6vw, 32px); }
-  .aw-source-name { font-size: clamp(15px, 1.1vw, 22px); }
-  .aw-source-sub { font-size: clamp(11px, .8vw, 16px); }
-  .aw-source-chev { font-size: clamp(18px, 1.2vw, 24px); }
-}
