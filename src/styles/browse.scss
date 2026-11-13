@@ -555,7 +555,7 @@ body#artwork .aw-browse { padding-bottom: calc(var(--mini-h) + 40px); }
 /* the library's cards: all six in one row on a wide desktop (the tile at the mockup's 72px so the words keep their room),
    three on a smaller desktop, two on a laptop or a touch display */
 body#artwork .aw-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
-@media (min-width: 1700px) { body#artwork .aw-cards { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 14px; }
+@media (min-width: 1800px) { body#artwork .aw-cards { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 14px; }
   body#artwork .aw-card { gap: 14px; padding: 14px; } body#artwork .aw-tile { width: 72px; height: 72px; }
   body#artwork .aw-tile--avatars img { width: 50px; height: 50px; } body#artwork .aw-tile--avatars img:nth-child(2) { margin-left: -22px; }
   body#artwork .aw-tile--icon .material-symbols-rounded { font-size: 34px; } body#artwork .aw-card-title { font-size: 19px; } body#artwork .aw-card-sub { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } }
