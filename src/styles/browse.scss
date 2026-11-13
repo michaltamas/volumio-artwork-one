@@ -246,20 +246,20 @@ body#artwork #browse.browsing-artists .music-card__label { font-size: 16px; font
 /* ============ playlist page (mockup 2d) ============ */
 body#artwork #browse.browsing-playlist #browseTablesWrapper { padding-top: 0; }
 .aw-albumhead--playlist {
-  /* the playlist mockup (.pl-head / .pl-art): the cover clamp(120px, 13cqw, 208px) beside the words, 32px apart, bottoms aligned */
-  display: grid; grid-template-columns: clamp(120px, 13vw, 208px) 1fr; column-gap: 32px; align-items: end;
+  /* the playlist mockup (.pl-head / .pl-art / .pl-info): the tile clamp(120px, 13cqw, 208px) beside the words, 32px apart, bottoms aligned;
+     above the title the eyebrow, under it Play and Add to queue */
+  display: grid; grid-template-columns: clamp(120px, 13vw, 208px) 1fr; column-gap: 32px; align-items: end; margin-top: 20px;
+  .aw-albumhead__eyebrow { grid-column: 2; margin: 0; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-muted); white-space: nowrap; }
+  .aw-albumhead__body { gap: 14px; padding-bottom: 4px; }
+  .aw-btn--ghost { background: transparent; border: 1px solid var(--fill-20); color: var(--ink-2); font-weight: 500; padding: 0 18px 0 14px; &:hover { background: var(--fill-08); } }
   .aw-albumhead__cover { max-width: none; width: clamp(120px, 13vw, 208px); grid-row: 2; }
-  .aw-albumhead__cover--mosaic { aspect-ratio: 1; border-radius: 6px; overflow: hidden; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; box-shadow: 0 30px 60px -22px rgba(0, 0, 0, .85); background: var(--fill-06);
-    img { width: 100%; height: 100%; min-height: 0; object-fit: cover; display: block; border-radius: 0; box-shadow: none; aspect-ratio: auto; }
-    .aw-albumhead__blank { background: var(--fill-07); }
-    &.is-one { grid-template-columns: 1fr; grid-template-rows: 1fr; } }
   .aw-albumhead__cover--glyph { aspect-ratio: 1; display: grid; place-items: center; background: var(--fill-08); border: 1px solid var(--fill-08); border-radius: 14px; color: var(--ink-1);
     .material-symbols-rounded { font-size: clamp(41px, 4.42vw, 71px); font-weight: 300; } }
   .aw-albumhead__title, .aw-albumhead__artist, .aw-albumhead__meta, .aw-albumhead__actions { grid-column: 2; }
   .aw-albumhead__body { grid-column: 2; grid-row: 2; align-self: end; display: flex; flex-direction: column; min-width: 0; padding-bottom: 6px; }
-  .aw-albumhead__title { font-size: var(--t-h1-xl); letter-spacing: -.035em; line-height: 1; margin: 0; }
+  .aw-albumhead__title { font-size: clamp(34px, 4.4vw, 68px); letter-spacing: -.03em; line-height: 1; margin: 0; }
   .aw-albumhead__meta { margin-top: 14px; }
-  .aw-albumhead__actions { margin-top: 26px; }
+  .aw-albumhead__actions { margin-top: 6px; gap: 10px; }
   .aw-albumhead__artist { display: none; }
 }
 .aw-albumhead:not(.aw-albumhead--playlist) .aw-albumhead__body { display: contents; }

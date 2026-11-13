@@ -260,6 +260,10 @@
   body#artwork .aw-albumhead .aw-albumhead__meta { grid-row: 4; align-self: start; }
   body#artwork .aw-albumhead .aw-albumhead__cover { grid-row: 2 / 5; align-self: center; }
   body#artwork .aw-albumhead .aw-albumhead__eyebrow { display: none; }
+  /* a playlist (and Favourites): the eyebrow with the count above the title, the pair centred on the tile */
+  body#artwork .aw-albumhead--playlist .aw-albumhead__eyebrow { display: block; grid-column: 2; grid-row: 2; align-self: end; margin: 0; font-size: 10px; letter-spacing: .14em; }
+  body#artwork .aw-albumhead--playlist .aw-albumhead__title { grid-row: 3; align-self: start; margin-top: 6px; }
+  body#artwork .aw-albumhead--playlist .aw-albumhead__cover { grid-row: 2 / 5; }
   body#artwork .aw-albumhead .aw-albumhead__title { font-size: 22px !important; letter-spacing: -.02em; line-height: 1.1; margin: 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
   body#artwork .aw-albumhead .aw-albumhead__artist { font-size: 15px; margin-top: 6px; color: var(--ink-25); }
   body#artwork .aw-albumhead .aw-albumhead__meta { font-size: 10px; margin-top: 8px; letter-spacing: .08em; white-space: normal; }
