@@ -42,6 +42,7 @@ export default function BrowseLanding({ dedicated }: { dedicated?: boolean }) {
   const recent = useRecentSearches(s => s.list);
   const [home, setHome] = useState<Home>({ stats: null, albumsArt: [], artistsArt: [], playlistArt: null, counts: {} });
   const [logoFail, setLogoFail] = useState<Record<string, boolean>>({});
+  const [artFail, setArtFail] = useState<Record<number, boolean>>({});
   const input = useRef<HTMLInputElement>(null);
   const source = (uri: string) => sources.find(s => s.uri === uri) || null;
   const fetch = (s: BrowseItem | null) => { if (s) { useBrowse.getState().fetch(s); } };
@@ -128,8 +129,10 @@ export default function BrowseLanding({ dedicated }: { dedicated?: boolean }) {
             {source('albums://') ? (
               <div className="aw-card" onClick={() => fetch(source('albums://'))}>
                 <div className="aw-tile aw-tile--mosaic">
-                  {home.albumsArt.map((a, i) => <img key={i} src={a} alt="" onError={(e) => e.currentTarget.remove()} />)}
-                  <Icon name="album" className="aw-tile__glyph" />
+                  {/* four cells always: a cover, or a quiet square where one is missing */}
+                  {[0, 1, 2, 3].map(i => home.albumsArt[i] && !artFail[i]
+                    ? <img key={i} src={home.albumsArt[i]} alt="" onError={() => setArtFail(f => ({ ...f, [i]: true }))} />
+                    : <span key={i} className="aw-tile__blank"><Icon name="album" /></span>)}
                 </div>
                 <div className="aw-card-body"><div className="aw-card-title">Albums</div>{s ? <div className="aw-card-sub">{s.albums} albums</div> : null}</div>
                 <Icon name="chevron_right" className="aw-card-chev" />
@@ -162,7 +165,7 @@ export default function BrowseLanding({ dedicated }: { dedicated?: boolean }) {
             ) : null}
             {source('genres://') ? (
               <div className="aw-card" onClick={() => fetch(source('genres://'))}>
-                <div className="aw-tile aw-tile--icon aw-tile--lines" aria-hidden="true"><i /><i /><i /><Icon name="graphic_eq" className="aw-tile__glyph" /></div>
+                <div className="aw-tile aw-tile--icon"><Icon name="category" /></div>
                 <div className="aw-card-body"><div className="aw-card-title">Genres</div>{home.counts.genres !== undefined ? <div className="aw-card-sub">{home.counts.genres} genres</div> : null}</div>
                 <Icon name="chevron_right" className="aw-card-chev" />
               </div>

@@ -183,39 +183,53 @@ body#artwork #browse.browsing-playlist .aw-headwrap { display: block; }
 
 /* ============ the landing (mockup 2b-browse) ============ */
 body#artwork .aw-browse { padding: var(--pad-top) var(--pad-screen) 40px; color: var(--ink-1); }
-.aw-browse-head { display: flex; align-items: baseline; gap: 16px; margin-top: 26px; margin-bottom: 14px; }
+/* ============ the landing after the November mockup (volumio-library-final.html): six cards in one row on a wide desktop,
+   three, two, one as the window narrows; a fixed place for the chevron; nothing wraps; quiet squares where a cover is missing.
+   Our own glyphs (Material Symbols) in place of the mockup's line icons. ============ */
+.aw-browse { --lb-thumb: 72px; --lb-card-h: 112px; --lb-card-name: 19px; --lb-cols: 6; }
+@media (max-width: 1499px) { .aw-browse { --lb-cols: 3; } }
+@media (max-width: 1099px) { .aw-browse { --lb-cols: 2; } }
+@media (max-width: 699px)  { .aw-browse { --lb-cols: 1; --lb-thumb: 48px; --lb-card-h: 72px; --lb-card-name: 17px; } }
+@media (max-height: 520px) and (min-width: 700px) { .aw-browse { --lb-cols: 3; --lb-thumb: 44px; --lb-card-h: 64px; --lb-card-name: 16px; } }
+.aw-browse-head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 16px; margin-top: 32px; margin-bottom: 0; }
 .aw-browse-title { margin: 0; font-family: var(--font-ui); font-size: 46px; font-weight: 800; letter-spacing: -.03em; line-height: 1; color: var(--ink); }
-.aw-browse-stats { font-size: 12px; letter-spacing: .1em; color: var(--ink-muted); }
-.aw-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 28px; }
-.aw-card { display: flex; align-items: center; gap: 18px; padding: 18px; border-radius: 16px; min-width: 0; background: var(--fill-08); border: 1px solid var(--fill-12); cursor: pointer; transition: background .25s ease; &:hover { background: var(--fill-13); } }
-.aw-tile { width: 96px; height: 96px; border-radius: 8px; overflow: hidden; flex: none; background: var(--card-flat); }
-.aw-tile--mosaic { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 4px; } img:nth-child(n+5) { display: none; } }
+@media (max-width: 1099px) { .aw-browse-title { font-size: 38px; } }
+@media (max-width: 699px) { .aw-browse-title { font-size: 30px; } }
+@media (max-height: 520px) and (min-width: 700px) { .aw-browse-title { font-size: 28px; } .aw-browse-head { margin-top: 14px; } }
+.aw-browse-stats { font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-3); white-space: nowrap; }
+.aw-cards { display: grid; grid-template-columns: repeat(var(--lb-cols), minmax(0, 1fr)); gap: 16px; margin-top: 24px; }
+.aw-card { display: grid; grid-template-columns: var(--lb-thumb) minmax(0, 1fr) 20px; align-items: center; column-gap: 16px; height: var(--lb-card-h); padding: 0 14px 0 20px; border-radius: 16px; min-width: 0; background: var(--fill-08); border: 1px solid var(--fill-12); cursor: pointer; transition: background .2s ease; &:hover { background: var(--fill-12); } }
+.aw-tile { width: var(--lb-thumb); height: var(--lb-thumb); border-radius: 6px; overflow: hidden; flex: none; background: var(--card-flat); }
+.aw-tile--mosaic { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 2px; background: transparent;
+  img { width: 100%; height: 100%; min-height: 0; object-fit: cover; display: block; }
+  .aw-tile__blank { background: var(--fill-07); display: grid; place-items: center; color: var(--ink-45); .material-symbols-rounded { font-size: calc(var(--lb-thumb) * .31); } } }
 .aw-tile--stack img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.aw-tile--avatars { display: flex; align-items: center; background: none; overflow: visible; img { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; border: 2px solid var(--ground); flex: none; } img:nth-child(2) { margin-left: -30px; } }
-.aw-tile--icon { display: grid; place-items: center; background: var(--fill-07); .material-symbols-rounded { font-size: 44px; color: var(--ink-1); } }
-.aw-tile--lines { display: flex; flex-direction: column; justify-content: center; gap: 9px; padding: 0 16px;
-  i { display: block; height: 5px; border-radius: 3px; background: rgba(255, 255, 255, .7); } i:nth-child(2) { width: 78%; background: rgba(255, 255, 255, .5); } i:nth-child(3) { width: 56%; background: rgba(255, 255, 255, .35); } }
+.aw-tile--avatars { display: flex; align-items: center; background: none; overflow: visible; border-radius: 0;
+  img { width: 64%; aspect-ratio: 1; height: auto; border-radius: 50%; object-fit: cover; border: 2px solid var(--ground); flex: none; } img + img { margin-left: -28%; } }
+.aw-tile--icon { display: grid; place-items: center; background: var(--fill-08); border-radius: 10px; .material-symbols-rounded { font-size: calc(var(--lb-thumb) * .42); color: var(--ink-1); } }
 .aw-tile__glyph { display: none; }
-.aw-card-body { min-width: 0; flex: 1; }
-.aw-card-title { font-size: 20px; font-weight: 700; letter-spacing: -.01em; color: var(--ink); }
-.aw-card-sub { font-size: 14px; color: var(--ink-muted); margin-top: 5px; }
+.aw-card-body { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.aw-card-title { font-size: var(--lb-card-name); font-weight: 700; letter-spacing: -.01em; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.aw-card-sub { font-size: 14px; color: var(--ink-muted); margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .aw-card-meta { font-size: 11px; letter-spacing: .1em; color: var(--ink-dim); margin-top: 9px; }
-.aw-card-chev { font-size: 22px; color: var(--ink-muted); flex: none; }
-.aw-sources-head { display: flex; align-items: center; gap: 14px; margin-top: 34px; padding-bottom: 12px; border-bottom: 1px solid var(--fill-10); .mono { font-size: 11px; letter-spacing: .18em; color: var(--ink-35); } }
-.aw-sources-manage { margin-left: auto; font-size: 13px; font-weight: 500; color: var(--ink-3); cursor: pointer; text-decoration: none; &:hover { color: var(--ink-1); } }
-.aw-sources { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 18px; }
-.aw-source { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 13px; min-width: 0; background: var(--fill-05); cursor: pointer; color: var(--ink-1); text-decoration: none;
-  > .material-symbols-rounded { font-size: 24px; color: var(--ink-2); flex: none; } &:hover { background: var(--fill-09); } }
-.aw-source-logo { width: 24px; height: 24px; flex: none; border-radius: 6px; overflow: hidden; display: grid; place-items: center; }
+.aw-card-chev { font-size: 20px; color: var(--ink-muted); flex: none; }
+.aw-sources-head { display: flex; align-items: center; gap: 14px; margin-top: 40px; padding-bottom: 12px; border-bottom: 1px solid var(--fill-10); .mono { font-size: 11px; letter-spacing: .18em; color: var(--ink-3); } }
+.aw-sources-manage { margin-left: auto; height: 28px; display: inline-flex; align-items: center; font-size: 13px; font-weight: 500; color: var(--ink-3); cursor: pointer; text-decoration: none; &:hover { color: var(--ink); } }
+.aw-sources { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 16px; }
+@media (max-width: 1499px) { .aw-sources { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); } }
+.aw-source { display: grid; grid-template-columns: 22px minmax(0, 1fr) 20px; align-items: center; column-gap: 14px; height: 64px; padding: 0 14px 0 20px; border-radius: 14px; min-width: 0; background: var(--fill-05); cursor: pointer; color: var(--ink-1); text-decoration: none; transition: background .2s ease;
+  > .material-symbols-rounded { font-size: 22px; color: var(--ink-2); flex: none; } &:hover { background: var(--fill-10); } }
+.aw-source-logo { width: 22px; height: 22px; flex: none; border-radius: 6px; overflow: hidden; display: grid; place-items: center; }
 .aw-source-logo__img { width: 100%; height: 100%; object-fit: contain; }
 /* Spotify's own icon file has a huge transparent safe-margin (the mark fills ~43% of the
    canvas vs. ~65-70% for other services' icons) — scale it up so it reads at the same visual
    size as its neighbours instead of looking shrunken; clipped by the wrapper above. */
 .aw-source-logo__img--pad { width: 100%; height: 100%; object-fit: contain; transform: scale(1.35); }
-.aw-source-body { min-width: 0; flex: 1; }
+.aw-source-body { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .aw-source-name { font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.aw-source-sub { font-size: 12px; color: var(--ink-dim); margin-top: 2px; }
+.aw-source-sub { font-size: 12px; color: var(--ink-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .aw-source-chev { font-size: 20px; color: var(--ink-muted); flex: none; }
+@media (max-height: 520px) and (min-width: 700px) { .aw-cards { margin-top: 12px; gap: 10px; } .aw-sources-head { margin-top: 16px; } .aw-source { height: 48px; } .aw-card-sub { font-size: 12px; } .aw-recent { margin-top: 10px; } }
 body#artwork #browse-page { background: transparent; }
 
 /* ============ lists (artists, albums, genres…) ============ */
@@ -552,8 +566,6 @@ body#artwork #browseTablesWrapper { padding-bottom: calc(var(--mini-h) + 16px); 
 body#artwork #browse.browsing-artist #browseTablesWrapper { padding-bottom: calc(var(--mini-h) + 48px); }
 body#artwork #browse.browsing-album #browseTablesWrapper > .aw-headwrap { padding-bottom: calc(var(--mini-h) + 24px); }
 body#artwork .aw-browse { padding-bottom: calc(var(--mini-h) + 40px); }
-body#artwork .aw-cards { grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: clamp(10px, 1.25vw, 18px); }
-body#artwork .aw-sources { grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); }
 body#artwork .aw-search { width: 320px; min-width: 0; }
 body#artwork #browse.browsing-list .main__row { grid-template-columns: repeat(auto-fill, minmax(clamp(120px, 13vw, 190px), 1fr)); gap: clamp(12px, 1.7vw, 24px); }
 body#artwork #browse.browsing-artists .main__row { row-gap: clamp(28px, 2.8vw, 40px); }
@@ -671,9 +683,9 @@ body#artwork .aw-recent { display: flex; align-items: center; gap: 12px; margin-
   &__chips { display: flex; gap: 8px; min-width: 0; overflow-x: auto; scrollbar-width: none; flex: 1; &::-webkit-scrollbar { display: none; } }
   &__chip { display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 4px 0 12px; border-radius: 18px; background: var(--fill-08); border: 1px solid var(--fill-11); font-size: 14px; color: var(--ink-2); white-space: nowrap; flex: none; }
   &__run { display: flex; align-items: center; gap: 8px; height: 100%; padding: 0; border: 0; background: transparent; color: inherit; font: inherit; cursor: pointer; line-height: normal;
-    .material-symbols-rounded { font-size: 17px; color: var(--ink-muted); } &:hover { color: var(--ink); } }
-  &__x { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; border: 0; background: transparent; color: var(--ink-3); cursor: pointer; padding: 0; .material-symbols-rounded { font-size: 16px; } &:hover { background: var(--fill-10); color: var(--ink); } }
-  &__clear { height: 36px; font: inherit; font-size: 13px; color: var(--ink-3); white-space: nowrap; flex: none; border: 0; background: transparent; cursor: pointer; padding: 0; &:hover { color: var(--ink); } }
+    .material-symbols-rounded { font-size: 16px; color: var(--ink-muted); } &:hover { color: var(--ink); } }
+  &__x { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; border: 0; background: transparent; color: var(--ink-muted); cursor: pointer; padding: 0; .material-symbols-rounded { font-size: 14px; } &:hover { background: var(--fill-10); color: var(--ink); } }
+  &__clear { height: 36px; font: inherit; font-size: 13px; font-weight: 500; color: var(--ink-3); white-space: nowrap; flex: none; border: 0; background: transparent; cursor: pointer; padding: 0; &:hover { color: var(--ink); } }
   &__hint { padding: 8px 0 14px; font-size: 13px; color: var(--ink-dim); }
 }
 @media (max-width: 767px) { body#artwork .aw-recent { flex-wrap: wrap; .aw-recent__label { flex: 1; } .aw-recent__clear { order: 1; } .aw-recent__chips { order: 2; flex: 1 1 100%; } } }
