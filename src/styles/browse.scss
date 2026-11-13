@@ -665,16 +665,18 @@ body#artwork .aw-found { padding-top: 4px;
   .main__source__title { display: none; }
   .main__source { margin-top: 0; }
 }
-body#artwork .aw-recent { padding: 6px 0 2px;
-  &__head { display: flex; align-items: center; justify-content: space-between; margin: 0 0 10px; .mono { font-size: 11px; letter-spacing: .1em; color: var(--ink-muted); } }
-  &__clear { border: 0; background: transparent; color: var(--ink-dim); font: inherit; font-size: 12px; cursor: pointer; padding: 2px 0; &:hover { color: var(--ink); } }
-  &__chips { display: flex; flex-wrap: wrap; gap: 8px; }
-  &__chip { display: inline-flex; align-items: center; height: 34px; border-radius: 17px; background: var(--fill-07); border: 1px solid var(--fill-10); overflow: hidden; }
-  &__run { display: inline-flex; align-items: center; gap: 7px; height: 100%; padding: 0 6px 0 12px; border: 0; background: transparent; color: var(--ink-2); font: inherit; font-size: 13px; cursor: pointer; line-height: normal;
-    .material-symbols-rounded { font-size: 16px; color: var(--ink-faint); } &:hover { color: var(--ink); } }
-  &__x { display: grid; place-items: center; width: 28px; height: 100%; border: 0; background: transparent; color: var(--ink-faint); cursor: pointer; padding: 0; .material-symbols-rounded { font-size: 15px; } &:hover { color: var(--ink); } }
+/* recent searches, after the November library mockup (.recent): one row — the label, the chips scrolling sideways, Clear all */
+body#artwork .aw-recent { display: flex; align-items: center; gap: 12px; margin-top: 24px; min-width: 0;
+  &__label { font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-muted); white-space: nowrap; flex: none; }
+  &__chips { display: flex; gap: 8px; min-width: 0; overflow-x: auto; scrollbar-width: none; flex: 1; &::-webkit-scrollbar { display: none; } }
+  &__chip { display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 4px 0 12px; border-radius: 18px; background: var(--fill-08); border: 1px solid var(--fill-11); font-size: 14px; color: var(--ink-2); white-space: nowrap; flex: none; }
+  &__run { display: flex; align-items: center; gap: 8px; height: 100%; padding: 0; border: 0; background: transparent; color: inherit; font: inherit; cursor: pointer; line-height: normal;
+    .material-symbols-rounded { font-size: 17px; color: var(--ink-muted); } &:hover { color: var(--ink); } }
+  &__x { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; border: 0; background: transparent; color: var(--ink-3); cursor: pointer; padding: 0; .material-symbols-rounded { font-size: 16px; } &:hover { background: var(--fill-10); color: var(--ink); } }
+  &__clear { height: 36px; font: inherit; font-size: 13px; color: var(--ink-3); white-space: nowrap; flex: none; border: 0; background: transparent; cursor: pointer; padding: 0; &:hover { color: var(--ink); } }
   &__hint { padding: 8px 0 14px; font-size: 13px; color: var(--ink-dim); }
 }
+@media (max-width: 767px) { body#artwork .aw-recent { flex-wrap: wrap; .aw-recent__label { flex: 1; } .aw-recent__clear { order: 1; } .aw-recent__chips { order: 2; flex: 1 1 100%; } } }
 body#artwork .dedicated-search { display: flex; align-items: center; gap: 10px; }
 body#artwork .aw-scope { position: relative; flex: none;
   .aw-scope__btn { display: inline-flex; align-items: center; gap: 4px; height: 46px; padding: 0 10px 0 16px; border-radius: 23px; border: 1px solid var(--fill-12); background: var(--fill-05); color: var(--ink-2); font: inherit; font-size: 14px; cursor: pointer; line-height: normal; white-space: nowrap;
@@ -682,7 +684,7 @@ body#artwork .aw-scope { position: relative; flex: none;
   &.open .aw-scope__btn { background: var(--fill-09); color: var(--ink); }
   .dropdown-menu { right: 0; left: auto; top: 100%; margin-top: 8px; } }
 @media (max-width: 600px) { body#artwork .aw-scope .aw-scope__label { max-width: 90px; overflow: hidden; text-overflow: ellipsis; } body#artwork .aw-scope .aw-scope__btn { padding-left: 12px; height: 42px; } }
-body#artwork .aw-recent__under { padding-top: 22px; }
+body#artwork .aw-recent__under .aw-recent { margin-top: 20px; }
 /* the search page's tiles: the library lists' fluid grid (the row of a shelf is however many fit) */
 body#artwork #browse.browsing-search .main__row { grid-template-columns: repeat(auto-fill, minmax(clamp(120px, 13vw, 190px), 1fr)); gap: clamp(12px, 1.7vw, 24px); padding: 12px 0 8px; }
 /* the landing's head: the source menu sits beside the search pill at the pill's height */

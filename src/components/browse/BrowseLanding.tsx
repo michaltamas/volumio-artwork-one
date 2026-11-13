@@ -74,15 +74,16 @@ export default function BrowseLanding({ dedicated }: { dedicated?: boolean }) {
       {searchField.length === 1 ? <div className="aw-recent__hint">Keep typing: the search starts at two characters.</div> : null}
       {recent.length && !searchField.length ? (
         <div className="aw-recent">
-          <div className="aw-recent__head"><span className="mono">RECENT SEARCHES</span><button type="button" className="aw-recent__clear" onClick={() => useRecentSearches.getState().clear()}>Clear all</button></div>
+          <span className="aw-recent__label mono">Recent searches</span>
           <div className="aw-recent__chips">
             {recent.map(q => (
               <span className="aw-recent__chip" key={q}>
                 <button type="button" className="aw-recent__run" onClick={() => useBrowse.getState().search(q)}><Icon name="history" /><span>{q}</span></button>
-                <button type="button" className="aw-recent__x" onClick={() => useRecentSearches.getState().remove(q)} aria-label={'Forget ' + q} title="Forget"><Icon name="close" /></button>
+                <button type="button" className="aw-recent__x" onClick={() => useRecentSearches.getState().remove(q)} aria-label={'Remove ' + q} title="Remove"><Icon name="close" /></button>
               </span>
             ))}
           </div>
+          <button type="button" className="aw-recent__clear" onClick={() => useRecentSearches.getState().clear()}>Clear all</button>
         </div>
       ) : null}
     </>
