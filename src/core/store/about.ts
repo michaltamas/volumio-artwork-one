@@ -56,13 +56,31 @@ const order: [Record<string, any>, string][] = [];
 let mbLast = 0; let mbChain: Promise<any> = Promise.resolve();
 let lastKeys = '';
 
-const json = async (url: string, params: Record<string, string>) => { const r = await fetch(url + '?' + new URLSearchParams(params).toString(), { headers: { Accept: 'application/json' } }); if (!r.ok) { throw new Error(String(r.status)); } return r.json(); };
-function mb(path: string, params: Record<string, string>): Promise<any> {
-  const run = async () => { const wait = Math.max(0, mbLast + MB_GAP - Date.now()); await new Promise(res => setTimeout(res, wait)); mbLast = Date.now(); return json(MB + path, { fmt: 'json', ...params }); };
+// a busy server (MusicBrainz answers 503 now and then, even at one request a second) gets two more tries, after
+// 1.5 and 3 seconds, so a lookup is not lost to a hiccup — one lost answer used to be kept as "nothing known"
+const json = async (url: string, params: Record<string, string>, retry = 2): Promise<any> => {
+  const r = await fetch(url + '?' + new URLSearchParams(params).toString(), { headers: { Accept: 'application/json' } });
+  if ((r.status === 503 || r.status === 429) && retry > 0) { await new Promise(res => setTimeout(res, retry === 2 ? 1500 : 3000)); return json(url, params, retry - 1); }
+  if (!r.ok) { throw new Error(String(r.status)); }
+  return r.json();
+};
+const STALE = new Error('stale');
+/** one MusicBrainz request a second, in one queue. `live` says whether the track that asked is still the one playing: a
+ *  request for a track skipped past is dropped from the queue instead of holding up the current track's (eight requests
+ *  a track, so three quick skips were half a minute of waiting, and the bio of the track playing came late or never) */
+function mb(path: string, params: Record<string, string>, live?: () => boolean): Promise<any> {
+  const run = async () => {
+    if (live && !live()) { throw STALE; }
+    const wait = Math.max(0, mbLast + MB_GAP - Date.now()); await new Promise(res => setTimeout(res, wait));
+    if (live && !live()) { throw STALE; }
+    mbLast = Date.now(); return json(MB + path, { fmt: 'json', ...params });
+  };
   const p = mbChain.then(run, run);
   mbChain = p.catch(() => {});
   return p;
 }
+// an answer that failed (the network, a dropped request) is not kept: the next time the track plays, it is asked again
+function forget(map: Record<string, any>, k: string) { delete map[k]; }
 const lucene = (v: any) => '"' + String(v).replace(/["\\]/g, ' ').trim() + '"';
 
 async function wiki(rels: any[]): Promise<Wiki | null> {
@@ -87,37 +105,39 @@ function remember(map: Record<string, any>, k: string, v: any) { map[k] = v; ord
 
 function lookupArtist(name: string): Promise<AboutArtist | null> {
   if (name in artists) { return artists[name]; }
-  const p = mb('artist/', { query: 'artist:' + lucene(name), limit: '1' }).then(async d => {
+  const live = () => keys()[0] === name;
+  const p = mb('artist/', { query: 'artist:' + lucene(name), limit: '1' }, live).then(async d => {
     const a = d && d.artists && d.artists[0];
     if (!a || a.score < 90) { return null; }
-    const full = await mb('artist/' + a.id, { inc: 'url-rels' });
+    const full = await mb('artist/' + a.id, { inc: 'url-rels' }, live);
     const [w, rel] = await Promise.all([wiki(full.relations), related(a.id)]);
     const begin = ((a['life-span'] && a['life-span'].begin) || '').slice(0, 4);
     return { name: a.name, mbid: a.id, kind: a.type || '', country: a.country || (a.area && a.area.name) || '', begin, area: (a['begin-area'] && a['begin-area'].name) || (a.area && a.area.name) || '',
       since: begin ? (a.type === 'Group' ? 'FORMED ' : a.type === 'Person' ? 'BORN ' : 'SINCE ') + begin : '', mbUrl: 'https://musicbrainz.org/artist/' + a.id,
       extract: w ? w.extract : '', description: w ? w.description : '', url: w ? w.url : '', thumb: w ? w.thumb : '', related: rel } as AboutArtist;
-  }).catch(() => null);
+  }).catch(() => { forget(artists, name); return null; });
   remember(artists, name, p);
   return p;
 }
 function lookupAlbum(artist: string, album: string): Promise<AboutAlbum | null> {
   const k = artist + '|' + album;
   if (k in albums) { return albums[k]; }
-  const p = mb('release-group/', { query: 'artist:' + lucene(artist) + ' AND releasegroup:' + lucene(album) + ' AND primarytype:album', limit: '1' }).then(async d => {
+  const live = () => { const [a, b] = keys(); return a === artist && b === album; };
+  const p = mb('release-group/', { query: 'artist:' + lucene(artist) + ' AND releasegroup:' + lucene(album) + ' AND primarytype:album', limit: '1' }, live).then(async d => {
     const g = d && d['release-groups'] && d['release-groups'][0];
     if (!g || g.score < 90) { return null; }
     // the label and the credits are on a release, not on the group: the earliest official one
-    const release = mb('release/', { query: 'rgid:' + g.id + ' AND status:official', limit: '25' }).then(dd => {
+    const release = mb('release/', { query: 'rgid:' + g.id + ' AND status:official', limit: '25' }, live).then(dd => {
       const rs = ((dd && dd.releases) || []).filter((r: any) => r.date).sort((a: any, b: any) => a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
       let label = ''; for (const r of rs) { const li = (r['label-info'] || []).find((x: any) => x.label && x.label.name); if (li) { label = li.label.name; break; } }
       return { label, id: rs[0] ? rs[0].id : '' };
     }).catch(() => ({ label: '', id: '' }));
-    const full = await mb('release-group/' + g.id, { inc: 'url-rels' });
+    const full = await mb('release-group/' + g.id, { inc: 'url-rels' }, live);
     const [w, rel] = await Promise.all([wiki(full.relations), release]);
-    const cr = rel.id ? await mb('release/' + rel.id, { inc: 'artist-rels' }).then(r => credits(r.relations)).catch(() => []) : [];
+    const cr = rel.id ? await mb('release/' + rel.id, { inc: 'artist-rels' }, live).then(r => credits(r.relations)).catch(() => []) : [];
     return { title: g.title, date: g['first-release-date'] || '', year: (g['first-release-date'] || '').slice(0, 4), kind: [g['primary-type']].concat(g['secondary-types'] || []).filter(Boolean).join(' · '),
       label: rel.label, mbUrl: 'https://musicbrainz.org/release-group/' + g.id, extract: w ? w.extract : '', description: w ? w.description : '', url: w ? w.url : '', credits: cr } as AboutAlbum;
-  }).catch(() => null);
+  }).catch(() => { forget(albums, k); return null; });
   remember(albums, k, p);
   return p;
 }
@@ -127,15 +147,16 @@ function lookupTrack(artist: string, title: string, album: string): Promise<Abou
   const k = artist + '|' + album + '|' + title;
   if (k in tracks) { return tracks[k]; }
   const q = 'recording:' + lucene(title) + ' AND artist:' + lucene(artist) + (album ? ' AND release:' + lucene(album) : '');
-  const p = mb('recording/', { query: q, limit: '1' }).then(async d => {
+  const live = () => keys().join('|') === k;
+  const p = mb('recording/', { query: q, limit: '1' }, live).then(async d => {
     const r = d && d.recordings && d.recordings[0];
     if (!r || r.score < 90) { return null; }
-    const full = await mb('recording/' + r.id, { inc: 'artist-rels+work-rels+work-level-rels' });
+    const full = await mb('recording/' + r.id, { inc: 'artist-rels+work-rels+work-level-rels' }, live);
     const rels: any[] = (full.relations || []).slice();
     (full.relations || []).forEach((x: any) => { if (x.work && x.work.relations) { rels.push(...x.work.relations); } });
     const cr = credits(rels, 10);
     return cr.length ? { title: r.title, mbUrl: 'https://musicbrainz.org/recording/' + r.id, credits: cr } as AboutTrack : null;
-  }).catch(() => null);
+  }).catch(() => { forget(tracks, k); return null; });
   remember(tracks, k, p);
   return p;
 }
@@ -155,13 +176,18 @@ function refresh() {
   const pend = (patch: Partial<AboutStore['pending']>) => useAbout.setState(s => ({ pending: { ...s.pending, ...patch } }));
   useAbout.setState(albumSame ? { track: null } : { artist: null, album: null, track: null });
   if (!artist) { pend({ artist: false, album: false, track: false }); return; }
+  // the order on the one-a-second queue: the artist (the bio) first, then the track (its credits), the record last
+  pend({ track: !!title });
+  const trackThen = () => { if (title) { lookupTrack(artist, title, album).then(t => { if (keys()[2] === title) { useAbout.setState({ track: t }); pend({ track: false }); } }); } };
   if (!albumSame) {
     pend({ artist: true, album: !!album });
-    lookupArtist(artist).then(a => { if (keys()[0] === artist) { useAbout.setState({ artist: a }); pend({ artist: false }); } });
-    if (album) { lookupAlbum(artist, album).then(a => { if (keys()[1] === album) { useAbout.setState({ album: a }); pend({ album: false }); } }); }
-  }
-  if (title) { pend({ track: true }); lookupTrack(artist, title, album).then(t => { if (keys()[2] === title) { useAbout.setState({ track: t }); pend({ track: false }); } }); }
-  else { pend({ track: false }); }
+    lookupArtist(artist).then(a => {
+      if (keys()[0] === artist) { useAbout.setState({ artist: a }); pend({ artist: false }); }
+      if (sig !== lastKeys) { return; }   // another track by now: its own refresh asked for its things
+      trackThen();
+      if (album) { lookupAlbum(artist, album).then(b => { if (keys()[1] === album) { useAbout.setState({ album: b }); pend({ album: false }); } }); }
+    });
+  } else { trackThen(); }
 }
 usePlayer.subscribe((s, prev) => { if (s.state !== prev.state) { refresh(); } });
 refresh();
