@@ -48,9 +48,9 @@
   .np-node-final { color: var(--ink); }
 
   /* the column's face switch (handoff 6a) */
-  /* the face switch's row, the heart pinned to its end */
+  /* the face switch's row, the heart right beside the switch */
   .np-tabrow { display: flex; align-items: center; gap: 16px; min-height: 46px; margin-bottom: 26px; }
-  .np-heart { margin-left: auto; flex: none; width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; padding: 0; background: var(--fill-08); border: 1px solid var(--fill-14); color: var(--ink-2); cursor: pointer;
+  .np-heart { flex: none; width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; padding: 0; background: var(--fill-08); border: 1px solid var(--fill-14); color: var(--ink-2); cursor: pointer;
     .material-symbols-rounded { font-size: 24px; } &:hover { color: var(--ink); background: var(--fill-12); } &.active { color: var(--ink); }
     &:disabled { opacity: .4; cursor: default; } &:focus-visible { outline: 2px solid var(--ink-1); outline-offset: 2px; } }
   .np-seg { display: inline-flex; align-self: flex-start; padding: 3px; border-radius: 999px; background: var(--fill-10); border: 1px solid var(--fill-13);

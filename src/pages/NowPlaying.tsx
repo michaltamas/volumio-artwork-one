@@ -245,7 +245,7 @@ export default function NowPlaying() {
       <div id="np-hero">
         <div id="np-cover">{st.albumart ? <img src={albumart(st.albumart)} alt={st.album || ''} /> : null}</div>
         <div id="np-meta" className={lyricsOn ? 'np-meta--lyrics' : ''}>
-          {/* the heart has a fixed spot at the end of the face switch's row (handoff 16B): a long title never moves it */}
+          {/* the heart sits beside the face switch, in its row: a long title never moves it */}
           <div className="np-tabrow">
             <div className="np-seg" role="tablist" aria-label="Now Playing view">
               {views.map(v => (
