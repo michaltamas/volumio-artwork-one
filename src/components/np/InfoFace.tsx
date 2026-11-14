@@ -20,7 +20,8 @@ export default function InfoFace() {
   const track = useAbout(s => s.track);
   const info = useTrackInfo();
   const nav = useNavigate();
-  if (!st.artist) { return null; }
+  // a track with no artist (a CUE sheet, a stream): the face says so instead of showing nothing (volumio-nowplaying-5.html .nq-empty)
+  if (!st.artist) { return <div className="np-about np-about--empty"><span className="mono">No artist or album info for this track</span></div>; }
   const canGo = String(st.service || '') === 'mpd' && !!st.artist;
   const img = (artist && artist.thumb) || (st.albumart ? albumart(st.albumart) : '');
   const artistSub = artist ? [artist.description, artist.begin].filter(Boolean).join(' · ') : '';
@@ -38,7 +39,17 @@ export default function InfoFace() {
   const goAlbum = () => { if (!canGo || !st.album) { return; } const item = { uri: 'albums://' + encodeURIComponent(st.artist) + '/' + encodeURIComponent(st.album), title: st.album, name: st.album, type: 'folder', service: 'mpd' }; useBrowse.getState().open(item, true); nav(browseUrl(item)); };
   return (
     <div className="np-about">
-      <div className="np-about__rule" />
+      {/* the track first (volumio-nowplaying-5.html): who made it, as facts */}
+      {track && track.credits.length ? (
+        <div className="np-about__row np-about__row--track">
+          <div className="np-about__img np-about__img--track"><Icon name="music_note" /></div>
+          <div className="np-about__body">
+            <div className="np-about__name">{st.title}</div>
+            <div className="np-about__sub">This track</div>
+            {creditRows(track.credits)}
+          </div>
+        </div>
+      ) : null}
       <div className={'np-about__row np-about__row--artist' + (canGo ? ' is-link' : '')} onClick={goArtist}>
         {img ? <img className="np-about__img np-about__img--round" src={img} alt="" onError={(e) => { e.currentTarget.style.visibility = 'hidden'; }} /> : <div className="np-about__img np-about__img--round" />}
         <div className="np-about__body">
@@ -68,16 +79,6 @@ export default function InfoFace() {
             {album && album.credits && album.credits.length ? creditRows(album.credits) : null}
           </div>
           {canGo ? <button type="button" className="np-about__go" aria-label="Open the album"><span>Album</span><Icon name="chevron_right" /></button> : null}
-        </div>
-      ) : null}
-      {track && track.credits.length ? (
-        <div className="np-about__row np-about__row--track">
-          <div className="np-about__img np-about__img--track"><Icon name="music_note" /></div>
-          <div className="np-about__body">
-            <div className="np-about__name">{st.title}</div>
-            <div className="np-about__sub">This track</div>
-            {creditRows(track.credits)}
-          </div>
         </div>
       ) : null}
     </div>

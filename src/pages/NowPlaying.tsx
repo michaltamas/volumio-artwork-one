@@ -37,7 +37,7 @@ const VIEW_KEY = 'aw-np-view';
 // too little room for the Cover/Info/Lyrics switch: a narrow window (the phone layout included, width
 // alone, no orientation clause there) OR a short-but-wide one (the existing 520px landscape breakpoint
 // that already compacts the hero — matched here so the same window counts as "no room" for both)
-const NARROW_NP_QUERY = '(max-width: 1100px), (max-height: 520px) and (orientation: landscape)';
+const NARROW_NP_QUERY = '(max-width: 700px), (max-height: 520px) and (orientation: landscape)';
 function isNarrowNp(): boolean { try { return window.matchMedia(NARROW_NP_QUERY).matches; } catch { return false; } }
 
 function readView(): View {
@@ -242,11 +242,12 @@ export default function NowPlaying() {
       {leaving || dragging ? <ArtStack /> : null}
       {topbar}
 
+      {/* the stage scrolls when Info or Lyrics under the block make it taller than the room; the grid sits centred otherwise */}
+      <div id="np-stage">
       <div id="np-hero">
         <div id="np-cover">{st.albumart ? <img src={albumart(st.albumart)} alt={st.album || ''} /> : null}</div>
-        <div id="np-meta" className={lyricsOn ? 'np-meta--lyrics' : ''}>
-          {/* the heart sits beside the face switch, in its row: a long title never moves it */}
-          <div className="np-tabrow">
+        {/* the face switch and the heart: the grid's first row beside the cover, never moving between the faces */}
+        <div className="np-tabrow">
             <div className="np-seg" role="tablist" aria-label="Now Playing view">
               {views.map(v => (
                 <button key={v} type="button" role="tab" className={view === v ? 'active' : ''} aria-selected={view === v} onClick={() => setView(v)} disabled={v === 'lyrics' && lyricsState === 'none'}>
@@ -255,7 +256,9 @@ export default function NowPlaying() {
               ))}
             </div>
             <button type="button" className={'np-heart' + (fav ? ' active' : '')} onClick={() => usePlayer.getState().toggleFavourite()} title={fav ? 'Remove from favourites' : 'Add to favourites'} aria-pressed={fav} disabled={!!st.disableUi}><FavIcon on={fav} /></button>
-          </div>
+        </div>
+        <div id="np-meta" className={lyricsOn ? 'np-meta--lyrics' : ''}>
+          <div className="np-text">
           {!lyricsOn && <div className="np-eyebrow mono">{queue.length ? <span>TRACK {pos + 1} OF {queue.length}</span> : <span>NOW PLAYING</span>}</div>}
           <ClampedTitle text={shownTitle(st)} />
           <div className="np-byline">
@@ -292,9 +295,11 @@ export default function NowPlaying() {
               ) : null}
             </div>
           </div>
+          </div>
           {view === 'info' ? <InfoFace /> : null}
           {lyricsOn ? <div className="np-lyrics-host"><LyricsColumn /></div> : null}
         </div>
+      </div>
       </div>
 
       <div className="np-m-actions">

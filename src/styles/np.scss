@@ -1,244 +1,188 @@
-/* ============ Now Playing (spec §6.1) — the theme's rules, one to one ============ */
+/* ============ Now Playing (volumio-nowplaying-5.html) ============
+   One grid: the cover | the face switch, the text, the seek and the transport never move between
+   Cover and Info. The block sits centred in what the top bar and the bottom bar leave; taller than
+   that (Info or Lyrics under it on a compact screen) the stage scrolls. A roomy screen (≥1700 wide
+   and ≥1000 high) keeps Info and Lyrics inside the column, scrolling in their own box. The phone
+   (phone.scss) and a phone on its side (landscape.scss) keep their own layouts. */
 #np {
-  --np-title: clamp(36px, 5vw, 72px);   /* a step up with the narrower cover: the wider column carries it */
-  position: relative; z-index: 1; display: flex; flex-direction: column;
+  --np-s: clamp(200px, min(36vw, 60vh), 720px);                 /* the cover */
+  --np-title: clamp(28px, min(3.4vw, 6.6vh), 64px);              /* a long title; .np-len-s / -m step it up */
+  position: relative; z-index: 1; display: flex; flex-direction: column; gap: clamp(8px, 1vw, 20px);
   height: 100%; min-height: 100%; overflow: hidden; box-sizing: border-box;
-  padding: clamp(20px, 3.8vh, 34px) var(--pad-screen) clamp(16px, 3.1vh, 28px);
+  padding: clamp(14px, 1.8vw, 36px) clamp(16px, 3.2vw, 64px) clamp(12px, 1.4vw, 28px);
   color: var(--ink-1);
 
-  #np-topbar { display: flex; align-items: center; justify-content: space-between; min-height: 40px;
-    .np-chevron { color: var(--ink-2); cursor: pointer; display: inline-grid; place-items: center; width: 40px; height: 40px; border-radius: 11px; background: var(--fill-10);
+  /* ---- the top bar: collapse, the zone and its output, the bit-perfect badge ---- */
+  #np-topbar { display: flex; align-items: center; justify-content: space-between; gap: 14px; min-height: 44px; flex: none;
+    .np-chevron { color: var(--ink-1); cursor: pointer; display: inline-grid; place-items: center; width: 44px; height: 44px; border-radius: 12px; background: var(--fill-10); flex: none;
       .material-symbols-rounded { font-size: 22px; } &:hover { background: var(--fill-16); } } }
   .np-menu-btn { display: none; }
   .np-topbar-left { display: flex; align-items: center; gap: 14px; min-width: 0; }
-  .np-zone { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 40vw;
+  .np-zone { font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 40vw;
     .np-zone-out { color: var(--ink-muted); } }
   #np-badge-slot { display: flex; align-items: center; justify-content: flex-end; gap: 16px; min-width: 0; }
-  .np-badge { display: inline-flex; align-items: center; gap: 10px; height: 36px; padding: 0 14px; border-radius: 18px; background: var(--fill-10); border: 1px solid var(--fill-13); color: var(--ink-1); font-size: 11px; letter-spacing: .08em; max-width: 48vw; overflow: hidden; }
+  .np-badge { display: inline-flex; align-items: center; gap: 9px; height: 36px; padding: 0 14px; border-radius: 18px; background: var(--fill-10); border: 1px solid var(--fill-13); color: var(--ink-1); font-size: 11px; letter-spacing: .16em; max-width: 48vw; overflow: hidden; flex: none; }
   .np-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); }
 
-  /* container-type: size, so #np-cover can express "the largest square that fits both the
-     available height and half the available width" directly via cqh/cqw — align-items: stretch
-     alone gave a definite height to derive from but then never re-shrank it after max-width
-     clamped the derived width in a "boxy" (near-square) window, cropping the cover; flex-start
-     never gave a definite size to derive from at all, so the box fell back to the raw image's
-     intrinsic pixel size (tiny). Query units solve both at once, no JS measurement needed. */
-  #np-hero { display: flex; align-items: flex-start; gap: clamp(20px, 3.9vw, 56px); margin-top: clamp(14px, 3.1vh, 28px); flex: 1 1 0; min-height: 0; container-type: size; }
-  /* 76% of the height, at most 42% of the width: the text column takes what the cover gives up */
-  #np-cover { flex: none; width: min(76cqh, 42cqw); height: min(76cqh, 42cqw); aspect-ratio: 1 / 1; border-radius: 6px;
-    img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 6px; box-shadow: var(--shadow-cover); } }
-  #np-meta { min-width: 0; padding-top: 0; flex: 1; display: flex; flex-direction: column; min-height: 0; }   /* the theme's fluid clamp for this never applied (csso dropped it): 14px is what shipped */
-  .np-eyebrow { font-size: 11px; letter-spacing: .16em; color: var(--ink-muted); margin-bottom: 10px; }
-  .np-title { font-family: var(--font-ui); font-size: var(--np-title); line-height: 1; letter-spacing: -.032em; font-weight: 800; color: var(--ink); margin: 0; text-wrap: pretty; }
-  /* two lines at most: ClampedTitle shortens the text itself (a clip would cut the descenders) */
-  .np-title { overflow-wrap: anywhere; }
-  .np-byline { display: contents; }
-  .np-artist { font-size: clamp(18px, 1.9vw, 27px); font-weight: 600; color: var(--ink); margin-top: 14px; text-wrap: pretty; }
-  .np-album { font-size: clamp(15px, 1.3vw, 19px); font-weight: 400; color: var(--ink-2); margin-top: 5px; }
-  #np-chip-slot { margin-top: clamp(14px, 3.5vh, 32px); }
-
-  .np-quality { display: flex; align-items: center; gap: 12px; }
-  /* the quality chip (16B): depth/rate, then the format */
-  .np-chip { display: inline-flex; align-items: center; gap: 7px; height: 30px; padding: 0 11px; border-radius: var(--r-pill); background: var(--tb-pill); border: 1px solid var(--tb-pill-line); }
-  .np-chip-num { font-size: 11px; font-weight: 700; color: var(--ink-2); }
-  .np-chip-unit { font-size: 10px; letter-spacing: .14em; color: var(--ink-3); text-transform: uppercase; }
-  .np-bp { display: none; }   /* the phone's (phone.scss): the top bar's badge stands for it elsewhere */
-  .np-signalpath { margin-top: 26px; display: flex; align-items: center; gap: 10px; text-transform: uppercase; font-size: 11px; letter-spacing: .14em; color: var(--ink-3); }
-  .np-arrow { color: var(--ink-faint); }
-  .np-node-final { color: var(--ink); }
-
-  /* the column's face switch (handoff 6a) */
-  /* the face switch's row, the heart right beside the switch */
-  .np-tabrow { display: flex; align-items: center; gap: 16px; min-height: 46px; margin-bottom: 26px; }
-  .np-heart { flex: none; width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; padding: 0; background: var(--fill-08); border: 1px solid var(--fill-14); color: var(--ink-2); cursor: pointer;
-    .material-symbols-rounded { font-size: 24px; } &:hover { color: var(--ink); background: var(--fill-12); } &.active { color: var(--ink); }
-    &:disabled { opacity: .4; cursor: default; } &:focus-visible { outline: 2px solid var(--ink-1); outline-offset: 2px; } }
-  .np-seg { display: inline-flex; align-self: flex-start; padding: 3px; border-radius: 999px; background: var(--fill-10); border: 1px solid var(--fill-13);
-    button { border: 0; background: transparent; border-radius: 999px; padding: 8px 16px; font-family: var(--font-ui); font-size: 14px; line-height: 20px; font-weight: 500; color: var(--ink-3); cursor: pointer;
+  /* ---- the stage and its grid ---- */
+  #np-stage { flex: 1 1 0; min-height: 0; display: flex; overflow-x: hidden; overflow-y: auto; scrollbar-width: thin; }
+  #np-hero { margin: auto 0; width: 100%; display: grid; grid-template-columns: var(--np-s) minmax(0, 920px); column-gap: clamp(28px, 4vw, 80px);
+    grid-template-rows: auto minmax(0, 1fr) auto; align-items: start; }
+  #np-cover { grid-column: 1; grid-row: 1 / 3; width: var(--np-s); height: var(--np-s); aspect-ratio: 1 / 1; border-radius: 6px;
+    img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 6px; box-shadow: 0 50px 100px -30px rgba(0, 0, 0, .95); } }
+  /* the face switch and the heart: the first row beside the cover */
+  .np-tabrow { grid-column: 2; grid-row: 1; display: flex; align-items: center; gap: 14px; min-height: 48px; margin: 0; }
+  .np-seg { display: inline-flex; align-self: center; padding: 4px; border-radius: 26px; background: var(--fill-10); border: 1px solid var(--fill-12);
+    button { border: 0; background: transparent; height: 40px; padding: 0 18px; border-radius: 20px; font-family: var(--font-ui); font-size: 15px; font-weight: 500; color: var(--ink-2); cursor: pointer;
       &:hover:not(.active):not(:disabled) { color: var(--ink); } &.active { background: var(--ink-1); color: var(--ground); font-weight: 700; }
       &:disabled { opacity: .4; cursor: default; } &:focus-visible { outline: 2px solid var(--ink-1); outline-offset: 2px; } } }
+  .np-heart { flex: none; width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; padding: 0; background: transparent; border: 1px solid var(--fill-20); color: var(--ink-2); cursor: pointer;
+    .material-symbols-rounded { font-size: 24px; } &:hover { color: var(--ink); background: var(--fill-08); } &.active { color: var(--ink); }
+    &:disabled { opacity: .4; cursor: default; } &:focus-visible { outline: 2px solid var(--ink-1); outline-offset: 2px; } }
+  /* the words: centred on the cover's height (compact), or at the top of the column over Info / Lyrics (roomy) */
+  #np-meta { display: contents; }
+  .np-text { grid-column: 2; grid-row: 2; align-self: stretch; min-height: 0; min-width: 0; display: flex; flex-direction: column; justify-content: center; }
+  .np-eyebrow { font-size: 11px; letter-spacing: .16em; color: var(--ink-muted); margin: 0; }
+  .np-title { font-family: var(--font-ui); font-size: var(--np-title); font-weight: 800; letter-spacing: -.04em; line-height: 1.12; color: var(--ink); margin: 10px 0 0; text-wrap: balance; overflow-wrap: anywhere; }
+  .np-title.np-len-s { --np-title: clamp(44px, min(8vw, 17vh), 168px); letter-spacing: -.05em; line-height: 1; }
+  .np-title.np-len-m { --np-title: clamp(36px, min(5.2vw, 11vh), 104px); line-height: 1.06; }
+  .np-byline { display: contents; }
+  .np-artist { margin-top: clamp(8px, 1vw, 18px); font-size: clamp(18px, 1.7vw, 34px); font-weight: 700; letter-spacing: -.02em; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+  .np-artist:empty { display: none; }
+  .np-album { margin-top: 6px; font-size: clamp(14px, 1.05vw, 20px); font-weight: 400; color: var(--ink-2); min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #np-chip-slot { margin-top: 6px; }
+  .np-quality { display: flex; align-items: center; gap: 12px; }
+  /* the quality chip: depth/rate, then the format */
+  .np-chip { display: inline-flex; align-items: center; gap: 8px; height: 26px; padding: 0 10px; border-radius: 13px; background: transparent; border: 1px solid var(--fill-20); flex: none; }
+  .np-chip-num { font-size: 10px; font-weight: 700; letter-spacing: .14em; color: var(--ink-1); }
+  .np-chip-unit { font-size: 10px; letter-spacing: .14em; color: var(--ink-1); text-transform: uppercase; }
+  .np-bp { display: none; }   /* the phone's (phone.scss): the top bar's badge stands for it elsewhere */
+  .np-signalpath { margin-top: clamp(12px, 1.2vw, 22px); display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; text-transform: uppercase; font-size: 11px; letter-spacing: .14em; color: var(--ink-3); }
+  .np-arrow { color: var(--ink-muted); }
+  .np-node-final { color: var(--ink); }
+
+  /* ---- Info and Lyrics: a section under the block, the whole width (compact) ---- */
+  .np-about, .np-lyrics-host { grid-column: 1 / -1; grid-row: 3; min-width: 0; margin-top: clamp(20px, 2.4vw, 32px); padding: clamp(18px, 2vw, 28px) 0 8px; border-top: 1px solid var(--fill-14); }
+  .np-lyrics-host { display: flex; flex-direction: column; height: clamp(320px, 56vh, 720px); }
   --lyr-near: var(--ink-muted); --lyr-mid: var(--ink-dim); --lyr-far: var(--ink-faint);
   .np-lsheet { display: none; }
-  .np-lyrics-host { display: contents; }
-  &.np--lyrics #np-hero, &.np--info #np-hero { align-items: stretch; }
-  &.np--info #np-meta { display: flex; flex-direction: column; min-height: 0; }
-  &.np--info .np-about { flex: 1 1 auto; }
-  .np-meta--lyrics { align-self: stretch; }
-  /* ---- the Info face (12B–12D) ---- */
-  @at-root body#artwork #np.np--info {
-    .np-byline { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin-top: 12px; }
-    .np-artist { flex-basis: 100%; font-size: 21px; font-weight: 600; color: var(--ink); margin: 0; }
-    .np-album { font-size: 16px; font-weight: 400; color: var(--ink-2); margin: 0; }
-    #np-chip-slot { margin: 0; display: inline-flex; }
-    .np-chip { height: 28px; padding: 0 11px; gap: 7px; .np-chip-num { font-size: 11px; } .np-chip-unit { font-size: 10px; } }
-    @media (max-width: 1100px) {
-      .np-eyebrow { display: none; }
-      .np-title { font-size: 28px; letter-spacing: -.02em; line-height: 1.1; }
-      .np-byline { gap: 0; margin-top: 6px; align-items: baseline; }
-      .np-artist { flex-basis: auto; font-size: 16px; font-weight: 400; color: var(--ink-2); &::after { content: '·'; margin: 0 8px; color: var(--ink-dim); } }
-      .np-album { font-size: 16px; }
-      #np-chip-slot { display: none; }
-    }
-    @media (max-width: 840px) {
-      .np-title { font-size: 24px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-      .np-artist { font-size: 15px; &::after { content: none; } }
-      .np-album { display: none; }
-    }
-  }
-  .np-about { min-height: 0; overflow-y: auto; scrollbar-width: none;   /* the whole column: the cover gave it its width */ &::-webkit-scrollbar { display: none; } }
-  .np-about__rule { height: 1px; background: var(--fill-10); margin: 26px 0 22px; flex: none; }
-  .np-about__row { display: grid; grid-template-columns: 48px minmax(0, 1fr) auto; gap: 16px; align-items: start; &.is-link { cursor: pointer; } }
-  .np-about__row--album { align-items: center; margin-top: 14px; }
-  .np-about__img { width: 48px; height: 48px; border-radius: 11px; object-fit: cover; display: block; background: var(--fill-08); }
+
+  /* the Info face's rows: the track and its facts, the artist and the record (volumio-nowplaying-5.html .ni-row) */
+  .np-about { display: flex; flex-direction: column; gap: clamp(16px, 1.4vw, 24px); }
+  .np-about__rule { display: none; }
+  .np-about--empty .mono { font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-muted); }
+  .np-about__row { display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; column-gap: 16px; align-items: start; &.is-link { cursor: pointer; } }
+  .np-about__row + .np-about__row { padding-top: clamp(16px, 1.4vw, 24px); border-top: 1px solid var(--fill-10); }
+  .np-about__img { width: 56px; height: 56px; border-radius: 6px; object-fit: cover; display: block; background: var(--fill-12); }
   .np-about__img--round { border-radius: 50%; object-position: 10% 5%; }
-  .np-about__body { min-width: 0; }
-  .np-about__head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
-  .np-about__name { font-size: 16px; font-weight: 700; color: var(--ink); }
-  .np-about__sub { font-size: 13px; color: var(--ink-muted); }
-  .np-about__row--album .np-about__sub { display: block; margin-top: 2px; }
-  .np-about__text { margin: 6px 0 0; font-size: 14px; line-height: 1.55; color: var(--ink-2); display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; text-wrap: pretty; }
+  .np-about__img--track { display: grid; place-items: center; color: var(--ink-2); .material-symbols-rounded { font-size: 24px; } }
+  .np-about__body { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+  .np-about__head { display: flex; flex-direction: column; gap: 4px; }
+  .np-about__name { font-size: 17px; font-weight: 700; line-height: 1.3; color: var(--ink); display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; overflow-wrap: anywhere; }
+  .np-about__sub { font-size: 14px; line-height: 1.4; color: var(--ink-muted); display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+  .np-about__text { margin: 8px 0 0; font-size: 15px; line-height: 1.55; color: var(--ink-2); max-width: 72ch; text-wrap: pretty; }
   .np-about__text--album { display: none; }
-  .np-about__src { display: inline-block; margin-top: 6px; font-size: 10px; letter-spacing: .16em; color: var(--ink-dim); text-decoration: none; &:hover { color: var(--ink-3); } }
-  .np-about__go { display: flex; align-items: center; gap: 4px; height: 36px; padding: 0 8px 0 14px; border-radius: 999px; background: var(--fill-10); border: 1px solid var(--fill-13); color: var(--ink); cursor: pointer; font-family: var(--font-ui);
-    > span:first-child { font-size: 13px; font-weight: 600; } .material-symbols-rounded { font-size: 19px; color: var(--ink-3); } &:hover { background: var(--fill-14); } }
-  @media (min-width: 1800px) {
-    .np-about__row { grid-template-columns: 56px minmax(0, 1fr) auto; gap: 18px; }
-    .np-about__img { width: 56px; height: 56px; }
-    .np-about__body { max-width: none; }
-    .np-about__head { display: block; }
-    .np-about__name { font-size: 17px; }
-    .np-about__sub { display: block; margin-top: 2px; }
-    .np-about__text { margin-top: 10px; font-size: 15px; -webkit-line-clamp: 5; }
-    .np-about__text--album { display: -webkit-box; -webkit-line-clamp: 3; }
-    .np-about__row--album { align-items: start; }
-    .np-about__src { margin-top: 8px; }
-    .np-about__go { height: 40px; padding: 0 10px 0 16px; > span:first-child { font-size: 14px; } .material-symbols-rounded { font-size: 20px; } }
-  }
-  @media (max-width: 1100px) {
-    .np-about { -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 36px), transparent); mask-image: linear-gradient(to bottom, #000 calc(100% - 36px), transparent); }
-    .np-about__rule { margin: 14px 0 0; background: transparent; }
-    .np-about__row { grid-template-columns: 44px minmax(0, 1fr) 24px; gap: 14px; align-items: center; min-height: 64px; }
-    .np-about__row--album { margin-top: 0; }
-    .np-about__img { width: 44px; height: 44px; }
-    .np-about__head { display: block; }
-    .np-about__name { font-size: 15px; font-weight: 600; }
-    .np-about__sub { display: block; margin-top: 1px; }
-    .np-about__body { display: contents; }
-    .np-about__body > .np-about__head, .np-about__row--album .np-about__body > .np-about__name, .np-about__row--album .np-about__body > .np-about__sub { grid-column: 2; }
-    .np-about__row--album .np-about__body > .np-about__name { align-self: end; }
-    .np-about__row--album .np-about__body > .np-about__sub { align-self: start; margin-top: 0; }
-    .np-about__text { grid-column: 2 / -1; margin: 0 0 14px; -webkit-line-clamp: 3; }
-    .np-about__row--album { position: relative; &::before { content: ''; position: absolute; left: 58px; right: 0; top: 0; height: 1px; background: var(--fill-08); } }
-    .np-about__src { display: none; }
-    .np-about__img, .np-about__body > .np-about__head, .np-about__go { grid-row: 1; }
-    .np-about__row--artist .np-about__text { grid-row: 2; }
-    .np-about__go { grid-column: 3; align-self: center; height: auto; padding: 0; border: 0; background: transparent; > span:first-child { display: none; } .material-symbols-rounded { font-size: 22px; } }
-  }
-  @media (max-width: 840px) {
-    .np-about__row { min-height: 52px; grid-template-columns: minmax(0, 1fr) 24px; gap: 0; border-bottom: 1px solid var(--fill-08); }
-    .np-about__row--album { border-bottom: 0; &::before { left: 0; } }
-    .np-about__img, .np-about__text, .np-about__row .np-about__sub, .np-about__row--album .np-about__body > .np-about__sub { display: none; }
-    .np-about__body > .np-about__head, .np-about__row--album .np-about__body > .np-about__name { grid-column: 1; align-self: center; }
-    .np-about__go { grid-column: 2; }
-  }
-  /* the Lyrics face: a compact head */
-  .np-meta--lyrics {
-    .np-title { font-size: 52px; letter-spacing: -.032em; line-height: 1.02; margin-top: 0; }
-    .np-byline { display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px; margin-top: 12px; }
-    .np-format { display: none; }
-  }
-  .np-lyrics { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; margin-top: 28px; }
+  .np-about__src { display: inline-block; margin-top: 10px; font-size: 10px; letter-spacing: .16em; color: var(--ink-muted); text-decoration: none; &:hover { color: var(--ink-1); } }
+  .np-about__go { display: flex; align-items: center; gap: 6px; height: 40px; padding: 0 10px 0 16px; border-radius: 20px; background: var(--fill-10); border: 1px solid var(--fill-14); color: var(--ink); cursor: pointer; font-family: var(--font-ui); white-space: nowrap;
+    > span:first-child { font-size: 14px; font-weight: 600; } .material-symbols-rounded { font-size: 16px; color: var(--ink-2); } &:hover { background: var(--fill-14); } }
+
+  /* ---- Lyrics ---- */
+  .np-lyrics { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; }
   .np-lyrics__col { position: relative; flex: 1 1 0; min-height: 0; overflow: hidden; }
-  .np-lyrics__col--synced { mask-image: linear-gradient(transparent 0, #000 58px, #000 calc(100% - 58px), transparent 100%); -webkit-mask-image: linear-gradient(transparent 0, #000 58px, #000 calc(100% - 58px), transparent 100%); }
-  .np-lyrics__stack { display: flex; flex-direction: column; gap: 14px; will-change: transform; transition: transform .28s cubic-bezier(.2, .7, .2, 1); &.no-tween { transition: none; } }
+  .np-lyrics__col--synced { mask-image: linear-gradient(transparent 0, #000 28px, #000 calc(100% - 44px), transparent 100%); -webkit-mask-image: linear-gradient(transparent 0, #000 28px, #000 calc(100% - 44px), transparent 100%); }
+  .np-lyrics__stack { display: flex; flex-direction: column; will-change: transform; transition: transform .28s cubic-bezier(.2, .7, .2, 1); &.no-tween { transition: none; } }
   .np-lyrics__line {
-    display: flex; align-items: flex-start; gap: 16px; font-size: 24px; font-weight: 500; line-height: 1.4; color: var(--lyr-far); cursor: pointer; border-radius: 8px; transition: background-color .12s ease;
-    .np-lyrics__mark { flex: none; width: 3px; align-self: stretch; border-radius: 2px; margin: 4px 0; background: transparent; }
+    display: flex; align-items: flex-start; gap: 17px; padding: 9px 0; font-size: clamp(18px, 1.45vw, 26px); font-weight: 500; line-height: 1.3; color: var(--lyr-far); cursor: pointer; border-radius: 8px; text-wrap: balance; max-width: 44ch; transition: background-color .12s ease;
+    .np-lyrics__mark { flex: none; width: 3px; align-self: stretch; border-radius: 0; background: transparent; }
     &.is-near, &.is-muted { color: var(--lyr-near); }
     &.is-dim { color: var(--lyr-mid); }
     &.is-faint { color: var(--lyr-far); }
-    &.is-now { font-size: 26px; font-weight: 600; line-height: 1.38; color: var(--ink); .np-lyrics__mark { background: var(--ink-1); } .np-lyrics__text { animation: aw-lyr-in .28s cubic-bezier(.2, .7, .2, 1); } }
-    &.is-now ~ .np-lyrics__line { .np-lyrics__mark { width: 3px; } }
-    .np-lyrics__mark { width: 0; }
-    &.is-now .np-lyrics__mark { width: 3px; }
+    &.is-now { font-weight: 700; color: var(--ink); .np-lyrics__mark { background: var(--ink-1); } .np-lyrics__text { animation: aw-lyr-in .28s cubic-bezier(.2, .7, .2, 1); } }
     &:active { background: var(--fill-07); }
   }
   .np-lyrics__col--plain { overflow-y: auto; scrollbar-width: none; &::-webkit-scrollbar { display: none; } }
-  .np-lyrics__eyebrow { font-size: 11px; letter-spacing: .16em; color: var(--ink-dim); margin-bottom: 14px; }
-  .np-lyrics__plain { display: flex; flex-direction: column; gap: 10px; padding-bottom: 24px; }
-  .np-lyrics__line.is-plain { color: var(--ink-2); cursor: default; &:active { background: transparent; } }
-  .np-lyrics__empty { font-size: 24px; font-weight: 500; line-height: 1.4; color: var(--ink-dim); }
+  .np-lyrics__eyebrow { font-size: 10px; letter-spacing: .16em; color: var(--ink-muted); margin-bottom: 14px; }
+  .np-lyrics__plain { display: flex; flex-direction: column; padding-bottom: 24px; }
+  .np-lyrics__line.is-plain { color: var(--ink-2); cursor: default; padding: 4px 0; &:active { background: transparent; } }
+  .np-lyrics__empty { font-size: clamp(18px, 1.45vw, 26px); font-weight: 500; line-height: 1.4; color: var(--ink-dim); }
   .np-lyrics__skeleton { display: flex; flex-direction: column; gap: 18px; padding-top: 6px; animation: aw-lyr-pulse 1.4s ease-in-out infinite;
     i { display: block; height: 18px; border-radius: 4px; background: var(--fill-10); width: 62%; &:nth-child(2) { width: 78%; } &:nth-child(3) { width: 70%; } &:nth-child(4) { width: 54%; } &:nth-child(5) { width: 66%; } } }
   .np-lyrics__eyebrow--synced { flex: none; margin-bottom: 12px; }
 
-  /* ---- the bar (handoff 16B): the seek row full width, then one grid of three zones — up next, the
-     transport centred on the content area, volume · output · queue ---- */
-  #np-footer { margin-top: auto; padding-top: clamp(14px, 3vh, 28px); }
-  #np-seek .artwork-seek { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; column-gap: 16px; align-items: center; }
+  /* ---- the bottom bar: the seek row the whole width, then up next | the transport | volume · output · queue ---- */
+  #np-footer { flex: none; margin-top: 0; padding-top: 0; display: flex; flex-direction: column; gap: clamp(8px, 1vw, 18px); }
+  #np-seek .artwork-seek { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; column-gap: 14px; align-items: center; }
   #np-seek .artwork-seek__hit { width: 100%; height: 24px; }
   #np-seek .seek-track { height: 6px; border-radius: 3px; background: var(--tb-track); }
   #np-seek .seek-fill { background: var(--ink-1); }
-  #np-seek .seek-handle { width: 16px; height: 16px; margin: -8px 0 0 -8px; background: var(--ink); box-shadow: 0 0 0 4px var(--fill-14), 0 0 18px rgba(255, 255, 255, .45), 0 3px 8px var(--shadow-soft); }   /* the knob keeps its ring and glow */
-  #np-seek .seek-time { font-size: 12px; }
-  #np-seek .seek-elapsed { color: var(--ink-2); }
-  #np-seek .seek-remaining, #np-seek .seek-duration { justify-self: end; color: var(--tb-dim); }
-  #np-footer-row { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(max-content, 1fr); align-items: center; gap: 24px; margin-top: 16px; }
+  #np-seek .seek-handle { width: 16px; height: 16px; margin: -8px 0 0 -8px; background: var(--ink); box-shadow: 0 0 0 4px var(--fill-16); }
+  #np-seek .seek-time { font-size: 12px; color: var(--ink-2); }
+  #np-seek .seek-remaining, #np-seek .seek-duration { justify-self: end; text-align: right; }
+  #np-footer-row { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 24px; margin-top: 0; }
   #np-upnext { display: flex; align-items: center; gap: 10px; min-width: 0; }
-  .np-upnext-label { margin-left: 6px; font-size: 10px; letter-spacing: .16em; color: var(--ink-muted); white-space: nowrap; background: transparent; border: 0; padding: 0; cursor: pointer; font-family: var(--font-mono);
+  .np-upnext-label { margin-left: 8px; font-size: 11px; letter-spacing: .16em; color: var(--ink-muted); white-space: nowrap; background: transparent; border: 0; padding: 0; cursor: pointer; font-family: var(--font-mono);
     &:hover { color: var(--ink); } &:focus-visible { outline: 2px solid var(--ink-1); outline-offset: 4px; border-radius: 4px; } }
   .np-upnext-films { display: flex; gap: 10px; }
   .np-upnext--covers-away { .np-upnext-label, .np-upnext-films { display: none; } }   /* no room in the left zone */
-  .np-upnext-film { display: block; padding: 0; margin: 0; border: 0; background: transparent; border-radius: 6px; cursor: pointer; transition: transform .15s ease;
-    img { display: block; width: 44px; height: 44px; border-radius: 6px; object-fit: cover; transition: opacity .15s ease; }
-    /* the order reads at a glance: 1 → .45 → .18 */
-    &:nth-child(1) img { opacity: 1; } &:nth-child(2) img { opacity: .45; } &:nth-child(3) img { opacity: .18; }
+  .np-upnext-film { display: block; padding: 0; margin: 0; border: 0; background: transparent; border-radius: 5px; cursor: pointer; transition: transform .15s ease;
+    img { display: block; width: 48px; height: 48px; border-radius: 5px; object-fit: cover; transition: opacity .15s ease; }
+    &:nth-child(1) img { opacity: 1; } &:nth-child(2) img { opacity: .6; } &:nth-child(3) img { opacity: .34; }
     &:hover { transform: translateY(-2px); img { opacity: 1 !important; } } &:focus-visible { outline: 2px solid var(--ink-1); outline-offset: 2px; } }
   #np-transport { display: flex; align-items: center; justify-content: center;
-    #playerButtons { gap: clamp(20px, 2.2vw, 32px); }
-    .btn-link { color: var(--ink-1); padding: 0; .material-symbols-rounded { font-size: 36px; } &:hover { color: var(--ink); } }
-    .player-action-shuffle, .repeat-button { color: var(--tb-dim); .material-symbols-rounded { font-size: 26px; } &.active { color: var(--ink); } }
-    .playPause { width: clamp(56px, 5.3vw, 76px); height: clamp(56px, 5.3vw, 76px); padding: 0; background: var(--ink-1); color: var(--on-ink); flex: none;
-      .material-symbols-rounded { font-size: clamp(32px, 2.9vw, 42px); } &:hover { background: var(--ink); color: var(--on-ink); } }
+    #playerButtons { gap: clamp(8px, 1.3vw, 24px); }
+    .btn-link { color: var(--ink-1); padding: 0; width: 48px; height: 48px; display: grid; place-items: center; .material-symbols-rounded { font-size: 32px; } &:hover { color: var(--ink); } }
+    .player-action-shuffle, .repeat-button { color: var(--ink-3); .material-symbols-rounded { font-size: 24px; } &.active { color: var(--ink); } }
+    .playPause { width: clamp(60px, 4.6vw, 88px); height: clamp(60px, 4.6vw, 88px); padding: 0; background: var(--ink-1); color: var(--on-ink); flex: none;
+      .material-symbols-rounded { font-size: clamp(30px, 2.2vw, 40px); } &:hover { background: var(--ink); color: var(--on-ink); } }
   }
-  #np-footer-right { display: flex; align-items: center; justify-content: flex-end; gap: 12px; min-width: 0; }
-  .np-volume { display: flex; align-items: center; margin-right: 6px;
-    .volume-slider { gap: 12px; input[type=range] { width: clamp(80px, 7.6vw, 110px); height: 20px; }
+  #np-footer-right { display: flex; align-items: center; justify-content: flex-end; gap: 10px; min-width: 0; }
+  .np-volume { display: none; align-items: center; margin-right: 0;   /* the slider from 1100px up (below) */
+    .volume-slider { gap: 10px; input[type=range] { width: 120px; height: 20px; }
       input[type=range]::-webkit-slider-runnable-track { height: 4px; background: linear-gradient(90deg, var(--ink-1) var(--aw-fill), var(--tb-track) var(--aw-fill)); }
       input[type=range]::-webkit-slider-thumb { width: 14px; height: 14px; margin-top: -5px; opacity: 1; background: var(--ink); box-shadow: 0 0 0 3px var(--fill-14), 0 2px 6px var(--shadow-soft); }
       input[type=range]::-moz-range-thumb { width: 14px; height: 14px; opacity: 1; background: var(--ink); box-shadow: 0 0 0 3px var(--fill-14), 0 2px 6px var(--shadow-soft); }
-      .button-mute { width: 24px; height: 24px; color: var(--tb-dim); .material-symbols-rounded { font-size: 22px; } } } }
-  .tb-pill { height: 44px; padding: 0 14px; gap: 8px; border-radius: 22px;
+      .button-mute { width: 24px; height: 24px; color: var(--ink-3); .material-symbols-rounded { font-size: 22px; } } } }
+  .tb-pill { height: 44px; padding: 0 16px; gap: 8px; border-radius: 22px;
     .material-symbols-rounded { font-size: 20px; } &.tb-pill--output .material-symbols-rounded { font-size: 19px; }
     .tb-pill__name { font-size: 14px; } }
   .np-m-actions, .np-m-bar { display: none; }
+}
+/* the volume slider only where the right zone has the room */
+@media (min-width: 1100px) { body#artwork #np .np-volume { display: flex; } }
+/* a narrower window: the "up next" word goes, the covers stay */
+@media (max-width: 999px) { body#artwork #np .np-upnext-label { display: none; } }
+/* a tablet: the next covers at the left edge, the transport centred in what is left, the pills at the right */
+@media (min-width: 701px) and (max-width: 899px) { body#artwork #np #np-footer-row { grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; } }
+/* roomy (≥1700 × ≥1000): Info and Lyrics stay inside the column and scroll in their own box; the title steps down over them */
+@media (min-width: 1700px) and (min-height: 1000px) {
+  body#artwork #np #np-hero { height: var(--np-s); grid-template-rows: auto minmax(0, 1fr); }
+  body#artwork #np #np-meta { display: flex; flex-direction: column; grid-column: 2; grid-row: 2; align-self: stretch; min-height: 0; min-width: 0; }
+  body#artwork #np .np-text { flex: 1 1 auto; align-self: auto; }
+  body#artwork #np.np--info, body#artwork #np.np--lyrics {
+    .np-text { flex: 0 0 auto; justify-content: flex-start; margin-top: clamp(8px, 1vw, 16px); }
+    .np-title, .np-title.np-len-s, .np-title.np-len-m { --np-title: clamp(24px, min(2.6vw, 5.6vh), 48px); letter-spacing: -.03em; line-height: 1.14; margin-top: 6px; }
+    .np-artist, .np-byline, .np-signalpath { display: none; }
+    .np-about, .np-lyrics-host { flex: 1 1 0; min-height: 0; height: auto; overflow-y: auto; scrollbar-width: thin; margin-top: clamp(12px, 1.2vw, 20px); padding: clamp(14px, 1.2vw, 20px) 8px 28px 0;
+      -webkit-mask-image: linear-gradient(#000 calc(100% - 32px), transparent); mask-image: linear-gradient(#000 calc(100% - 32px), transparent); }
+    .np-lyrics-host { overflow: hidden; -webkit-mask-image: none; mask-image: none; padding-bottom: 0; }
+  }
+}
+/* the phone's Info rows (the phone layout itself: phone.scss) */
+@media (max-width: 700px) {
+  body#artwork #np .np-about__row { grid-template-columns: 44px minmax(0, 1fr); column-gap: 12px; }
+  body#artwork #np .np-about__img { width: 44px; height: 44px; }
+  body#artwork #np .np-about__go { grid-column: 2; justify-self: start; margin-top: 12px; }
 }
 @keyframes aw-lyr-in { from { opacity: .4; } to { opacity: 1; } }
 @keyframes aw-lyr-pulse { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
 html.aw-is-light body#artwork #np { --lyr-near: #5e646c; --lyr-mid: #676d74; --lyr-far: #8b9098; }
 html.aw-is-light body#artwork #np .np-lyrics__line:active { background: rgba(20, 22, 26, .07); }
-/* the Lyrics face's head: the title alone (not on the phone, where the words are a panel) */
-@media not all and (max-width: 700px) and (orientation: portrait) {
-  body#artwork #np .np-meta--lyrics .np-byline { display: none; }
-  body#artwork #np .np-meta--lyrics #np-chip-slot { display: inline-flex; align-self: center; margin: 0; }
-  body#artwork #np .np-meta--lyrics .np-chip { height: 30px; padding: 0 12px; gap: 7px; .np-chip-num { font-size: 12px; } .np-chip-unit { font-size: 10px; } }
-}
 html.aw-is-light body#artwork #np .np-about__go { background: rgba(255, 255, 255, .7); border-color: rgba(20, 22, 26, .12); }
 html.aw-is-light body#artwork #np .np-about__rule { background: rgba(20, 22, 26, .09); }
 /* below this the seg control has no room to earn its keep: Cover is the only face on offer
    (Lyrics stays reachable through the phone's own tile once that layout kicks in) */
-@media (max-width: 1100px) { body#artwork #np .np-seg { display: none; } }
+@media (max-width: 700px) { body#artwork #np .np-seg { display: none; } }   /* the phone has its tiles */
 body#artwork #np.np--cramped .np-seg { display: none; }   /* beside the docked queue, when the footer no longer fits (NowPlaying.tsx) */
-/* tall or narrow: the cover above the text (a landscape window merely resized boxy — not
-   actually tall — keeps the cover beside the text instead; only real portrait shapes stack) */
-@media (max-aspect-ratio: 3/4), (max-width: 760px) {
-  body#artwork #np { height: auto; min-height: 100%; overflow: visible; }
-  body#artwork #np #np-hero { flex-direction: column; align-items: flex-start; flex: 1 0 auto; }
-  body#artwork #np #np-cover { height: auto; width: min(100%, max(36vh, calc(100vh - 560px))); max-width: none; }   /* a tablet upright: what the text and the bar leave */
-  body#artwork #np #np-meta { padding-top: 0; }
-  body#artwork #np .np-title { font-size: clamp(26px, 7.5vw, 54px); }
-  body#artwork #np .np-upnext-films, body#artwork #np .np-upnext-label { display: none; }
-}
 /* a short landscape window (a phone on its side): landscape.scss */
 
 /* Now Playing opens as a sheet sliding up from the mini player and slides back down on the chevron */
@@ -315,28 +259,25 @@ html[data-aw-text="l"] body#artwork #np #np-meta::-webkit-scrollbar, html[data-a
 /* the cover face's byline (16B): the artist on its own line, then the album · year with the quality chip
    beside it; the signal path and an outside source's note on lines of their own (not on the phone) */
 @media not all and (max-width: 700px) and (orientation: portrait) {
-  body#artwork #np:not(.np--info) #np-meta:not(.np-meta--lyrics) {
+  body#artwork #np #np-meta {   /* on every face: the roomy screen hides the byline over Info and Lyrics itself */
     .np-byline { display: flex; flex-wrap: wrap; align-items: center; column-gap: 12px; }
     .np-artist { flex-basis: 100%; }
-    .np-album { margin-top: 10px; }
+    .np-album { margin-top: 6px; }
     #np-chip-slot { display: contents; }
-    .np-quality { margin-top: 10px; }
+    .np-quality { margin-top: 6px; }
     .np-external, .np-signalpath { flex-basis: 100%; }
   }
 }
 
-/* --- the Info face's credits and related artists (MusicBrainz, ListenBrainz) --------------- */
-body#artwork .np-about__credits { margin: 10px 0 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px 14px; align-items: baseline;
-  .np-about__credit { display: contents; }
+/* --- the Info face's credits (the track's facts) and related artists (MusicBrainz, ListenBrainz) --------------- */
+body#artwork .np-about__credits { margin: 12px 0 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px 24px; max-width: 72ch;
+  .np-about__credit { display: flex; flex-direction: column; min-width: 0; }
   dt, dd { margin: 0; }
-  .np-about__role { font-size: 10px; letter-spacing: .14em; color: var(--ink-dim); }
-  .np-about__names { font-size: 13px; color: var(--ink-2); line-height: 1.4; } }
-body#artwork .np-about__related { margin-top: 10px; display: flex; flex-direction: column; gap: 7px;
-  .np-about__role { font-size: 10px; letter-spacing: .14em; color: var(--ink-dim); } }
-body#artwork .np-about__chips { display: flex; flex-wrap: wrap; gap: 6px; }
-body#artwork .np-about__chip { height: 28px; padding: 0 12px; border-radius: 14px; border: 1px solid var(--fill-12); background: var(--fill-06); color: var(--ink-2); font: inherit; font-size: 12px; font-weight: 500; cursor: pointer; line-height: normal; white-space: nowrap;
+  .np-about__role { font-size: 10px; letter-spacing: .16em; color: var(--ink-muted); }
+  .np-about__names { margin-top: 4px; font-size: 15px; font-weight: 600; color: var(--ink-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } }
+body#artwork .np-about__related { margin-top: 10px; display: flex; flex-direction: column; gap: 8px;
+  .np-about__role { font-size: 10px; letter-spacing: .16em; color: var(--ink-muted); } }
+body#artwork .np-about__chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+body#artwork .np-about__chip { height: 36px; padding: 0 14px; border-radius: 18px; border: 1px solid var(--fill-18); background: transparent; color: var(--ink-2); font: inherit; font-size: 14px; font-weight: 400; cursor: pointer; line-height: normal; white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis;
   &:hover { background: var(--fill-10); color: var(--ink); } }
-body#artwork .np-about__row--track { margin-top: 14px; align-items: start; }
-body#artwork .np-about__img--track { display: grid; place-items: center; color: var(--ink-dim); .material-symbols-rounded { font-size: 24px; } }
-/* the phone's Info face is a compact list of the artist and the record: the credits and the related artists stay on wider screens */
-@media (max-width: 1100px) { body#artwork .np-about__credits, body#artwork .np-about__related, body#artwork .np-about__row--track { display: none; } }
+@media (max-width: 700px) { body#artwork .np-about__credits { grid-template-columns: 1fr 1fr; gap: 12px 16px; } }

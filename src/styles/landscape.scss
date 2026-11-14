@@ -56,11 +56,11 @@
     #np-badge-slot { flex: none; }
     .np-zone { flex: 0 1 auto; min-width: 0; }
     .np-badge { flex: none; white-space: nowrap; height: 30px; padding: 0 11px; gap: 8px; font-size: 10px; } }
-  body#artwork #np #np-hero { display: contents; }
+  body#artwork #np #np-stage, body#artwork #np #np-hero, body#artwork #np .np-text { display: contents; }
   body#artwork #np #np-cover { grid-column: 1; grid-row: 1 / -1; align-self: center; width: min(100cqh, 44cqw); height: min(100cqh, 44cqw); }
-  body#artwork #np #np-meta { grid-column: 2; grid-row: 2; align-self: center; position: relative; min-height: 0; overflow: hidden; padding: 4px 48px 0 0; }
+  body#artwork #np #np-meta { display: flex; flex-direction: column; justify-content: center; grid-column: 2; grid-row: 2; align-self: center; position: relative; min-height: 0; overflow: hidden; padding: 4px 48px 0 0; }   /* a box again (the desk makes it `contents`) */
   /* the heart at the text's top right; no face switch, eyebrow or signal path here */
-  body#artwork #np .np-tabrow { position: absolute; top: 4px; right: 0; min-height: 0; margin: 0; }
+  body#artwork #np .np-tabrow { grid-column: 2; grid-row: 2; justify-self: end; align-self: start; position: relative; z-index: 1; margin: 4px 0 0; min-height: 0; }   /* the heart at the text's top right, over the meta cell's padding */
   body#artwork #np .np-heart { width: 38px; height: 38px; .material-symbols-rounded { font-size: 21px; } }
   body#artwork #np .np-seg, body#artwork #np .np-eyebrow, body#artwork #np .np-signalpath { display: none; }
   body#artwork #np .np-title { font-size: clamp(18px, 7.4vh, 36px); line-height: 1.05; }
