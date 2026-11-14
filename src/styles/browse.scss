@@ -290,18 +290,14 @@ body#artwork #browse.browsing-list .main__list { display: flex; flex-direction: 
   input { flex: 1; min-width: 0; background: transparent; border: 0; padding: 0; height: 100%; font-size: 14px; color: var(--ink); outline: 0; box-shadow: none; font-family: var(--font-ui);
     &:focus, &:focus-visible { outline: none; box-shadow: none; } &::placeholder { color: var(--ink-muted); } &::-webkit-search-cancel-button { -webkit-appearance: none; } }
   &:focus-within { border-color: var(--fill-30); } }
-.aw-viewtoggle { display: flex; gap: 4px; padding: 4px; border-radius: 12px; background: var(--fill-08); border: 1px solid var(--fill-11);
-  button { width: 34px; height: 30px; border-radius: 8px; border: 0; padding: 0; background: transparent; display: grid; place-items: center; cursor: pointer;
-    .material-symbols-rounded { font-size: 19px; color: var(--ink-muted); } &.active { background: var(--ink); .material-symbols-rounded { color: var(--on-ink); } }
+.aw-viewtoggle { display: flex; padding: 4px; border-radius: 22px; background: var(--fill-07); border: 1px solid var(--fill-10); flex: none;
+  button { width: 44px; height: 34px; border-radius: 17px; border: 0; padding: 0; background: transparent; display: grid; place-items: center; cursor: pointer;
+    .material-symbols-rounded { font-size: 18px; color: var(--ink-3); } &.active { background: var(--fill-18); .material-symbols-rounded { color: var(--ink); } }
     &:hover:not(.active) .material-symbols-rounded { color: var(--ink); } &:focus-visible { outline: 2px solid var(--ink-1); outline-offset: 2px; } } }
 body#artwork #browse.browsing-list .aw-listhead { gap: 16px; margin: 26px 0 0; }
 .aw-sort { margin-left: auto; display: flex; align-items: center; gap: 9px; height: 34px; padding: 0 15px; border-radius: 17px; border: 1px solid var(--fill-16); background: transparent; cursor: pointer; align-self: center;
   .aw-sort__k { font-size: 13px; color: var(--ink-muted); } .aw-sort__v { font-size: 13px; font-weight: 500; color: var(--ink-2); } .material-symbols-rounded { font-size: 17px; color: var(--ink-muted); }
   &:hover { background: var(--fill-06); } &:focus-visible { outline: 2px solid var(--ink-1); outline-offset: 2px; } }
-body#artwork #browse.browsing-list .main__row { grid-template-columns: repeat(6, 1fr); gap: 24px; padding: 28px 0 0; }
-@media (max-width: 1400px) { body#artwork #browse.browsing-list .main__row { grid-template-columns: repeat(5, 1fr); } }
-@media (max-width: 1100px) { body#artwork #browse.browsing-list .main__row { grid-template-columns: repeat(4, 1fr); } }
-@media (max-width: 800px)  { body#artwork #browse.browsing-list .main__row { grid-template-columns: repeat(3, 1fr); } }
 body#artwork #browse.browsing-artists .music-card__info { margin-top: 12px; justify-content: center; }
 body#artwork #browse.browsing-artists .music-card__label { max-width: 100%; }
 body#artwork #browse.browsing-artists .music-card__label { font-size: 15px; font-weight: 600; margin-top: 0; }
@@ -574,7 +570,6 @@ body#artwork #browse.browsing-artist #browseTablesWrapper { padding-bottom: calc
 body#artwork #browse.browsing-album #browseTablesWrapper > .aw-headwrap { padding-bottom: calc(var(--mini-h) + 24px); }
 body#artwork .aw-browse { padding-bottom: calc(var(--mini-h) + 40px); }
 body#artwork .aw-search { width: 320px; min-width: 0; }
-body#artwork #browse.browsing-list .main__row { grid-template-columns: repeat(auto-fill, minmax(clamp(120px, 13vw, 190px), 1fr)); gap: clamp(12px, 1.7vw, 24px); }
 body#artwork #browse.browsing-artists .main__row { row-gap: clamp(28px, 2.8vw, 40px); }
 body#artwork .aw-head__row { flex-wrap: wrap; row-gap: 10px; }
 body#artwork .aw-filter { width: min(290px, 100%); }
@@ -719,3 +714,50 @@ body#artwork .aw-head--home .aw-scope .aw-scope__btn { height: 38px; border-radi
 /* the artist page: a picture the service cannot serve gives way to a glyph; the similar artists are round tiles without play or menu */
 body#artwork .aw-artist__img--glyph { display: grid; place-items: center; color: var(--ink-dim); .material-symbols-rounded { font-size: 48px; } }
 body#artwork .aw-artist-album--artist { .aw-artist-album__cover, .aw-artist-album__cover img { border-radius: 50%; } .aw-artist-album__title { text-align: center; } }
+
+/* ============ the list pages after the Tidal mockup (volumio-tidal.html): the head's pill, crumbs and back; the title row with
+   Sort; each list a section with its name and count; eight covers to a row on a wide desktop; the collection's links as cards;
+   a "Show more" tile after the tenth cover of a long list. The same head and grids serve every list (Albums, Artists, folders, radio…). ============ */
+body#artwork .aw-head__row { gap: 12px; }
+body#artwork .aw-head__back { width: 44px; height: 44px; margin-left: -12px; border-radius: 50%; .material-symbols-rounded { color: var(--ink-2); } &:hover { background: var(--fill-08); } }
+body#artwork .aw-crumbs { font-size: 15px; min-height: 44px; a { color: var(--ink-3); } .aw-crumbs__sep { color: var(--ink-muted); } .aw-crumbs__cur { font-weight: 700; } }
+body#artwork .aw-filter, body#artwork .aw-artist__filter { width: 300px; height: 44px; border-radius: 22px; padding: 0 16px; gap: 12px; background: var(--fill-09); border-color: var(--fill-13); .material-symbols-rounded { font-size: 20px; } }
+body#artwork .aw-search { height: 44px; border-radius: 22px; padding: 0 16px; gap: 12px; width: 380px; background: var(--fill-09); border-color: var(--fill-13); }
+body#artwork .aw-head--home .aw-scope .aw-scope__btn, body#artwork .aw-scope .aw-scope__btn { height: 44px; border-radius: 22px; }
+body#artwork .dedicated-search input.form-control { height: 44px; border-radius: 22px; }
+body#artwork #browse.browsing-list .aw-listhead { margin: 28px 0 0; gap: 16px; align-items: center; }
+body#artwork .aw-listhead__count { font-family: var(--font-mono); font-size: 11px; letter-spacing: .16em; color: var(--ink-muted); }
+body#artwork .aw-sort { height: 40px; padding: 0 12px 0 16px; border-radius: 20px; border-color: var(--fill-16); gap: 8px;
+  .aw-sort__k { font-size: 14px; color: var(--ink-muted); } .aw-sort__v { font-size: 14px; font-weight: 400; color: var(--ink-1); } .material-symbols-rounded { font-size: 18px; color: var(--ink-3); } }
+body#artwork #browse.browsing-list .main__source__title { display: flex; align-items: baseline; gap: 12px; margin: 40px 0 0; padding: 0; border: 0; font-family: var(--font-ui); font-size: 20px; font-weight: 700; letter-spacing: -.01em; text-transform: none; color: var(--ink);
+  .main__source__count { font-family: var(--font-mono); font-size: 11px; letter-spacing: .16em; color: var(--ink-muted); } }
+body#artwork #browse.browsing-list .main__source:first-of-type .main__source__title { margin-top: 32px; }
+body#artwork #browse.browsing-list .main__row { grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 28px 20px; padding: 16px 0 0; }
+@media (max-width: 1499px) { body#artwork #browse.browsing-list .main__row { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+@media (max-width: 1199px) { body#artwork #browse.browsing-list .main__row { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+@media (max-width: 899px)  { body#artwork #browse.browsing-list .main__row { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (max-width: 699px)  { body#artwork #browse.browsing-list .main__row { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 12px; } }
+body#artwork #browse.browsing-list .music-card__header { margin-bottom: 0; }
+body#artwork #browse.browsing-list .music-card:not(.is-artist) .music-card__header { border-radius: 6px; }
+body#artwork #browse.browsing-artists .music-card__header, body#artwork #browse.browsing-list .music-card.is-artist .music-card__header { border-radius: 50%; overflow: hidden; }
+body#artwork #browse.browsing-list .music-card.is-artist .music-card__img, body#artwork #browse.browsing-list .music-card.is-artist .music-card__overlay { border-radius: 50%; }
+body#artwork #browse.browsing-list .music-card.is-artist .music-card__info, body#artwork #browse.browsing-list .music-card.is-artist .music-card__label, body#artwork #browse.browsing-list .music-card.is-artist .music-card__meta { text-align: center; justify-content: center; }
+body#artwork #browse.browsing-list .music-card__info { margin-top: 12px; }
+body#artwork #browse.browsing-list .music-card__label { white-space: normal; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+@media (hover: hover) { body#artwork #browse.browsing-list .music-card__wrapper:hover { transform: translateY(-5px); } }
+/* a list of a service's own links (My playlists, My albums…): cards with the service's glyph */
+body#artwork .aw-linkcards { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; padding: 16px 0 0; }
+@media (max-width: 1199px) { body#artwork .aw-linkcards { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 699px)  { body#artwork .aw-linkcards { grid-template-columns: 1fr; } }
+body#artwork .aw-linkcard { display: grid; grid-template-columns: 52px minmax(0, 1fr) 20px; align-items: center; column-gap: 16px; height: 84px; padding: 0 14px 0 16px; border-radius: 16px; background: var(--fill-08); border: 1px solid var(--fill-12); min-width: 0; cursor: pointer; color: var(--ink-1); font: inherit; text-align: left; transition: background .2s ease;
+  &:hover { background: var(--fill-12); }
+  &__glyph { width: 52px; height: 52px; border-radius: 10px; display: grid; place-items: center; background: var(--fill-08); color: var(--ink-1); overflow: hidden;
+    img { width: 100%; height: 100%; object-fit: contain; padding: 10px; box-sizing: border-box; filter: invert(var(--icon-invert, 0)); } .material-symbols-rounded { font-size: 24px; } }
+  &__name { font-size: 17px; font-weight: 700; letter-spacing: -.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  &__chev { font-size: 20px; color: var(--ink-muted); } }
+@media (max-width: 699px) { body#artwork .aw-linkcard { height: 64px; column-gap: 12px; grid-template-columns: 40px minmax(0, 1fr) 20px; &__glyph { width: 40px; height: 40px; } } }
+/* the tile after the tenth cover of a long list: the rest of the list on a tap */
+body#artwork .aw-more { display: flex; flex-direction: column; gap: 12px; min-width: 0; cursor: pointer;
+  &__box { display: grid; place-items: center; aspect-ratio: 1; border-radius: 6px; border: 1px dashed var(--fill-26, var(--fill-20)); color: var(--ink-3); background: transparent; width: 100%; padding: 0; cursor: pointer; .material-symbols-rounded { font-size: 28px; } }
+  &:hover &__box { background: var(--fill-06); color: var(--ink); }
+  &__label { font-size: 15px; font-weight: 500; line-height: 1.3; color: var(--ink-1); } }

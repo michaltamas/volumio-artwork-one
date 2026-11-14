@@ -7,6 +7,13 @@ import MusicCard from './MusicCard';
 import MusicRow from './MusicRow';
 import { artistLists, norm } from './ArtistHead';
 import VirtualItems, { VIRTUAL_FROM } from './VirtualItems';
+import Icon from '../Icon';
+import { albumart } from '../../core/api';
+import * as A from '../../core/browseActions';
+
+// a list of a service's own links (My playlists, My albums…): drawn as cards, not covers
+export const isMoreItem = (it: BrowseItem) => !!it && !it.albumart && /^show more/i.test(String(it.title || it.name || ''));
+const isLinkList = (items: BrowseItem[]) => items.length > 0 && items.every(i => i && (i.type === 'streaming-category' || i.type === 'spotify-category' || i.type === 'radio-category') );
 
 export interface ListsProps { lists: BrowseList[]; filter: string; sortDesc: boolean; isArtist: boolean; artistsPage: boolean; serviceSearch: boolean; activeMenu: string | null; onMenuOpen: (key: string, open: boolean) => void; base?: number }
 
@@ -15,6 +22,8 @@ export default function BrowseLists({ lists, filter, sortDesc, isArtist, artists
   const gridFor = useBrowse(s => s.gridFor);
   useBrowse(s => s.showGridView); useBrowse(s => s.showGridViewTracks);   // a change of either redraws
   const fav = useBrowse(s => s.favourites);
+  // a service's "Show more…" at the end of a list (Tidal's landing) is a way on, not one of the list's items: the count leaves it out
+  const shown = (items: BrowseItem[]) => items.filter(i => !isMoreItem(i)).length;
   const st = usePlayer(s => s.state);
   const playingUri = normUri(st && st.uri);
   const paused = (st && st.status) !== 'play';
@@ -46,9 +55,25 @@ export default function BrowseLists({ lists, filter, sortDesc, isArtist, artists
         const asGrid = gridFor(list);
         const items = list.items || [];
         const cls = isArtist ? (albumsIdx.indexOf(li) > -1 ? ' aw-artist-albums' : songsIdx.indexOf(li) > -1 ? ' aw-artist-tracks' : '') : '';
+        if (isLinkList(items)) {
+          return (
+            <div className={'main__source' + cls} key={at + li}>
+              <h3 className={'main__source__title panel-title' + (!list.title ? ' hidden' : '')}>{list.title || ''}<span className="main__source__count">{shown(items)}</span></h3>
+              <div className="aw-linkcards">
+                {items.map((it, ii) => (
+                  <button type="button" className="aw-linkcard" key={ii} onClick={() => A.clickListItem(it, items, ii)}>
+                    <span className="aw-linkcard__glyph">{it.albumart ? <img src={albumart(it.albumart)} alt="" /> : <Icon name={A.faIcon(it.icon) || 'folder'} />}</span>
+                    <span className="aw-linkcard__name">{it.title || it.name}</span>
+                    <Icon name="chevron_right" className="aw-linkcard__chev" />
+                  </button>
+                ))}
+              </div>
+            </div>
+          );
+        }
         return (
           <div className={'main__source' + cls} key={at + li}>
-            <h3 className={'main__source__title panel-title' + (!list.title ? ' hidden' : '')}>{list.title || ''}</h3>
+            <h3 className={'main__source__title panel-title' + (!list.title ? ' hidden' : '')}>{list.title || ''}{list.title ? <span className="main__source__count">{shown(items)}</span> : null}</h3>
             {!isArtist && items.length > VIRTUAL_FROM
               ? <LongList items={items} grid={asGrid} q={(list as any).awNoFilter ? '' : q} sortDesc={sortDesc} matches={matches} cell={(ii) => cell(li, ii, items, asGrid, false, undefined)} />
               : (

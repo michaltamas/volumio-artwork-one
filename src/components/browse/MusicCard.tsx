@@ -6,6 +6,8 @@ import { albumart } from '../../core/api';
 import { type BrowseItem, useBrowse } from '../../core/store/browse';
 import * as A from '../../core/browseActions';
 import { countText, useArtistCounts } from '../../core/artistCounts';
+import { isMoreItem } from './BrowseLists';
+import { isArtistItem } from './ArtistHead';
 
 export interface CardProps { item: BrowseItem; list: BrowseItem[]; listIndex: number; itemIndex: number; hidden?: boolean; order?: number; artistCounts?: boolean; onMenuOpen?: (open: boolean) => void }
 
@@ -16,11 +18,21 @@ export default function MusicCard({ item, list, listIndex, itemIndex, hidden, or
   const [countMeta, setCountMeta] = useState('');
   // the Artists grid: "7 albums" under the name, asked for as the tile comes into view
   useArtistCounts(ref, item.uri, !!artistCounts && !item.meta, c => setCountMeta(countText(c)));
+  // a service's "Show more…" at the end of a list: the dashed tile of the Tidal mockup, a way to the rest of the list
+  if (isMoreItem(item)) {
+    return (
+      <div className={'music-card__wrapper aw-more' + (hidden ? ' aw-hidden' : '')} ref={ref} style={order ? { order } : undefined} onClick={() => A.clickListItem(item, list, itemIndex)}>
+        <button type="button" className="aw-more__box" aria-label="Show more"><Icon name="add" /></button>
+        <div className="aw-more__label">Show more</div>
+      </div>
+    );
+  }
   const favVisible = A.showPlayButton(item) && (item.type === 'song' || item.type === 'folder-with-favourites') && (req ? req.uri : '') !== 'favourites';
   const noMenu = !A.showHamburgerMenu(item);
   return (
     <div className={'music-card__wrapper' + (hidden ? ' aw-hidden' : '') + (menuOpen ? ' is-menu-open' : '')} ref={ref} style={order ? { order } : undefined}>
-      <div className="music-card" onClick={() => A.clickListItem(item, list, itemIndex)}>
+      {/* an artist (a service's My artists, a search's artists, the library's) is a round tile */}
+      <div className={'music-card' + (isArtistItem(item) ? ' is-artist' : '')} onClick={() => A.clickListItem(item, list, itemIndex)}>
         <div className="music-card__header">
           <img className={'music-card__img' + (!item.albumart ? ' hidden' : '')} src={albumart(item.albumart)} alt="" />
           <div className={'music-card__img-icon' + (!item.icon ? ' hidden' : '')}><Icon name={A.faIcon(item.icon)} /></div>

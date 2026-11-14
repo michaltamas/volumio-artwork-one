@@ -26,7 +26,7 @@ export function artistLists(lists: BrowseList[] | null, kind: 'songs' | 'albums'
 export interface ArtistAlbum { item: BrowseItem; uri: string; listIndex: number; itemIndex: number; year: number | null; tracks: number; kind: 'album' | 'artist' }
 // a service's artist page lists other artists too (Tidal's "Similar artists"): the uri says so (tidal:artist:…, spotify:artist:…).
 // The library's own artist page names its albums artists://Artist/Album — a path with the album after the artist is an album
-const isArtistItem = (it: BrowseItem) => {
+export const isArtistItem = (it: BrowseItem) => {
   if (it.type === 'artist') { return true; }
   const u = String(it.uri || '').toLowerCase();
   if (/^artists:\/\//.test(u)) { return !/^artists:\/\/[^/]+\/./.test(u); }

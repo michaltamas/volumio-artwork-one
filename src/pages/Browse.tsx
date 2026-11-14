@@ -54,7 +54,8 @@ export default function Browse({ dedicated }: { dedicated?: boolean }) {
   const isLandingSearch = !!(b.isSearching && !b.isBrowsing);
   const artistsPage = uri === 'artists://';
   const lists = b.lists || [];
-  const count = (() => { try { return lists[0].items.length; } catch { return 0; } })();
+  // the title's count: the one list's items; a page of several lists (a service's landing) counts each under its own name
+  const count = (() => { try { return lists.filter(l => (l.items || []).length).length > 1 ? 0 : lists[0].items.length; } catch { return 0; } })();
   // a plain list (Last 100, Favourites, a genre/folder's tracks, search results…) still renders
   // its rows through MusicRow like an album or playlist, but only actually IS a track listing
   // when its rows are songs — the same component (and #browse.browsing-list class) also carries
