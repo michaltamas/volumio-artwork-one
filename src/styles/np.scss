@@ -28,7 +28,10 @@
   /* padding inside the scrolling box, pulled back by the same margins: the cover's shadow (50px down, a 70px spread) is not cut at the box's edge */
   #np-stage { flex: 1 1 0; min-height: 0; display: flex; overflow: visible; }
   /* Info or Lyrics under the block: the stage scrolls, with room inside for the cover's shadow at the sides and the top, ending at the bar */
-  &.np--info #np-stage, &.np--lyrics #np-stage { overflow-x: hidden; overflow-y: auto; scrollbar-width: thin; padding: 24px 72px 0; margin: -24px -72px 0; }
+  /* the box reaches 28px up under the top bar and 20px down to the bottom bar, masked to nothing at both ends, so what scrolls
+     fades out under the bars instead of being cut (or showing beside them); the content starts where the mask is whole */
+  &.np--info #np-stage, &.np--lyrics #np-stage { overflow-x: hidden; overflow-y: auto; scrollbar-width: thin; padding: 28px 72px 20px; margin: -28px -72px 0;
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 28px, #000 calc(100% - 20px), transparent); mask-image: linear-gradient(to bottom, transparent, #000 28px, #000 calc(100% - 20px), transparent); }
   #np-hero { margin: auto 0; width: 100%; display: grid; grid-template-columns: var(--np-s) minmax(0, 920px); column-gap: clamp(28px, 4vw, 80px);
     grid-template-rows: auto minmax(0, 1fr) auto; align-items: start; }
   #np-cover { grid-column: 1; grid-row: 1 / 3; width: var(--np-s); height: var(--np-s); aspect-ratio: 1 / 1; border-radius: 6px;
