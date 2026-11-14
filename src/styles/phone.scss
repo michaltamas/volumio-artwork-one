@@ -233,7 +233,7 @@
   body#artwork .aw-browse .aw-source-logo__img { width: 100%; height: 100%; object-fit: contain; padding: 22px; box-sizing: border-box; }
   body#artwork .aw-browse .aw-source-logo__img--pad { width: 100%; height: 100%; object-fit: contain; padding: 22px; box-sizing: border-box; transform: scale(1.35); }
   body#artwork .aw-browse .aw-tile img, body#artwork .aw-browse .aw-tile--lines i, body#artwork .aw-browse .aw-tile__blank { display: none; }
-  body#artwork .aw-browse .aw-tile--mosaic, body#artwork .aw-browse .aw-tile--avatars, body#artwork .aw-browse .aw-tile--stack { display: grid; grid-template-columns: 1fr; gap: 0; place-items: center; }
+  body#artwork .aw-browse .aw-tile--mosaic, body#artwork .aw-browse .aw-tile--avatars, body#artwork .aw-browse .aw-tile--stack { display: grid; grid-template-columns: 1fr; grid-template-rows: 1fr; gap: 0; place-items: center; }
   body#artwork .aw-browse .aw-tile .material-symbols-rounded { font-size: 34px; color: var(--ink-25); }
   body#artwork .aw-browse .aw-tile__glyph { display: block; }
   body#artwork .aw-browse .aw-card-body, body#artwork .aw-browse .aw-source-body { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
