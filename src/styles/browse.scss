@@ -840,3 +840,11 @@ body#artwork #browse.browsing-album .music-item {
       &::before, &::after, .item__number-dot { width: 3px; border-radius: 1px; }
       &::before { left: 0; } &::after { left: 5px; } .item__number-dot { left: 10px; } } }
 }
+
+/* the search's first answer on its way: a shelf of quiet tiles (SearchSkeleton), the pill's spinner */
+body#artwork .aw-found--skel { margin-top: 28px; .aw-found__tiles { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 28px 20px; margin-top: 18px; } .aw-found__tile .aw-skel + .aw-skel { margin-top: 0; } }
+@media (max-width: 1199px) { body#artwork .aw-found--skel .aw-found__tiles { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+@media (max-width: 899px) { body#artwork .aw-found--skel .aw-found__tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (max-width: 699px) { body#artwork .aw-found--skel .aw-found__tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 12px; } }
+body#artwork .aw-search .aw-spinner, body#artwork .aw-filter .aw-spinner { color: var(--ink-muted); }
+body#artwork .aw-listhead__spin { color: var(--ink-muted); margin-left: 4px; }

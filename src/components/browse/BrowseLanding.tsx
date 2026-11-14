@@ -6,6 +6,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../Icon';
+import Spinner from '../Spinner';
 import Dropdown, { type MenuEntry } from '../Dropdown';
 import PageHead from '../PageHead';
 import { albumart, rest } from '../../core/api';
@@ -37,6 +38,7 @@ export default function BrowseLanding({ dedicated }: { dedicated?: boolean }) {
   const nav = useNavigate();
   const sources = useBrowse(s => s.sources);
   const searchField = useBrowse(s => s.searchField);
+  const searching = useBrowse(s => s.searching);
   const isSearching = useBrowse(s => s.isSearching);
   const lists = useBrowse(s => s.lists);
   const recent = useRecentSearches(s => s.list);
@@ -103,7 +105,7 @@ export default function BrowseLanding({ dedicated }: { dedicated?: boolean }) {
             {source('radio') ? <div className="aw-tab" onClick={() => fetch(source('radio'))}>Radio</div> : null}
           </>}
           actions={<><label className={'aw-search' + (searchField.length ? ' active' : '')}>
-            <Icon name="search" />
+            {searching ? <Spinner size={18} /> : <Icon name="search" />}
             <input id="aw-search-input" ref={input} type="search" value={searchField} onChange={(e) => useBrowse.getState().search(e.target.value)}
               placeholder={s ? 'Search ' + s.songs + ' tracks' : 'Search everything'} aria-label="Search" autoComplete="off" spellCheck={false} />
             {!searchField.length ? <span className="aw-search-key mono">⌘K</span> : null}
@@ -114,7 +116,7 @@ export default function BrowseLanding({ dedicated }: { dedicated?: boolean }) {
       {landingSearch && searchField.length >= 2 ? (
         <div className="aw-listhead aw-listhead--search">
           <h1 className="aw-listhead__title">Results</h1>
-          {searchCount ? <span className="aw-listhead__count mono">{searchCount}</span> : null}
+          {searching ? <Spinner size={16} className="aw-listhead__spin" /> : searchCount ? <span className="aw-listhead__count mono">{searchCount}</span> : null}
         </div>
       ) : landingSearch ? null : (
         <div>

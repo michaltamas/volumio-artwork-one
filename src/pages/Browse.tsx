@@ -6,6 +6,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import Icon from '../components/Icon';
+import Spinner from '../components/Spinner';
 import ServiceFilters, { hasServiceFilters, hasServiceSortings } from '../components/browse/ServiceFilters';
 import { searchPlaylists } from '../core/playlistSearch';
 import { jumpVirtual } from '../components/browse/VirtualItems';
@@ -16,7 +17,7 @@ import AlbumHead, { AlbumPageHead, useCrumbs, goCrumb, isPlaylistInfo } from '..
 import ArtistHead, { artistLists, norm } from '../components/browse/ArtistHead';
 import BrowseLists from '../components/browse/BrowseLists';
 import { isFileBrowser } from '../components/browse/FileCard';
-import SearchResults from '../components/browse/SearchResults';
+import SearchResults, { SearchSkeleton } from '../components/browse/SearchResults';
 import { albumart } from '../core/api';
 import { emit } from '../core/socket';
 import { useBrowse } from '../core/store/browse';
@@ -93,6 +94,7 @@ export default function Browse({ dedicated }: { dedicated?: boolean }) {
       setFilter(''); setSortDesc(false); setActiveLetter(''); setShowAll(false); setNewest(true);
       if (!scope.current.searching) { scope.current.from = null; }
       scope.current.searching = false;
+      if (scope.current.timer) { window.clearTimeout(scope.current.timer); scope.current.timer = null; }   // a search typed on the page before: not sent after it
     }
   }, [uri, b.stamp]);
   // the scroll position of a page comes back with it
@@ -132,10 +134,11 @@ export default function Browse({ dedicated }: { dedicated?: boolean }) {
     if (!service) { return; }
     const q = v.trim(); const sc = scope.current;
     if (sc.timer) { window.clearTimeout(sc.timer); sc.timer = null; }
-    if (!q) { const from = sc.from; sc.from = null; sc.searching = false; if (from && from.uri) { emit('browseLibrary', { uri: from.uri }); } return; }
+    if (!q) { const from = sc.from; sc.from = null; sc.searching = false; useBrowse.setState({ searching: false }); if (from && from.uri) { emit('browseLibrary', { uri: from.uri }); } return; }
     if (q.length < 2) { return; }
     const r: any = request;
     if (!sc.from) { sc.from = r; }
+    useBrowse.setState({ searching: true });
     sc.timer = window.setTimeout(() => { sc.searching = true; emit('search', { type: 'any', value: q, service: r.service || service.service || service.plugin_name, plugin_name: service.plugin_name || r.plugin_name, plugin_type: service.plugin_type || r.plugin_type || 'music_service', uri: service.uri }); }, 400);
   };
   // an album's or a playlist's page filters its own rows whatever the service: the field there is "Filter album", not the service's search
@@ -201,7 +204,7 @@ export default function Browse({ dedicated }: { dedicated?: boolean }) {
                 nav={<Crumbs trail={crumbs} current={listTitle} onHome={() => b.backHome()} onCrumb={goCrumb} />}
                 actions={<>
                   <label className={'aw-filter' + (filter.length ? ' aw-filter--on' : '')}>
-                    <Icon name="search" />
+                    {b.searching && service ? <Spinner size={16} /> : <Icon name="search" />}
                     <input type="search" value={filter} onChange={(e) => headInput(e.target.value)} placeholder={placeholder} aria-label={placeholder} spellCheck={false} />
                   </label>
                   {b.showGridViewSelector() ? (
@@ -227,6 +230,7 @@ export default function Browse({ dedicated }: { dedicated?: boolean }) {
             {isTrackList && !(isFileBrowser(request) && lists[0] && b.gridFor(lists[0])) ? <div className="aw-cols mono aw-cols--fav" aria-hidden="true"><span>#</span><span /><span className="aw-cols__info"><span>TITLE</span><span>ALBUM</span></span><span className="aw-cols__duration">{hasDuration ? 'DURATION' : ''}</span><span /><span /></div> : null}
 
             <div id="browse-page">
+              {isLandingSearch && b.searching && !(b.lists && b.lists.length) ? <SearchSkeleton /> : null}
               {(b.isBrowsing || b.isSearching) && b.lists ? (isLandingSearch
                 ? <SearchResults lists={listsShown} filter="" sortDesc={sortDesc} isArtist={false} artistsPage={false} serviceSearch={false} activeMenu={activeMenu} onMenuOpen={onMenuOpen} />
                 : <BrowseLists lists={listsShown} filter={filter} sortDesc={sortDesc} isArtist={isArtist} artistsPage={artistsPage} serviceSearch={!localFilter} activeMenu={activeMenu} onMenuOpen={onMenuOpen} />) : null}

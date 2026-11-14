@@ -18,6 +18,7 @@ export default function InfoFace() {
   const artist = useAbout(s => s.artist);
   const album = useAbout(s => s.album);
   const track = useAbout(s => s.track);
+  const pending = useAbout(s => s.pending);
   const info = useTrackInfo();
   const nav = useNavigate();
   // a track with no artist (a CUE sheet, a stream): the face says so instead of showing nothing (volumio-nowplaying-5.html .nq-empty)
@@ -39,7 +40,15 @@ export default function InfoFace() {
   const goAlbum = () => { if (!canGo || !st.album) { return; } const item = { uri: 'albums://' + encodeURIComponent(st.artist) + '/' + encodeURIComponent(st.album), title: st.album, name: st.album, type: 'folder', service: 'mpd' }; useBrowse.getState().open(item, true); nav(browseUrl(item)); };
   return (
     <div className="np-about">
-      {/* the track first (volumio-nowplaying-5.html): who made it, as facts */}
+      {/* the track first (volumio-nowplaying-5.html): who made it, as facts; a placeholder while MusicBrainz answers */}
+      {!track && pending.track ? (
+        <div className="np-about__row np-about__row--track np-about__row--skel" aria-hidden="true">
+          <div className="np-about__img np-about__img--track"><Icon name="music_note" /></div>
+          <div className="np-about__body"><div className="np-about__name">{st.title}</div><div className="np-about__sub">This track</div>
+            <div className="np-about__credits"><div className="np-about__credit"><i className="aw-skel" style={{ width: 64 }} /><i className="aw-skel aw-skel--l" style={{ width: 110 }} /></div><div className="np-about__credit"><i className="aw-skel" style={{ width: 72 }} /><i className="aw-skel aw-skel--l" style={{ width: 130 }} /></div><div className="np-about__credit"><i className="aw-skel" style={{ width: 80 }} /><i className="aw-skel aw-skel--l" style={{ width: 150 }} /></div></div>
+          </div>
+        </div>
+      ) : null}
       {track && track.credits.length ? (
         <div className="np-about__row np-about__row--track">
           <div className="np-about__img np-about__img--track"><Icon name="music_note" /></div>
@@ -57,6 +66,7 @@ export default function InfoFace() {
             <span className="np-about__name">{st.artist}</span>
             {artistSub ? <span className="np-about__sub">{artistSub}</span> : null}
           </div>
+          {!artist && pending.artist ? <div className="np-about__skel" aria-hidden="true"><i className="aw-skel" style={{ width: '40%' }} /><i className="aw-skel aw-skel--l" style={{ width: '92%' }} /><i className="aw-skel aw-skel--l" style={{ width: '84%' }} /><i className="aw-skel aw-skel--l" style={{ width: '58%' }} /></div> : null}
           {artist && artist.extract ? <p className="np-about__text">{artist.extract}</p> : null}
           {artist && artist.extract && artist.url && !KIOSK ? <a className="np-about__src mono" href={artist.url} target="_blank" rel="noopener" onClick={(e) => e.stopPropagation()}>BIO · WIKIPEDIA</a> : null}
           {artist && artist.extract && (!artist.url || KIOSK) ? <span className="np-about__src mono">BIO · WIKIPEDIA</span> : null}
@@ -74,7 +84,7 @@ export default function InfoFace() {
           {st.albumart ? <img className="np-about__img" src={albumart(st.albumart)} alt="" /> : <div className="np-about__img" />}
           <div className="np-about__body">
             <div className="np-about__name">{st.album}</div>
-            {albumSub ? <div className="np-about__sub">{albumSub}</div> : null}
+            {albumSub ? <div className="np-about__sub">{albumSub}</div> : (!album && pending.album ? <i className="aw-skel" style={{ width: 160 }} aria-hidden="true" /> : null)}
             {album && album.extract ? <p className="np-about__text np-about__text--album">{album.extract}</p> : null}
             {album && album.credits && album.credits.length ? creditRows(album.credits) : null}
           </div>

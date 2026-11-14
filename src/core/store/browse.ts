@@ -60,6 +60,7 @@ interface BrowseStore {
   isSearching: boolean;
   dedicatedSearch: boolean;
   loading: boolean;
+  searching: boolean;        // a search typed and not yet answered: the pill spins, the results shimmer
   showGridView: boolean;
   showGridViewTracks: boolean;
   searchField: string;
@@ -111,6 +112,8 @@ function oncePerFile(lists: BrowseList[]): BrowseList[] {
 }
 
 let searchTimer: number | null = null;
+// a search typed and not yet sent must not go out after a page was opened: its answer would replace the page's lists ("No items" on Genres)
+const dropSearch = () => { if (searchTimer) { window.clearTimeout(searchTimer); searchTimer = null; } pendingPlaylists = null; };
 let pendingPlaylists: Promise<any> | null = null;   // the playlists' own matches, joined to the player's answer
 let favTimer: number | null = null;
 
@@ -126,6 +129,7 @@ export const useBrowse = create<BrowseStore>((set, get) => ({
   isSearching: false,
   dedicatedSearch: false,
   loading: false,
+  searching: false,
   showGridView: readGrid(),
   showGridViewTracks: readGridTracks(),
   searchField: '',
@@ -136,9 +140,10 @@ export const useBrowse = create<BrowseStore>((set, get) => ({
   fetch: (item, back) => {
     if (item.uri === '/') { get().backHome(); return; }
     if (item.uri === 'cd') { return; }
+    dropSearch();
     const scroll = { ...get().scroll };
     if (!back) { delete scroll[item.uri]; }
-    set({ request: item, currentUri: String(item.uri || ''), loading: true, isBrowsing: item.static ? get().isBrowsing : true, scroll });
+    set({ request: item, currentUri: String(item.uri || ''), loading: true, searching: false, isBrowsing: item.static ? get().isBrowsing : true, scroll });
     emit('browseLibrary', { uri: item.uri });
   },
   // a service's genre filter or sort order (Qobuz: New Releases): the same page asked for again under
@@ -162,7 +167,7 @@ export const useBrowse = create<BrowseStore>((set, get) => ({
       get().backHome();
     }
   },
-  backHome: () => set({ isBrowsing: false, isSearching: false, trail: [], info: null, lists: null, request: null, currentUri: '', searchField: '', prev: null, stamp: get().stamp + 1 }),
+  backHome: () => { dropSearch(); set({ isBrowsing: false, isSearching: false, searching: false, trail: [], info: null, lists: null, request: null, currentUri: '', searchField: '', prev: null, stamp: get().stamp + 1 }); },
   home: () => get().backHome(),
   refresh: () => { const r = get().request; if (r) { set({ loading: true }); emit('browseLibrary', { uri: r.uri }); } },
   setGridView: (on, tracks) => {
@@ -174,7 +179,7 @@ export const useBrowse = create<BrowseStore>((set, get) => ({
     set({ searchField: value });
     if (searchTimer) { window.clearTimeout(searchTimer); searchTimer = null; }
     if (value && value.length >= 2) {
-      set({ isSearching: true });
+      set({ isSearching: true, searching: true });
       searchTimer = window.setTimeout(() => {
         const sc = get().searchScope;
         // one source: that source's own search (as the field on its pages does); every source: Volumio's, plus the playlists' tracks
@@ -188,7 +193,7 @@ export const useBrowse = create<BrowseStore>((set, get) => ({
   setSearchScope: (sc) => { set({ searchScope: sc }); const v = get().searchField; if (v && v.length >= 2) { get().search(v); } },
   clearSearch: () => {
     if (searchTimer) { window.clearTimeout(searchTimer); searchTimer = null; }
-    set({ searchField: '', isSearching: false, lists: get().isBrowsing ? get().lists : null });
+    set({ searchField: '', isSearching: false, searching: false, lists: get().isBrowsing ? get().lists : null });
   },
   setDedicated: (on) => {
     if (on) { set({ dedicatedSearch: true, isSearching: true, isBrowsing: false, lists: [], info: null, request: null, trail: [] }); }
@@ -231,7 +236,7 @@ on('pushBrowseLibrary', (data: any) => {
     p.then((pl) => { const cur = useBrowse.getState(); if (!pl || !cur.isSearching || cur.lists !== lists) { return; } let at = 0; while (at < lists.length && /^Found /.test(String(lists[at].title || ''))) { at++; } useBrowse.setState({ lists: [...lists.slice(0, at), { ...pl, awSource: 'Playlists' }, ...lists.slice(at)], stamp: cur.stamp + 1 }); });   // awSource: the search page names the shelf
   }
   const info = data.navigation.info ? plainItem(data.navigation.info) : null;
-  const patch: Partial<BrowseStore> = { lists, info, prev: data.navigation.prev || null, loading: false, stamp: st.stamp + 1 };
+  const patch: Partial<BrowseStore> = { lists, info, prev: data.navigation.prev || null, loading: false, searching: false, stamp: st.stamp + 1 };
   const req = st.request;
   if (req && req.uri && st.isBrowsing) {
     // a page already on the trail (a breadcrumb, a loop back) is returned to, not stacked twice

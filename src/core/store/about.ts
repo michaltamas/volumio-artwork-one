@@ -22,9 +22,9 @@ export interface AboutArtist { name: string; mbid: string; kind: string; country
 export interface AboutAlbum { title: string; date: string; year: string; kind: string; label: string; mbUrl: string; extract: string; description: string; url: string; credits: Credit[] }
 export interface AboutTrack { title: string; mbUrl: string; credits: Credit[] }
 interface Wiki { extract: string; description: string; url: string; thumb: string }
-interface AboutStore { artist: AboutArtist | null; album: AboutAlbum | null; track: AboutTrack | null }
+interface AboutStore { artist: AboutArtist | null; album: AboutAlbum | null; track: AboutTrack | null; pending: { artist: boolean; album: boolean; track: boolean } }   // pending: a lookup under way, the Info face shows a placeholder
 
-export const useAbout = create<AboutStore>(() => ({ artist: null, album: null, track: null }));
+export const useAbout = create<AboutStore>(() => ({ artist: null, album: null, track: null, pending: { artist: false, album: false, track: false } }));
 
 const artists: Record<string, Promise<AboutArtist | null>> = {};
 const albums: Record<string, Promise<AboutAlbum | null>> = {};
@@ -152,13 +152,16 @@ function refresh() {
   const albumSame = lastKeys.split('|').slice(0, 2).join('|') === artist + '|' + album;
   lastKeys = sig;
   // the same record, the next track: the artist and the album stay on the screen
+  const pend = (patch: Partial<AboutStore['pending']>) => useAbout.setState(s => ({ pending: { ...s.pending, ...patch } }));
   useAbout.setState(albumSame ? { track: null } : { artist: null, album: null, track: null });
-  if (!artist) { return; }
+  if (!artist) { pend({ artist: false, album: false, track: false }); return; }
   if (!albumSame) {
-    lookupArtist(artist).then(a => { if (keys()[0] === artist) { useAbout.setState({ artist: a }); } });
-    if (album) { lookupAlbum(artist, album).then(a => { if (keys()[1] === album) { useAbout.setState({ album: a }); } }); }
+    pend({ artist: true, album: !!album });
+    lookupArtist(artist).then(a => { if (keys()[0] === artist) { useAbout.setState({ artist: a }); pend({ artist: false }); } });
+    if (album) { lookupAlbum(artist, album).then(a => { if (keys()[1] === album) { useAbout.setState({ album: a }); pend({ album: false }); } }); }
   }
-  if (title) { lookupTrack(artist, title, album).then(t => { if (keys()[2] === title) { useAbout.setState({ track: t }); } }); }
+  if (title) { pend({ track: true }); lookupTrack(artist, title, album).then(t => { if (keys()[2] === title) { useAbout.setState({ track: t }); pend({ track: false }); } }); }
+  else { pend({ track: false }); }
 }
 usePlayer.subscribe((s, prev) => { if (s.state !== prev.state) { refresh(); } });
 refresh();

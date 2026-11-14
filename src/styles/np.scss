@@ -26,7 +26,9 @@
 
   /* ---- the stage and its grid ---- */
   /* padding inside the scrolling box, pulled back by the same margins: the cover's shadow (50px down, a 70px spread) is not cut at the box's edge */
-  #np-stage { flex: 1 1 0; min-height: 0; display: flex; overflow-x: hidden; overflow-y: auto; scrollbar-width: thin; padding: 24px 72px 96px; margin: -24px -72px -96px; }
+  #np-stage { flex: 1 1 0; min-height: 0; display: flex; overflow: visible; }
+  /* Info or Lyrics under the block: the stage scrolls, with room inside for the cover's shadow at the sides and the top, ending at the bar */
+  &.np--info #np-stage, &.np--lyrics #np-stage { overflow-x: hidden; overflow-y: auto; scrollbar-width: thin; padding: 24px 72px 0; margin: -24px -72px 0; }
   #np-hero { margin: auto 0; width: 100%; display: grid; grid-template-columns: var(--np-s) minmax(0, 920px); column-gap: clamp(28px, 4vw, 80px);
     grid-template-rows: auto minmax(0, 1fr) auto; align-items: start; }
   #np-cover { grid-column: 1; grid-row: 1 / 3; width: var(--np-s); height: var(--np-s); aspect-ratio: 1 / 1; border-radius: 6px;
@@ -282,3 +284,7 @@ body#artwork .np-about__chips { display: flex; flex-wrap: wrap; gap: 8px; margin
 body#artwork .np-about__chip { height: 36px; padding: 0 14px; border-radius: 18px; border: 1px solid var(--fill-18); background: transparent; color: var(--ink-2); font: inherit; font-size: 14px; font-weight: 400; cursor: pointer; line-height: normal; white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis;
   &:hover { background: var(--fill-10); color: var(--ink); } }
 @media (max-width: 700px) { body#artwork .np-about__credits { grid-template-columns: 1fr 1fr; gap: 12px 16px; } }
+
+/* the Info face while MusicBrainz and Wikipedia answer: quiet bars where the words will be */
+body#artwork .np-about__skel { margin-top: 10px; max-width: 72ch; }
+body#artwork .np-about__row--skel .np-about__credit .aw-skel + .aw-skel { margin-top: 6px; }

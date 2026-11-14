@@ -85,3 +85,14 @@ export default function SearchResults(props: ListsProps) {
     </div>
   );
 }
+
+
+/** six quiet tiles under a quiet title: the first answer is on its way */
+export function SearchSkeleton() {
+  return (
+    <div className="aw-found aw-found--skel" aria-hidden="true">
+      <i className="aw-skel" style={{ width: 120, height: 14 }} />
+      <div className="aw-found__tiles">{[0, 1, 2, 3, 4, 5].map(i => <div key={i} className="aw-found__tile"><i className="aw-skel aw-skel--tile" /><i className="aw-skel" style={{ width: '70%' }} /></div>)}</div>
+    </div>
+  );
+}
