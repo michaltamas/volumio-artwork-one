@@ -82,7 +82,7 @@ export default function ArtistHead({ filter, onFilter, showAll, onShowAll, newes
         nav={<Crumbs trail={crumbs} current={info.title} onHome={() => b.backHome()} onCrumb={goCrumb} />}
         actions={<label className={'aw-filter aw-artist__filter' + (filter.length ? ' aw-filter--on' : '')}>
           <Icon name="search" />
-          <input type="search" value={filter} onChange={(e) => onFilter(e.target.value)} placeholder="Search this artist" aria-label="Search this artist" spellCheck={false} />
+          <input type="search" value={filter} onChange={(e) => onFilter(e.target.value)} placeholder="Filter artist" aria-label="Filter artist" spellCheck={false} />
         </label>} />
 
       <div className="aw-artist__hero">

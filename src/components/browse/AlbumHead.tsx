@@ -32,7 +32,8 @@ export function AlbumPageHead({ filter, onFilter }: { filter?: string; onFilter?
   const info = useBrowse(s => s.info) || {};
   const crumbs = useCrumbs();
   const title = info.title || info.album;
-  const placeholder = 'Filter ' + (isPlaylistInfo(info as BrowseItem) ? 'playlist' : 'album');
+  const fav = String((useBrowse.getState().request || {}).uri || '') === 'favourites';
+  const placeholder = 'Filter ' + (fav ? 'favourites' : isPlaylistInfo(info as BrowseItem) ? 'playlist' : 'album');
   return (
     <PageHead variant="album" back={browseBack}
       nav={<Crumbs trail={crumbs} current={title} onHome={() => useBrowse.getState().backHome()} onCrumb={goCrumb} />}
@@ -96,7 +97,7 @@ function Actions({ info, isPlaylist }: { info: BrowseItem; isPlaylist: boolean }
   const collect = canCollect(info);
   return (
     <div className="aw-albumhead__actions">
-      <button type="button" className="aw-btn aw-btn--primary" onClick={() => A.playItemsList(info)}><Icon name="play_arrow" /><span>{isPlaylist ? 'Play' : 'Play album'}</span></button>
+      <button type="button" className="aw-btn aw-btn--primary" onClick={() => A.playItemsList(info)}><Icon name="play_arrow" /><span>{isPlaylist ? 'Play' : <><span className="aw-btn__long">Play album</span><span className="aw-btn__short">Play</span></>}</span></button>
       {collect ? <button type="button" className="aw-iconbtn" onClick={() => A.addToFavorites(info)} title="Favourite"><Icon name="favorite" /></button> : null}
       {collect ? <button type="button" className="aw-iconbtn" onClick={() => A.addToPlaylist(info)} title="Add to playlist"><Icon name="playlist_add" /></button> : null}
       {isPlaylist

@@ -11,7 +11,7 @@ import { searchPlaylists } from '../core/playlistSearch';
 import { jumpVirtual } from '../components/browse/VirtualItems';
 import PageHead from '../components/PageHead';
 import Crumbs from '../components/browse/Crumbs';
-import BrowseLanding, { streamingOf, SearchScope } from '../components/browse/BrowseLanding';
+import BrowseLanding, { streamingOf } from '../components/browse/BrowseLanding';
 import AlbumHead, { AlbumPageHead, useCrumbs, goCrumb, isPlaylistInfo } from '../components/browse/AlbumHead';
 import ArtistHead, { artistLists, norm } from '../components/browse/ArtistHead';
 import BrowseLists from '../components/browse/BrowseLists';
@@ -19,13 +19,12 @@ import SearchResults from '../components/browse/SearchResults';
 import { albumart } from '../core/api';
 import { emit } from '../core/socket';
 import { useBrowse } from '../core/store/browse';
-import { useBrowseUrl, browseBack } from '../core/browseUrl';
+import { useBrowseUrl, browseBack, titleFor } from '../core/browseUrl';
 
 export default function Browse({ dedicated }: { dedicated?: boolean }) {
   const b = useBrowse();
   const crumbs = useCrumbs();
   const scroller = useRef<HTMLDivElement>(null);
-  const searchInput = useRef<HTMLInputElement>(null);
   const [filter, setFilter] = useState('');
   const [sortDesc, setSortDesc] = useState(false);
   const [activeLetter, setActiveLetter] = useState('');
@@ -45,7 +44,7 @@ export default function Browse({ dedicated }: { dedicated?: boolean }) {
   const info = b.info;
   const uri = b.currentUri;
   const request = b.request;
-  const listTitle = request ? (request.name || request.title || '') : '';
+  const listTitle = request ? (request.name || request.title || titleFor(String(request.uri || ''), b.sources)) : '';   // a page reloaded by its address: the name from the sources or the uri
   const isPlaylist = !!info && isPlaylistInfo(info);
   // Spotify reports its playlists as info.type 'album' too: a playlist is a playlist, never an album
   const isAlbum = !!info && !isPlaylist && (info.type === 'album' || info.type === 'cd');
@@ -63,6 +62,7 @@ export default function Browse({ dedicated }: { dedicated?: boolean }) {
   // albums/artists/playlists shown as rows instead of cards, which have no "album" field of their
   // own to put in a column, so the number+album-column treatment only turns on for real tracks
   const isTrackList = isPlaylist || ((isPlainList || isLandingSearch) && lists[0] && lists[0].items && lists[0].items[0] && lists[0].items[0].type === 'song');
+  const hasDuration = lists.some(l => (l.items || []).some(it => it && it.duration));   // Favourites comes without lengths: no empty column head
 
   // the search page: Volumio's own search box in the head
   // Backspace outside a text field goes back one level, as the frame's browse controllers did
@@ -80,7 +80,7 @@ export default function Browse({ dedicated }: { dedicated?: boolean }) {
     document.addEventListener('keydown', onKey, false);
     return () => document.removeEventListener('keydown', onKey, false);
   }, []);
-  useEffect(() => { b.setDedicated(!!dedicated); if (dedicated) { window.setTimeout(() => searchInput.current && searchInput.current.focus(), 100); } return () => { if (dedicated) { useBrowse.getState().setDedicated(false); } }; }, [dedicated]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { b.setDedicated(!!dedicated); if (dedicated) { window.setTimeout(() => { const el = document.getElementById('aw-search-input'); if (el) { el.focus(); } }, 100); } return () => { if (dedicated) { useBrowse.getState().setDedicated(false); } }; }, [dedicated]); // eslint-disable-line react-hooks/exhaustive-deps
   // the address bar follows the page (and leads it on Back, Forward and a reload)
   useBrowseUrl(!!dedicated);
 
@@ -185,18 +185,6 @@ export default function Browse({ dedicated }: { dedicated?: boolean }) {
         <div className={'body-content new-browse' + (dedicated ? ' with-search-header' : '')}>
           <div id="browseTablesWrapper" ref={scroller} onScroll={onScroll}>
 
-            {dedicated ? (
-              <PageHead variant="search" nav={<div className="dedicated-search"><div className="search-container">
-                <form action="." id="searchForm" onSubmit={(e) => { e.preventDefault(); (document.activeElement as HTMLElement)?.blur(); }}>
-                  <input type="search" id="search-input-form" ref={searchInput} className="form-control" value={b.searchField} onChange={(e) => b.search(e.target.value)} placeholder="Search ..." title="Search" spellCheck={false} />
-                </form>
-                <button type="button" className="search-icon" onMouseDown={(e) => { if (b.searchField.length) { e.preventDefault(); b.search(''); } }}><Icon name={b.searchField.length ? 'cancel' : 'search'} /></button>
-              </div>
-              {/* where to look: every source, or one of them (its own search, as on its pages) */}
-              <SearchScope />
-              </div>} />
-            ) : null}
-
             {!b.isBrowsing ? <BrowseLanding dedicated={dedicated} /> : null}
 
             {info && !hideInfo && (isAlbum || info.type === 'song' || isPlaylist) ? <AlbumPageHead filter={filter} onFilter={setFilter} /> : null}
@@ -230,12 +218,12 @@ export default function Browse({ dedicated }: { dedicated?: boolean }) {
                 {count ? <span className="aw-listhead__count mono">{visibleCount !== null ? visibleCount + ' / ' : ''}{count}</span> : null}
                 {hasServiceFilters(b.lists)
                   ? <ServiceFilters>{!hasServiceSortings(b.lists) ? localSort : null}</ServiceFilters>
-                  : localSort}
+                  : uri === 'Last_100' ? null : localSort}
               </div>
             ) : null}
 
             {isPlainList && artistsPage && !b.showGridView ? <div className="aw-cols aw-cols--artists mono" aria-hidden="true"><span>#</span><span /><span>ARTIST</span><span /></div> : null}
-            {isTrackList ? <div className="aw-cols mono aw-cols--fav" aria-hidden="true"><span>#</span><span /><span className="aw-cols__info"><span>TITLE</span><span>ALBUM</span></span><span className="aw-cols__duration">DURATION</span><span /><span /></div> : null}
+            {isTrackList ? <div className="aw-cols mono aw-cols--fav" aria-hidden="true"><span>#</span><span /><span className="aw-cols__info"><span>TITLE</span><span>ALBUM</span></span><span className="aw-cols__duration">{hasDuration ? 'DURATION' : ''}</span><span /><span /></div> : null}
 
             <div id="browse-page">
               {(b.isBrowsing || b.isSearching) && b.lists ? (isLandingSearch

@@ -13,7 +13,8 @@ import * as A from '../../core/browseActions';
 
 // a list of a service's own links (My playlists, My albums…): drawn as cards, not covers
 export const isMoreItem = (it: BrowseItem) => !!it && !it.albumart && /^show more/i.test(String(it.title || it.name || ''));
-const isLinkList = (items: BrowseItem[]) => items.length > 0 && items.every(i => i && (i.type === 'streaming-category' || i.type === 'spotify-category' || i.type === 'radio-category') );
+const LINK_TYPES = ['streaming-category', 'spotify-category', 'radio-category', 'mywebradio-category', 'radio-favourites', 'item-no-menu'];   // a service's own doors: Tidal's and Spotify's collection, Radio's directory, SoundCloud's Welcome
+const isLinkList = (items: BrowseItem[]) => items.length > 0 && items.every(i => i && LINK_TYPES.indexOf(String(i.type)) > -1);
 
 export interface ListsProps { lists: BrowseList[]; filter: string; sortDesc: boolean; isArtist: boolean; artistsPage: boolean; serviceSearch: boolean; activeMenu: string | null; onMenuOpen: (key: string, open: boolean) => void; base?: number }
 

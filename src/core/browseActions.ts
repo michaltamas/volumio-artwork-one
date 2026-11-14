@@ -137,6 +137,8 @@ export function faIcon(icon?: string): string {
   if (/folder/.test(s)) { return 'folder'; }
   if (/microphone/.test(s)) { return 'mic'; }
   if (/heart/.test(s)) { return 'favorite'; }
+  if (/category/.test(s)) { return 'category'; }
+  if (/tags/.test(s)) { return 'sell'; }
   if (/list-ol|list/.test(s)) { return 'queue_music'; }
   if (/hdd|server/.test(s)) { return 'storage'; }
   if (/usb/.test(s)) { return 'usb'; }

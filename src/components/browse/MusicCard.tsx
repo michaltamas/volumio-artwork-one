@@ -22,7 +22,7 @@ export default function MusicCard({ item, list, listIndex, itemIndex, hidden, or
   if (isMoreItem(item)) {
     return (
       <div className={'music-card__wrapper aw-more' + (hidden ? ' aw-hidden' : '')} ref={ref} style={order ? { order } : undefined} onClick={() => A.clickListItem(item, list, itemIndex)}>
-        <button type="button" className="aw-more__box" aria-label="Show more"><Icon name="add" /></button>
+        <button type="button" className="aw-more__box" aria-label="Show more"><Icon name="arrow_forward" /></button>
         <div className="aw-more__label">Show more</div>
       </div>
     );

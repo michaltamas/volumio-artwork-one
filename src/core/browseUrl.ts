@@ -18,6 +18,24 @@ export function slimItem(item: BrowseItem | null | undefined): Partial<BrowseIte
   return out;
 }
 
+// the library's own roots: a page reached by its address alone (a reload, a pasted link) still gets its name
+const ROOTS: Record<string, string> = { 'albums://': 'Albums', 'artists://': 'Artists', 'genres://': 'Genres', 'playlists': 'Playlists', 'favourites': 'Favourites', 'Last_100': 'Last 100', 'music-library': 'Music Library', 'radio': 'Web Radio' };
+/** a page's name from its uri when nothing else carries one: a source's own name, a library root, else the uri's last segment */
+export function titleFor(uri: string, sources: BrowseItem[]): string {
+  const known = knownTitle(uri, sources);
+  if (known) { return known; }
+  const last = String(uri || '').replace(/[/:]+$/, '').split(/[/:]/).pop() || '';
+  try { return decodeURIComponent(last); } catch { return last; }
+}
+// a name that is certain: a root's or a source's (the sources may not be in yet when a page is asked for)
+function knownTitle(uri: string, sources: BrowseItem[]): string {
+  const u = String(uri || '');
+  if (!u) { return ''; }
+  if (ROOTS[u]) { return ROOTS[u]; }
+  const src = (sources || []).find(s => s && s.uri && String(s.uri) === u);
+  return src ? String(src.name || src.title || '') : '';
+}
+
 /** the address of a library page: where `open(item)` followed by `nav(browseUrl(item))` lands */
 export function browseUrl(item: BrowseItem | null | undefined): string {
   const uri = item && item.uri ? String(item.uri) : '';
@@ -64,7 +82,12 @@ export function useBrowseUrl(dedicated: boolean): void {
       else {
         const at = st.trail.findIndex(t => String(t.uri || '') === wantUri);
         if (at > -1) { st.goTo(at); }
-        else { st.fetch({ uri: wantUri, ...((loc.state && typeof loc.state === 'object') ? loc.state : {}) } as BrowseItem, true); }
+        else {
+          const state = (loc.state && typeof loc.state === 'object') ? loc.state as Partial<BrowseItem> : {};
+          // a name only when certain; otherwise the page names itself at render time (titleFor), once the sources are in
+          const title = state.title || state.name || knownTitle(wantUri, st.sources) || undefined;
+          st.fetch({ uri: wantUri, ...state, title, name: state.name || title } as BrowseItem, true);
+        }
       }
     }
     if (!wantUri && wantQ !== haveQ) { if (wantQ) { st.search(wantQ); } else { st.clearSearch(); } }

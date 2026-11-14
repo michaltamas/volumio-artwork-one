@@ -93,12 +93,12 @@ export default function BrowseLanding({ dedicated }: { dedicated?: boolean }) {
 
   return (
     <div className="aw-browse">
-      {!dedicated ? (
-        <PageHead variant="home"
+      {/* the same head on the library and on the search page: the tabs, the pill, the scope */}
+      <PageHead variant="home"
           nav={<>
             {/* the same row as Home's: Home, Library (here), the sources */}
             <div className="aw-tab" onClick={() => nav('/home')}>Home</div>
-            <div className="aw-tab active" aria-current="page">Library</div>
+            {dedicated ? <div className="aw-tab" onClick={() => { useBrowse.getState().backHome(); nav('/browse'); }}>Library</div> : <div className="aw-tab active" aria-current="page">Library</div>}
             {streaming.map(x => <div key={x.uri} className="aw-tab" onClick={() => fetch(x)}>{x.name}</div>)}
             {source('radio') ? <div className="aw-tab" onClick={() => fetch(source('radio'))}>Radio</div> : null}
           </>}
@@ -109,7 +109,6 @@ export default function BrowseLanding({ dedicated }: { dedicated?: boolean }) {
             {!searchField.length ? <span className="aw-search-key mono">⌘K</span> : null}
             {searchField.length ? <button type="button" className="aw-search-clear" onClick={() => useBrowse.getState().clearSearch()} aria-label="Clear search"><Icon name="close" /></button> : null}
           </label><SearchScope /></>} />
-      ) : null}
 
       {landingSearch && searchField.length < 2 ? <div className="aw-recent__under">{recents}</div> : null}
       {landingSearch && searchField.length >= 2 ? (

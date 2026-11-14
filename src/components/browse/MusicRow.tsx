@@ -30,6 +30,10 @@ export default function MusicRow({ item, list, listIndex, itemIndex, hidden, ord
   const [counts, setCounts] = useState('');
   // the Artists list: "7 albums · 64 tracks" under the name, asked for as the row comes into view
   useArtistCounts(rowRef, item.uri, artistsPage, c => setCounts(countsText(c)));
+  // Volumio's placeholder picture (`/albumart?…&icon=fa-tags`, no file behind it) is a glyph here, as a row with an icon is
+  const placeholder = /^\/albumart\?/.test(String(item.albumart || '')) && /[?&]icon=/.test(String(item.albumart)) && !/[?&](web|path)=/.test(String(item.albumart));
+  const art = placeholder ? '' : item.albumart;
+  const icon = item.icon || (placeholder ? (/^genres:\/\//.test(String(item.uri || '')) ? 'fa fa-category' : String(item.albumart).replace(/^.*[?&]icon=([^&]+).*$/, 'fa $1')) : '');
   const favVisible = A.showPlayButton(item) && (item.type === 'song' || item.type === 'folder-with-favourites') && (req ? req.uri : '') !== 'favourites';
   const noMenu = !A.showHamburgerMenu(item);
   // a folder of the file browser (USB, NAS, internal storage) is opened, never played from its row:
@@ -50,9 +54,9 @@ export default function MusicRow({ item, list, listIndex, itemIndex, hidden, ord
           <button type="button" className="ghost-btn play-btn" onClick={playBtnClick}><Icon name={playing ? 'pause' : 'play_arrow'} className="play-btn__icon" /></button>
         </div>
         <div className="item__number">{item.tracknumber || (itemIndex + 1)}<span className="item__number-dot">.</span>{browserLoading ? <Spinner size={16} className="aw-loading-spin" /> : null}</div>
-        <div className={'item__image' + (!item.albumart && !item.icon ? ' hidden' : '')}>
-          <div className={'item__albumart' + (!item.albumart ? ' hidden' : '')}><img className="item__image__img" src={albumart(item.albumart)} alt="" /></div>
-          <div className={'item__albumart-icon' + (!item.icon ? ' hidden' : '')}><Icon name={A.faIcon(item.icon)} /></div>
+        <div className={'item__image' + (!art && !icon ? ' hidden' : '')}>
+          <div className={'item__albumart' + (!art ? ' hidden' : '')}><img className="item__image__img" src={albumart(art)} alt="" /></div>
+          <div className={'item__albumart-icon' + (!icon ? ' hidden' : '')}><Icon name={icon ? A.faIcon(icon) : ''} /></div>
         </div>
         <div className="item__info">
           <div className={'item__title truncate-text ' + titleCls} title={item.title || ''}>{item.title || ''} {item.tagImage ? <img className="music-card__extension tagrow" src={albumart(item.tagImage)} alt="" /> : null}</div>
