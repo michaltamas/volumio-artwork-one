@@ -131,6 +131,13 @@ export function shufflePlay(item: BrowseItem): void {
 }
 
 // Volumio's items carry a FontAwesome class for their glyph; the theme draws Material symbols
+/** Volumio's placeholder picture (`/albumart?…&icon=server`, no file or web art behind it) names its own icon: that name as a fa class, else '' */
+export function iconOfArt(albumart?: string): string {
+  const a = String(albumart || '');
+  if (!/^\/albumart\?/.test(a) || !/[?&]icon=/.test(a) || /[?&](web|path)=[^&]/.test(a)) { return ''; }
+  return 'fa ' + a.replace(/^.*[?&]icon=([^&]+).*$/, '$1');
+}
+
 export function faIcon(icon?: string): string {
   const s = String(icon || '');
   if (/folder-open/.test(s)) { return 'folder_open'; }

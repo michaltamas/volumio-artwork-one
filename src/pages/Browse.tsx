@@ -15,6 +15,7 @@ import BrowseLanding, { streamingOf } from '../components/browse/BrowseLanding';
 import AlbumHead, { AlbumPageHead, useCrumbs, goCrumb, isPlaylistInfo } from '../components/browse/AlbumHead';
 import ArtistHead, { artistLists, norm } from '../components/browse/ArtistHead';
 import BrowseLists from '../components/browse/BrowseLists';
+import { isFileBrowser } from '../components/browse/FileCard';
 import SearchResults from '../components/browse/SearchResults';
 import { albumart } from '../core/api';
 import { emit } from '../core/socket';
@@ -169,7 +170,7 @@ export default function Browse({ dedicated }: { dedicated?: boolean }) {
   const cls = ['boxTable',
     isAlbum ? 'browsing-album' : '', isPlaylist ? 'browsing-playlist' : '',
     (!b.isBrowsing && !b.isSearching) ? 'browsing-home' : '', isLandingSearch ? 'browsing-search' : '',
-    artistsPage ? 'browsing-artists' : '', isArtist ? 'browsing-artist' : '', (showAll || filter) ? 'aw-artist-all' : '', isPlainList ? 'browsing-list' : '', isTrackList ? 'aw-tracklist' : ''].filter(Boolean).join(' ');
+    artistsPage ? 'browsing-artists' : '', isArtist ? 'browsing-artist' : '', (showAll || filter) ? 'aw-artist-all' : '', isPlainList ? 'browsing-list' : '', isTrackList ? 'aw-tracklist' : '', (isPlainList && letters.length > 1) ? 'aw-has-alpha' : ''].filter(Boolean).join(' ');
   const showAlbumBg = !!(info && !hideInfo && info.albumart && (isAlbum || info.type === 'song' || isPlaylist));
 
   // the list's own order; beside a service's genre menu it joins that group, so both sit on one line
@@ -223,7 +224,7 @@ export default function Browse({ dedicated }: { dedicated?: boolean }) {
             ) : null}
 
             {isPlainList && artistsPage && !b.showGridView ? <div className="aw-cols aw-cols--artists mono" aria-hidden="true"><span>#</span><span /><span>ARTIST</span><span /></div> : null}
-            {isTrackList ? <div className="aw-cols mono aw-cols--fav" aria-hidden="true"><span>#</span><span /><span className="aw-cols__info"><span>TITLE</span><span>ALBUM</span></span><span className="aw-cols__duration">{hasDuration ? 'DURATION' : ''}</span><span /><span /></div> : null}
+            {isTrackList && !(isFileBrowser(request) && lists[0] && b.gridFor(lists[0])) ? <div className="aw-cols mono aw-cols--fav" aria-hidden="true"><span>#</span><span /><span className="aw-cols__info"><span>TITLE</span><span>ALBUM</span></span><span className="aw-cols__duration">{hasDuration ? 'DURATION' : ''}</span><span /><span /></div> : null}
 
             <div id="browse-page">
               {(b.isBrowsing || b.isSearching) && b.lists ? (isLandingSearch

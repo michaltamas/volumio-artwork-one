@@ -31,9 +31,9 @@ export default function MusicRow({ item, list, listIndex, itemIndex, hidden, ord
   // the Artists list: "7 albums · 64 tracks" under the name, asked for as the row comes into view
   useArtistCounts(rowRef, item.uri, artistsPage, c => setCounts(countsText(c)));
   // Volumio's placeholder picture (`/albumart?…&icon=fa-tags`, no file behind it) is a glyph here, as a row with an icon is
-  const placeholder = /^\/albumart\?/.test(String(item.albumart || '')) && /[?&]icon=/.test(String(item.albumart)) && !/[?&](web|path)=/.test(String(item.albumart));
-  const art = placeholder ? '' : item.albumart;
-  const icon = item.icon || (placeholder ? (/^genres:\/\//.test(String(item.uri || '')) ? 'fa fa-category' : String(item.albumart).replace(/^.*[?&]icon=([^&]+).*$/, 'fa $1')) : '');
+  const artIcon = A.iconOfArt(item.albumart);
+  const art = artIcon ? '' : item.albumart;
+  const icon = item.icon || (artIcon ? (/^genres:\/\//.test(String(item.uri || '')) ? 'fa fa-category' : artIcon) : '');
   const favVisible = A.showPlayButton(item) && (item.type === 'song' || item.type === 'folder-with-favourites');   // on Favourites too: a full heart there takes the track out
   const noMenu = !A.showHamburgerMenu(item);
   // a folder of the file browser (USB, NAS, internal storage) is opened, never played from its row:

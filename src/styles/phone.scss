@@ -391,3 +391,10 @@
   body#artwork [class*="aw-state-myvolumio-"] .box my-volumio-back-button { display: none !important; }   /* the theme shows the pill with a heavier selector */
   body#artwork .aw-state-myvolumio-plans .box .aw-plans { margin-top: 12px; }
 }
+
+/* the album's rows on the phone (volumio-album.html ≤599): number · title · duration · more, the heart goes */
+@media (max-width: 700px) and (orientation: portrait) {
+  body#artwork #browse.browsing-album .music-item { grid-template-columns: 28px minmax(0, 1fr) 48px 44px; gap: 8px; height: 56px; min-height: 56px; padding: 0 0 0 8px; }
+  body#artwork #browse.browsing-album .music-item .item__favorite { display: none; }
+  body#artwork #browse.browsing-album .music-item .item__play { left: 8px; }
+}
