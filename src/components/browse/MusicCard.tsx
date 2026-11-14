@@ -3,7 +3,7 @@ import { useRef, useState } from 'react';
 import Icon from '../Icon';
 import ItemMenu from './ItemMenu';
 import { albumart } from '../../core/api';
-import { type BrowseItem, useBrowse } from '../../core/store/browse';
+import { type BrowseItem } from '../../core/store/browse';
 import * as A from '../../core/browseActions';
 import { countText, useArtistCounts } from '../../core/artistCounts';
 import { isMoreItem } from './BrowseLists';
@@ -13,7 +13,6 @@ export interface CardProps { item: BrowseItem; list: BrowseItem[]; listIndex: nu
 
 export default function MusicCard({ item, list, listIndex, itemIndex, hidden, order, artistCounts, onMenuOpen }: CardProps) {
   const [menuOpen, setMenuOpen] = useState(false);   // the tile is raised over its later siblings while its menu is open
-  const req = useBrowse(s => s.request);
   const ref = useRef<HTMLDivElement>(null);
   const [countMeta, setCountMeta] = useState('');
   // the Artists grid: "7 albums" under the name, asked for as the tile comes into view
@@ -27,7 +26,7 @@ export default function MusicCard({ item, list, listIndex, itemIndex, hidden, or
       </div>
     );
   }
-  const favVisible = A.showPlayButton(item) && (item.type === 'song' || item.type === 'folder-with-favourites') && (req ? req.uri : '') !== 'favourites';
+  const favVisible = A.showPlayButton(item) && (item.type === 'song' || item.type === 'folder-with-favourites');
   const noMenu = !A.showHamburgerMenu(item);
   return (
     <div className={'music-card__wrapper' + (hidden ? ' aw-hidden' : '') + (menuOpen ? ' is-menu-open' : '')} ref={ref} style={order ? { order } : undefined}>

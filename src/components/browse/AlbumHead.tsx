@@ -4,7 +4,7 @@ import PageHead from '../PageHead';
 import Crumbs from './Crumbs';
 import { albumart } from '../../core/api';
 import { browseBack } from '../../core/browseUrl';
-import { useBrowse, type BrowseItem } from '../../core/store/browse';
+import { useBrowse, type BrowseItem, type BrowseInfo } from '../../core/store/browse';
 import * as A from '../../core/browseActions';
 import { runtime } from '../../core/format';
 
@@ -20,6 +20,13 @@ export function useCrumbs(): BrowseItem[] {
   const leaf = (s: BrowseItem) => /^albums:\/\/[^/]+\/.+/.test(String(s.uri || ''));
   return trail.slice(0, -1).filter(s => (s.title || s.name) && !leaf(s)).slice(-2);
 }
+// Volumio keeps Favourites under two addresses: `favourites` (the source) and `playlists/favourites`
+// (the page's own info, a pin, "Go to playlist"); the page is Favourites either way
+export function isFavouritesPage(request: BrowseItem | null | undefined, info?: BrowseInfo | null): boolean {
+  const r = String((request || {}).uri || ''); const i = String((info || {}).uri || '');
+  return r === 'favourites' || r === 'playlists/favourites' || i === 'playlists/favourites';
+}
+
 export function goCrumb(item: BrowseItem): void {
   if (!item) { return; }
   useBrowse.getState().fetch({ uri: item.uri, title: item.title || item.name, name: item.name || item.title, service: item.service, type: item.type, plugin_name: item.plugin_name, plugin_type: item.plugin_type });
@@ -32,7 +39,7 @@ export function AlbumPageHead({ filter, onFilter }: { filter?: string; onFilter?
   const info = useBrowse(s => s.info) || {};
   const crumbs = useCrumbs();
   const title = info.title || info.album;
-  const fav = String((useBrowse.getState().request || {}).uri || '') === 'favourites';
+  const fav = isFavouritesPage(useBrowse.getState().request, info as BrowseInfo);
   const placeholder = 'Filter ' + (fav ? 'favourites' : isPlaylistInfo(info as BrowseItem) ? 'playlist' : 'album');
   return (
     <PageHead variant="album" back={browseBack}
@@ -51,7 +58,7 @@ export default function AlbumHead() {
   const lists = useBrowse(s => s.lists);
   const isPlaylist = isPlaylistInfo(info as BrowseItem);
   // Favourites comes through the same head: the heart in the tile, not the playlist glyph (Volumio names its uri playlists/favourites for other playlists too, so the request decides)
-  const isFav = String((useBrowse.getState().request || {}).uri || '') === 'favourites';
+  const isFav = isFavouritesPage(useBrowse.getState().request, info as BrowseInfo);
   // what the page lists: its songs and their total length ("10 TRACKS · 46 MIN" in place of the album's "46:34")
   const songs = (lists || []).flatMap(l => (l.items || []).filter(i => i && i.type === 'song'));
   const count = songs.length || (() => { try { return lists![0].items.length; } catch { return 0; } })();
