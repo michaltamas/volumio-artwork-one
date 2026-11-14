@@ -34,7 +34,7 @@ export default function MusicRow({ item, list, listIndex, itemIndex, hidden, ord
   const placeholder = /^\/albumart\?/.test(String(item.albumart || '')) && /[?&]icon=/.test(String(item.albumart)) && !/[?&](web|path)=/.test(String(item.albumart));
   const art = placeholder ? '' : item.albumart;
   const icon = item.icon || (placeholder ? (/^genres:\/\//.test(String(item.uri || '')) ? 'fa fa-category' : String(item.albumart).replace(/^.*[?&]icon=([^&]+).*$/, 'fa $1')) : '');
-  const favVisible = A.showPlayButton(item) && (item.type === 'song' || item.type === 'folder-with-favourites') && (req ? req.uri : '') !== 'favourites';
+  const favVisible = A.showPlayButton(item) && (item.type === 'song' || item.type === 'folder-with-favourites');   // on Favourites too: a full heart there takes the track out
   const noMenu = !A.showHamburgerMenu(item);
   // a folder of the file browser (USB, NAS, internal storage) is opened, never played from its row:
   // no play button and no number (albums://, playlists and genres keep both)

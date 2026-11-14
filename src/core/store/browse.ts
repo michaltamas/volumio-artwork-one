@@ -205,7 +205,8 @@ export const useBrowse = create<BrowseStore>((set, get) => ({
       set({ favourites: fav });
     });
   },
-  favouritesChanged: () => { if (favTimer) { window.clearTimeout(favTimer); } favTimer = window.setTimeout(() => { favTimer = null; get().loadFavourites(); }, 900); },
+  // the Favourites page itself is asked for again, so a track taken out leaves the list
+  favouritesChanged: () => { if (favTimer) { window.clearTimeout(favTimer); } favTimer = window.setTimeout(() => { favTimer = null; get().loadFavourites(); const r = get().request; if (r && r.uri === 'favourites' && get().isBrowsing) { get().refresh(); } }, 900); },
   canShowGridView: (list) => !!(list && list.availableListViews && list.availableListViews.indexOf('grid') > -1),
   // a list of songs only: the tracks inside an album or a folder
   isTrackList: (list) => { const it = (list && list.items) || []; return it.length > 0 && it.every(i => i && i.type === 'song'); },
