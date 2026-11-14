@@ -7,7 +7,7 @@
 #np {
   --np-s: clamp(200px, min(36vw, 60vh), 720px);                 /* the cover */
   --np-title: clamp(28px, min(3.4vw, 6.6vh), 64px);              /* a long title; .np-len-s / -m step it up */
-  position: relative; z-index: 1; display: flex; flex-direction: column; gap: clamp(8px, 1vw, 20px);
+  position: relative; z-index: 1; display: flex; flex-direction: column;
   height: 100%; min-height: 100%; overflow: hidden; box-sizing: border-box;
   padding: clamp(14px, 1.8vw, 36px) clamp(16px, 3.2vw, 64px) clamp(12px, 1.4vw, 28px);
   color: var(--ink-1);
@@ -28,10 +28,13 @@
   /* padding inside the scrolling box, pulled back by the same margins: the cover's shadow (50px down, a 70px spread) is not cut at the box's edge */
   #np-stage { flex: 1 1 0; min-height: 0; display: flex; overflow: visible; }
   /* Info or Lyrics under the block: the stage scrolls, with room inside for the cover's shadow at the sides and the top, ending at the bar */
-  /* the box reaches 28px up under the top bar and 20px down to the bottom bar, masked to nothing at both ends, so what scrolls
-     fades out under the bars instead of being cut (or showing beside them); the content starts where the mask is whole */
-  &.np--info #np-stage, &.np--lyrics #np-stage { overflow-x: hidden; overflow-y: auto; scrollbar-width: thin; padding: 28px 72px 20px; margin: -28px -72px 0;
-    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 28px, #000 calc(100% - 20px), transparent); mask-image: linear-gradient(to bottom, transparent, #000 28px, #000 calc(100% - 20px), transparent); }
+  /* the scroll box reaches up under the top bar (its height and the gap), the content starting below it; what scrolls
+     passes under the bar's frosted strip, as under the page head (HeadBlur) — the same strip, turned, over the bottom bar */
+  --np-gap: clamp(8px, 1vw, 20px);
+  gap: var(--np-gap);
+  &.np--info #np-stage, &.np--lyrics #np-stage { overflow-x: hidden; overflow-y: auto; scrollbar-width: thin; padding: calc(44px + var(--np-gap)) 72px 0; margin: calc(-44px - var(--np-gap)) -72px 0; }
+  /* the strips and the tint only where something scrolls under the bars */
+  &:not(.np--info):not(.np--lyrics) { .aw-hblur { display: none; } .aw-hbar::after { content: none; } }
   #np-hero { margin: auto 0; width: 100%; display: grid; grid-template-columns: var(--np-s) minmax(0, 920px); column-gap: clamp(28px, 4vw, 80px);
     grid-template-rows: auto minmax(0, 1fr) auto; align-items: start; }
   #np-cover { grid-column: 1; grid-row: 1 / 3; width: var(--np-s); height: var(--np-s); aspect-ratio: 1 / 1; border-radius: 6px;

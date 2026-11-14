@@ -15,6 +15,7 @@
  */
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import Icon from './Icon';
+import HeadBlur from './HeadBlur';
 import { useUi } from '../core/store/ui';
 
 export default function PageHead({ variant, back, backLabel, nav, actions }: { variant?: string; back?: () => void; backLabel?: string; nav?: ReactNode; actions?: ReactNode }) {
@@ -33,7 +34,7 @@ export default function PageHead({ variant, back, backLabel, nav, actions }: { v
   return (
     <>
       <div ref={ref} className={'aw-head' + (variant ? ' aw-head--' + variant : '')}>
-        <div className="aw-hblur" aria-hidden="true"><i /></div>
+        <HeadBlur />
         <div className="aw-head__row">
           <button type="button" className="aw-menu-btn" onClick={() => useUi.getState().toggleMenu()} aria-label="Menu" title="Menu"><Icon name="menu" /></button>
           {back ? <button type="button" className="aw-head__back" onClick={back} aria-label={backLabel || 'Back'} title={backLabel || 'Back'}><Icon name="arrow_back" /></button> : null}
