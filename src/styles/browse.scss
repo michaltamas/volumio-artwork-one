@@ -138,8 +138,8 @@ body#artwork #browse.browsing-album #browseTablesWrapper {
      while the track list spans both and keeps its own scroll — see the .aw-head comment in
      AlbumHead.tsx for why the crumb bar is a column-1 sibling and not nested inside the cover's
      own (much shorter) box */
-  display: grid; grid-template-columns: minmax(260px, 34%) 1fr; grid-template-rows: auto minmax(0, 1fr);
-  column-gap: clamp(24px, 3.9vw, 56px); row-gap: 0; align-items: start; padding: 0 var(--pad-screen);
+  display: grid; grid-template-columns: clamp(300px, 29vw, 540px) minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr);   /* volumio-album-2.html */
+  column-gap: clamp(40px, 4.5vw, 88px); row-gap: 0; align-items: start; padding: 0 var(--pad-screen);
   overflow: hidden !important; overscroll-behavior: contain;
   /* static here, not fixed: this column never scrolls, so .aw-head just sits in the grid like any
      other cell — but its own padding-left (built for the full-bleed fixed bar elsewhere) would
@@ -585,14 +585,39 @@ body#artwork .aw-listhead { flex-wrap: wrap; row-gap: 10px; }
   body#artwork .aw-alpha { display: none; }
 }
 @media (max-height: 520px) { body#artwork .aw-alpha { display: none; } }
-body#artwork .aw-albumhead__cover { max-width: min(380px, 100%, 44vh, calc(100vh - 480px)); }
-body#artwork #browse.browsing-album .aw-albumhead__title { font-size: min(var(--t-h1), 6vh); }
-body#artwork #browse.browsing-album .aw-albumhead__actions { margin-top: clamp(12px, 2.6vh, 24px); }
-@media (max-width: 860px), (max-height: 560px) {
+/* the album's head after volumio-album-2.html: the cover the column's width, the title up to three
+   lines (smaller when long), the artist on one line, the meta wrapping, Play album and three rounds */
+body#artwork #browse.browsing-album .aw-albumhead {
+  .aw-albumhead__cover { max-width: none; width: 100%; img { border-radius: 6px; box-shadow: 0 40px 80px -28px rgba(0, 0, 0, .9); } }
+  .aw-albumhead__body { min-width: 0; max-width: 100%; }
+  .aw-albumhead__title { margin: 28px 0 0; font-size: clamp(32px, 3.3vw, 60px); line-height: 1.02; -webkit-line-clamp: 3; overflow-wrap: anywhere; text-wrap: balance; padding-bottom: .06em; }
+  .aw-albumhead__title--long { font-size: clamp(26px, 2.3vw, 42px); line-height: 1.06; }
+  .aw-albumhead__artist { margin-top: 10px; font-size: clamp(17px, 1.3vw, 23px); color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+  .aw-albumhead__meta { margin-top: 16px; font-size: 11px; letter-spacing: .16em; line-height: 1.7; white-space: normal; }
+  .aw-albumhead__actions { margin-top: 24px; gap: 10px; flex-wrap: nowrap; }
+  .aw-btn--primary { height: 48px; padding: 0 24px 0 18px; border-radius: 24px; font-weight: 700; }
+  .aw-iconbtn { width: 48px; height: 48px; border: 1px solid var(--fill-20); color: var(--ink-2); background: transparent; &:hover { background: var(--fill-08); color: var(--ink); } }
+}
+@media (max-width: 1199px) { body#artwork #browse.browsing-album .aw-albumhead { .aw-albumhead__actions { gap: 8px; } .aw-iconbtn { width: 44px; height: 44px; } .aw-btn--primary { height: 44px; padding: 0 18px 0 14px; } .aw-albumhead__meta { font-size: 10px; } } }
+/* a wide but short window (≤820px): the two columns stay, the whole page scrolls instead of the list alone */
+@media (min-width: 1000px) and (max-height: 820px) {
+  body#artwork #browse.browsing-album #browseTablesWrapper { overflow-y: auto !important; padding-bottom: calc(var(--mini-h) + 16px); }
+  body#artwork #browse.browsing-album #browseTablesWrapper > .aw-headwrap { align-self: start; }
+  body#artwork #browse.browsing-album #browseTablesWrapper > #browse-page { height: auto; overflow: visible; }
+}
+/* under 1000px: one column, the head a row (the cover beside the words, bottom-aligned), the list under it */
+@media (max-width: 999px) {
   body#artwork #browse.browsing-album #browseTablesWrapper { display: block; overflow-y: auto !important; padding-bottom: calc(var(--mini-h) + 16px); }
   body#artwork #browse.browsing-album #browseTablesWrapper > .aw-headwrap { overflow: visible; margin: 0; padding: 0; scrollbar-width: auto; }
   body#artwork #browse.browsing-album #browseTablesWrapper > #browse-page { height: auto; margin-top: 28px; overflow: visible; }
-  body#artwork .aw-albumhead__cover { max-width: min(320px, 60vw); }
+  body#artwork #browse.browsing-album .aw-albumhead { display: grid; grid-template-columns: clamp(120px, 26vw, 220px) minmax(0, 1fr); column-gap: 24px; align-items: end;
+    .aw-albumhead__cover { width: 100%; max-width: none; }
+    .aw-albumhead__body { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; }   /* a box here (on the desk it is `contents`): the words are the second column */
+    .aw-albumhead__title { margin-top: 0; font-size: clamp(30px, 5vw, 44px); }
+    .aw-albumhead__title--long { font-size: clamp(22px, 3.4vw, 30px); }
+    .aw-albumhead__artist { margin-top: 6px; }
+    .aw-albumhead__meta { margin-top: 10px; }
+    .aw-albumhead__actions { margin-top: 14px; } }
   /* only here does the crumb bar truly sit over scrolling content (the wide 2-column grid never
      scrolls its head column at all, so head.scss turns the frosted glass off there by default) */
   body#artwork .aw-head--album::after { content: ''; }
@@ -765,7 +790,7 @@ body#artwork .aw-more { display: flex; flex-direction: column; gap: 12px; min-wi
 /* the album's Play: "Play album" where the head is wide, "Play" beside its three icon buttons in a
    narrow head (a two-column album page under 1200px), so the row stays one row */
 .aw-btn__short { display: none; }
-@media (max-width: 1199px) { body#artwork #browse.browsing-album .aw-btn__long { display: none; } body#artwork #browse.browsing-album .aw-btn__short { display: inline; } }
+@media (min-width: 701px) and (max-width: 1199px) { body#artwork #browse.browsing-album .aw-btn__long { display: none; } body#artwork #browse.browsing-album .aw-btn__short { display: inline; } }
 
 /* ============ the file browser's cards (volumio-files-root/usb/folder.html) ============
    Music Library in its grid view: NAS and USB, the folders and the tracks inside, as cards —

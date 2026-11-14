@@ -398,3 +398,20 @@
   body#artwork #browse.browsing-album .music-item .item__favorite { display: none; }
   body#artwork #browse.browsing-album .music-item .item__play { left: 8px; }
 }
+
+/* the album's head on the phone (volumio-album-2.html ≤699): the cover centred at 72%, the words and the actions centred under it */
+@media (max-width: 700px) and (orientation: portrait) {
+  body#artwork #browse.browsing-album .aw-albumhead { display: flex; flex-direction: column; align-items: center; text-align: center; }
+  body#artwork #browse.browsing-album .aw-albumhead .aw-albumhead__cover { width: min(72%, 300px); max-width: none; margin-bottom: 22px; img { box-shadow: 0 40px 80px -28px rgba(0, 0, 0, .9); } }
+  body#artwork #browse.browsing-album .aw-albumhead .aw-albumhead__body { display: flex; flex-direction: column; align-items: center; min-width: 0; max-width: 100%; }
+  /* the shared phone head above places these by grid lines (align-self end / start): centred here, in a column */
+  body#artwork #browse.browsing-album .aw-albumhead .aw-albumhead__cover, body#artwork #browse.browsing-album .aw-albumhead .aw-albumhead__title, body#artwork #browse.browsing-album .aw-albumhead .aw-albumhead__artist, body#artwork #browse.browsing-album .aw-albumhead .aw-albumhead__meta, body#artwork #browse.browsing-album .aw-albumhead .aw-albumhead__actions { align-self: center; grid-area: auto; }
+  body#artwork #browse.browsing-album .aw-albumhead .aw-albumhead__title { font-size: 32px !important; line-height: 1.02; margin: 0; }
+  body#artwork #browse.browsing-album .aw-albumhead .aw-albumhead__title--long { font-size: 24px !important; line-height: 1.06; }
+  body#artwork #browse.browsing-album .aw-albumhead .aw-albumhead__artist { white-space: normal; margin-top: 6px; font-size: 17px; color: var(--ink-2); }
+  body#artwork #browse.browsing-album .aw-albumhead .aw-albumhead__meta { margin-top: 10px; font-size: 10px; }
+  body#artwork #browse.browsing-album .aw-albumhead .aw-albumhead__actions { justify-content: center; margin-top: 18px !important; gap: 10px; }
+  body#artwork #browse.browsing-album .aw-albumhead .aw-albumhead__actions .aw-btn { height: 48px; padding: 0 22px 0 16px; font-size: 15px; }
+  body#artwork #browse.browsing-album .aw-albumhead .aw-albumhead__actions .aw-iconbtn { width: 48px; height: 48px; }
+  body#artwork #browse.browsing-album #browseTablesWrapper > #browse-page { margin-top: 22px; }
+}

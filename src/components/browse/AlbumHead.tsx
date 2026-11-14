@@ -20,11 +20,14 @@ export function useCrumbs(): BrowseItem[] {
   const leaf = (s: BrowseItem) => /^albums:\/\/[^/]+\/.+/.test(String(s.uri || ''));
   return trail.slice(0, -1).filter(s => (s.title || s.name) && !leaf(s)).slice(-2);
 }
-// Volumio keeps Favourites under two addresses: `favourites` (the source) and `playlists/favourites`
-// (the page's own info, a pin, "Go to playlist"); the page is Favourites either way
+// Volumio keeps Favourites under two addresses, `favourites` (the source) and `playlists/favourites`;
+// the request decides. Its info.uri cannot: every playlist's info says playlists/favourites, so the
+// info counts only when it is also titled Favourites (a page reached without a request uri)
 export function isFavouritesPage(request: BrowseItem | null | undefined, info?: BrowseInfo | null): boolean {
-  const r = String((request || {}).uri || ''); const i = String((info || {}).uri || '');
-  return r === 'favourites' || r === 'playlists/favourites' || i === 'playlists/favourites';
+  const r = String((request || {}).uri || '');
+  if (r) { return r === 'favourites' || r === 'playlists/favourites'; }
+  const i = info || {};
+  return String(i.uri || '') === 'playlists/favourites' && /^favou?rites$/i.test(String(i.title || ''));
 }
 
 export function goCrumb(item: BrowseItem): void {
@@ -78,7 +81,7 @@ export default function AlbumHead() {
       )}
       <div className="aw-albumhead__body">
         {isPlaylist ? <div className="aw-albumhead__eyebrow mono">{[isFav ? 'FAVOURITES' : 'PLAYLIST', summary].filter(Boolean).join(' · ')}</div> : null}
-        <h1 className="aw-albumhead__title">{title}</h1>
+        <h1 className={'aw-albumhead__title' + (String(title || '').length > 36 ? ' aw-albumhead__title--long' : '')}>{title}</h1>
         {info.artist ? <div className="aw-albumhead__artist">{info.artist}</div> : null}
         {isPlaylist ? null : <div className="aw-albumhead__meta mono">
           {info.year ? <span>{info.year}</span> : null}
