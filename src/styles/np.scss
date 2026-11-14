@@ -24,8 +24,8 @@
      never gave a definite size to derive from at all, so the box fell back to the raw image's
      intrinsic pixel size (tiny). Query units solve both at once, no JS measurement needed. */
   #np-hero { display: flex; align-items: flex-start; gap: clamp(20px, 3.9vw, 56px); margin-top: clamp(14px, 3.1vh, 28px); flex: 1 1 0; min-height: 0; container-type: size; }
-  /* 82% of the height, at most 44% of the width: the text column takes what the cover gives up */
-  #np-cover { flex: none; width: min(82cqh, 44cqw); height: min(82cqh, 44cqw); aspect-ratio: 1 / 1; border-radius: 6px;
+  /* 76% of the height, at most 42% of the width: the text column takes what the cover gives up */
+  #np-cover { flex: none; width: min(76cqh, 42cqw); height: min(76cqh, 42cqw); aspect-ratio: 1 / 1; border-radius: 6px;
     img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 6px; box-shadow: var(--shadow-cover); } }
   #np-meta { min-width: 0; padding-top: 0; flex: 1; display: flex; flex-direction: column; min-height: 0; }   /* the theme's fluid clamp for this never applied (csso dropped it): 14px is what shipped */
   .np-eyebrow { font-size: 11px; letter-spacing: .16em; color: var(--ink-muted); margin-bottom: 10px; }
