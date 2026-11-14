@@ -35,14 +35,7 @@
     -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
     -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 40%, transparent 100%); mask-image: linear-gradient(to bottom, #000 0%, #000 40%, transparent 100%); }
 }
-/* the same strip under a bar at the bottom (Now Playing's), turned: the fade goes up over the last rows */
-.aw-hblur--up { top: calc(-1 * var(--head-fade, 40px)); bottom: 0;
-  i { -webkit-mask-image: linear-gradient(to top, #000 0%, #000 40%, transparent 100%); mask-image: linear-gradient(to top, #000 0%, #000 40%, transparent 100%); } }
-/* a bar that is not the page head (Now Playing's two) with the head's tint: the strip's companion */
-.aw-hbar { position: relative; z-index: 2; }
-.aw-hbar::after { content: ''; position: absolute; left: 0; right: 0; top: 0; bottom: calc(-1 * var(--head-fade, 40px)); z-index: -1; pointer-events: none;
-  background: linear-gradient(to bottom, var(--head-tint-1) 0%, var(--head-tint-2) 52%, transparent 100%); }
-.aw-hbar--up::after { top: calc(-1 * var(--head-fade, 40px)); bottom: 0; background: linear-gradient(to top, var(--head-tint-1) 0%, var(--head-tint-2) 52%, transparent 100%); }
+
 .aw-head--album { &::after { content: none; } .aw-hblur { display: none; } }
 
 .aw-tab { font-size: 15px; color: var(--ink-dim); cursor: pointer; &.active { color: var(--ink); font-weight: 600; } &:hover { color: var(--ink-2); } }

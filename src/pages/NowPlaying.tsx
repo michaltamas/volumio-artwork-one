@@ -6,7 +6,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import FavIcon from '../components/FavIcon';
-import HeadBlur from '../components/HeadBlur';
 import Icon from '../components/Icon';
 import SeekBar from '../components/SeekBar';
 import { OutputPill, QueuePill } from '../components/BarPills';
@@ -215,8 +214,7 @@ export default function NowPlaying() {
   const views: View[] = ['cover', 'info', 'lyrics'];
 
   const topbar = (
-      <div id="np-topbar" className="aw-hbar">
-        <HeadBlur />
+      <div id="np-topbar">
         <button type="button" className="np-menu-btn" onClick={() => useUi.getState().toggleMenu()} aria-label="Menu" title="Menu"><Icon name="menu" /></button>
         <div className="np-topbar-left">
           <a className="np-chevron" onClick={goBack} aria-label="Back" title="Back"><Icon name="expand_more" /></a>
@@ -312,8 +310,7 @@ export default function NowPlaying() {
         <button type="button" className="np-m-tile" title="More" onClick={() => { if (st.title || st.album || st.artist) { useModal.getState().open('track-actions'); } }} disabled={!!st.disableUi}><Icon name="more_horiz" /></button>
       </div>
 
-      <div id="np-footer" className="aw-hbar aw-hbar--up">
-        <HeadBlur up />
+      <div id="np-footer">
         <div id="np-seek"><SeekBar /></div>
         {/* handoff 16B: one grid, three zones — up next (left), the transport centred on the content area, volume · output · queue (right) */}
         <div id="np-footer-row" ref={footerRow}>
