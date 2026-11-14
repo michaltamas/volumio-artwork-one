@@ -63,7 +63,7 @@ export default function InfoFace() {
         {img ? <img className="np-about__img np-about__img--round" src={img} alt="" onError={(e) => { e.currentTarget.style.visibility = 'hidden'; }} /> : <div className="np-about__img np-about__img--round" />}
         <div className="np-about__body">
           <div className="np-about__head">
-            <span className="np-about__name">{st.artist}</span>
+            <span className="np-about__name">{(artist && artist.name) || st.artist}</span>   {/* MusicBrainz's spelling once it answered: a tag a letter off is shown right */}
             {artistSub ? <span className="np-about__sub">{artistSub}</span> : null}
           </div>
           {!artist && pending.artist ? <div className="np-about__skel" aria-hidden="true"><i className="aw-skel" style={{ width: '40%' }} /><i className="aw-skel aw-skel--l" style={{ width: '92%' }} /><i className="aw-skel aw-skel--l" style={{ width: '84%' }} /><i className="aw-skel aw-skel--l" style={{ width: '58%' }} /></div> : null}

@@ -63,6 +63,7 @@ function show(t: HTMLElement, touch: boolean) {
   d.classList.add('is-on');
   // placed above the control, kept inside the window; below it when there is no room above
   const r = t.getBoundingClientRect(); const w = d.offsetWidth, h = d.offsetHeight, vw = window.innerWidth;
+  if (!r.width && !r.height) { hide(); return; }   // a control with no box (re-rendering, hidden): nothing to point at
   let x = r.left + r.width / 2 - w / 2; x = Math.max(8, Math.min(vw - w - 8, x));
   let y = r.top - h - 8; if (y < 8) { y = r.bottom + 8; }
   d.style.transform = `translate(${Math.round(x)}px, ${Math.round(y)}px)`;
@@ -88,3 +89,5 @@ document.addEventListener('pointerup', (e) => { if (e.pointerType === 'mouse') {
 document.addEventListener('focusin', (e) => { const t = e.target as HTMLElement; if (t && t.title && t.matches(':focus-visible') && !t.matches('input, textarea, select')) { show(t, false); } });
 document.addEventListener('focusout', hide);
 useUi.subscribe(hide);   // a sheet opening, a page changing: the tip has nothing under it any more
+// the control re-rendered away under the pointer (the title on a track change): the tip would stay at its old place
+new MutationObserver(() => { if (target && !target.isConnected) { hide(); } }).observe(document.body, { childList: true, subtree: true });

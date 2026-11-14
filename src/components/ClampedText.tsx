@@ -39,5 +39,5 @@ export default function ClampedText({ text, lines, className, as: Tag = 'div' }:
     return () => { ro.disconnect(); window.removeEventListener('resize', fit); };
   }, [text, lines]);
 
-  return <Tag className={className} title={text} ref={el}>{shown}</Tag>;
+  return <Tag className={className} title={shown !== text ? text : undefined} ref={el}>{shown}</Tag>;   /* the whole text as a tip only when it was shortened */
 }

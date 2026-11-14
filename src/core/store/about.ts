@@ -103,12 +103,29 @@ async function summary(title: string): Promise<Wiki | null> {
 }
 function remember(map: Record<string, any>, k: string, v: any) { map[k] = v; order.push([map, k]); while (order.length > KEEP) { const [m, key] = order.shift()!; delete m[key]; } }
 
+// the two names once lowercased and stripped of accents and punctuation: the same, or one letter off ("Phil Collin")
+const fold = (v: string) => String(v || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
+function near(a: string, b: string): boolean {
+  const x = fold(a), y = fold(b); if (!x || !y) { return false; }
+  if (x === y || x.replace(/^the /, '') === y.replace(/^the /, '')) { return true; }
+  if (Math.abs(x.length - y.length) > 1) { return false; }
+  let i = 0, j = 0, miss = 0;   // one edit apart
+  while (i < x.length && j < y.length) { if (x[i] === y[j]) { i++; j++; continue; } if (++miss > 1) { return false; } if (x.length > y.length) { i++; } else if (y.length > x.length) { j++; } else { i++; j++; } }
+  return miss + (x.length - i) + (y.length - j) <= 1;
+}
 function lookupArtist(name: string): Promise<AboutArtist | null> {
   if (name in artists) { return artists[name]; }
   const live = () => keys()[0] === name;
   const p = mb('artist/', { query: 'artist:' + lucene(name), limit: '1' }, live).then(async d => {
-    const a = d && d.artists && d.artists[0];
-    if (!a || a.score < 90) { return null; }
+    let a = d && d.artists && d.artists[0];
+    // a tag a letter off ("Phil Collin"): the phrase finds nothing, a fuzzy search does — taken when the name is one edit away
+    if (!a || a.score < 90) {
+      const words = fold(name).split(' ').filter(Boolean);
+      if (!words.length) { return null; }
+      const dd = await mb('artist/', { query: 'artist:(' + words.map(w => w.length > 3 ? w + '~' : w).join(' AND ') + ')', limit: '3' }, live);
+      a = ((dd && dd.artists) || []).find((x: any) => x.score >= 90 && (near(x.name, name) || (x.aliases || []).some((al: any) => near(al.name, name))));
+      if (!a) { return null; }
+    }
     const full = await mb('artist/' + a.id, { inc: 'url-rels' }, live);
     const [w, rel] = await Promise.all([wiki(full.relations), related(a.id)]);
     const begin = ((a['life-span'] && a['life-span'].begin) || '').slice(0, 4);
