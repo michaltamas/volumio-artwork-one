@@ -123,7 +123,7 @@
   body#artwork #np .np-m-tile--lyrics:disabled { opacity: .35; }
   /* --- the words on the phone (6b): a panel that rises over what plays; its handle drags it away --- */
   body#artwork #np .np-lyrics-host { display: none; }
-  body#artwork #np .np-lsheet-scrim { position: absolute; inset: 0; z-index: 1; background: var(--scrim-page); -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); }
+  body#artwork #np .np-lsheet-scrim { display: block; position: absolute; inset: 0; z-index: 1; background: var(--scrim-page); -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); }
   body#artwork #np .np-lsheet {
     display: flex; flex-direction: column; position: absolute; left: 0; right: 0; bottom: 0; top: calc(var(--phone-top) + 52px); z-index: 2;
     border-radius: 20px 20px 0 0; padding: 26px 26px 0;

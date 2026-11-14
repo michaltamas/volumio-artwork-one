@@ -65,7 +65,7 @@
   .np-about, .np-lyrics-host { grid-column: 1 / -1; grid-row: 3; min-width: 0; margin-top: clamp(20px, 2.4vw, 32px); padding: clamp(18px, 2vw, 28px) 0 8px; border-top: 1px solid var(--fill-14); }
   .np-lyrics-host { display: flex; flex-direction: column; height: clamp(320px, 56vh, 720px); }
   --lyr-near: var(--ink-muted); --lyr-mid: var(--ink-dim); --lyr-far: var(--ink-faint);
-  .np-lsheet { display: none; }
+  .np-lsheet, .np-lsheet-scrim { display: none; }   /* the phone's lyrics sheet and its scrim: a flex child here, its gap moved the bottom bar */
 
   /* the Info face's rows: the track and its facts, the artist and the record (volumio-nowplaying-5.html .ni-row) */
   .np-about { display: flex; flex-direction: column; gap: clamp(16px, 1.4vw, 24px); }
