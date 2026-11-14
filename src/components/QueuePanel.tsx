@@ -14,6 +14,7 @@ import { usePlayer } from '../core/store/player';
 import { useUi, isQueueDocked, canDockQueue } from '../core/store/ui';
 import { useModal } from '../core/store/modal';
 import { useStopAfter } from '../core/store/stopAfter';
+import { browseUrl } from '../core/browseUrl';
 import { useBrowse } from '../core/store/browse';
 import { usePlaylists } from '../core/store/playlists';
 import { addToPlaylist } from '../core/browseActions';
@@ -87,7 +88,7 @@ export default function QueuePanel({ page }: { page?: boolean }) {
   const endNote = stopAt >= 0 ? (stopAt === position ? 'Stops after this track' : 'Stops after ' + (queue[stopAt].name || queue[stopAt].title || 'the marked track'))
     : st.repeat && st.repeatSingle ? 'Repeats this track' : st.repeat ? 'Repeats the queue' : 'Stops after the queue ends';
   // the library's page for a row's artist or album: the floating queue goes away, the page opens
-  const goTo = (item: any) => { if (!docked && !page) { useUi.getState().hideQueue(); } useBrowse.getState().open(item, true); nav('/browse'); };
+  const goTo = (item: any) => { if (!docked && !page) { useUi.getState().hideQueue(); } useBrowse.getState().open(item, true); nav(browseUrl(item)); };
   const clear = async () => {
     const n = queue.length;
     if (n >= CLEAR_ASKS_FROM && !(await useModal.getState().confirm({ title: 'Clear queue', message: 'Remove all ' + n + ' tracks from the queue?', danger: true }))) { return; }

@@ -133,6 +133,7 @@ export default function BrowseLanding({ dedicated }: { dedicated?: boolean }) {
                   {[0, 1, 2, 3].map(i => home.albumsArt[i] && !artFail[i]
                     ? <img key={i} src={home.albumsArt[i]} alt="" onError={() => setArtFail(f => ({ ...f, [i]: true }))} />
                     : <span key={i} className="aw-tile__blank"><Icon name="album" /></span>)}
+                  <Icon name="album" className="aw-tile__glyph" />
                 </div>
                 <div className="aw-card-body"><div className="aw-card-title">Albums</div>{s ? <div className="aw-card-sub">{s.albums} albums</div> : null}</div>
                 <Icon name="chevron_right" className="aw-card-chev" />

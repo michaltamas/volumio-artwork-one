@@ -9,6 +9,7 @@ import { albumart } from '../../core/api';
 import { usePlayer } from '../../core/store/player';
 import { useAbout, type Credit } from '../../core/store/about';
 import { useTrackInfo } from '../../core/store/trackInfo';
+import { browseUrl } from '../../core/browseUrl';
 import { useBrowse } from '../../core/store/browse';
 import { KIOSK } from '../../core/kiosk';
 
@@ -26,7 +27,7 @@ export default function InfoFace() {
   const n = info.tracks;
   // the genre lives here, not on the Cover face (handoff 16B)
   const albumSub = [album && album.label, (album && album.year) || info.year, info.genre, n ? n + (n === 1 ? ' track' : ' tracks') : ''].filter(Boolean).join(' · ');
-  const goArtist = () => { if (!canGo) { return; } useBrowse.getState().open({ uri: 'artists://' + encodeURIComponent(st.artist), title: st.artist, name: st.artist, type: 'folder', service: 'mpd' }, true); nav('/browse'); };
+  const goArtist = () => { if (!canGo) { return; } const item = { uri: 'artists://' + encodeURIComponent(st.artist), title: st.artist, name: st.artist, type: 'folder', service: 'mpd' }; useBrowse.getState().open(item, true); nav(browseUrl(item)); };
   // a related artist: the search page, with the name typed in
   const findArtist = (e: React.MouseEvent, name: string) => { e.stopPropagation(); nav('/search'); window.setTimeout(() => useBrowse.getState().search(name), 50); };
   const creditRows = (list: Credit[]) => (
@@ -34,7 +35,7 @@ export default function InfoFace() {
       {list.map(c => <div className="np-about__credit" key={c.role}><dt className="np-about__role mono">{c.role.toUpperCase()}</dt><dd className="np-about__names">{c.names.join(', ')}</dd></div>)}
     </dl>
   );
-  const goAlbum = () => { if (!canGo || !st.album) { return; } useBrowse.getState().open({ uri: 'albums://' + encodeURIComponent(st.artist) + '/' + encodeURIComponent(st.album), title: st.album, name: st.album, type: 'folder', service: 'mpd' }, true); nav('/browse'); };
+  const goAlbum = () => { if (!canGo || !st.album) { return; } const item = { uri: 'albums://' + encodeURIComponent(st.artist) + '/' + encodeURIComponent(st.album), title: st.album, name: st.album, type: 'folder', service: 'mpd' }; useBrowse.getState().open(item, true); nav(browseUrl(item)); };
   return (
     <div className="np-about">
       <div className="np-about__rule" />

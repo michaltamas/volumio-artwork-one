@@ -11,6 +11,7 @@ import Crumbs from './Crumbs';
 import ItemMenu from './ItemMenu';
 import { useCrumbs, goCrumb } from './AlbumHead';
 import { albumart } from '../../core/api';
+import { browseBack } from '../../core/browseUrl';
 import { useBrowse, type BrowseItem, type BrowseList } from '../../core/store/browse';
 import * as A from '../../core/browseActions';
 
@@ -77,7 +78,7 @@ export default function ArtistHead({ filter, onFilter, showAll, onShowAll, newes
   const b = useBrowse.getState();
   return (
     <div className="aw-artist">
-      <PageHead variant="artist" back={() => b.goBack()} backLabel="Back"
+      <PageHead variant="artist" back={browseBack} backLabel="Back"
         nav={<Crumbs trail={crumbs} current={info.title} onHome={() => b.backHome()} onCrumb={goCrumb} />}
         actions={<label className={'aw-filter aw-artist__filter' + (filter.length ? ' aw-filter--on' : '')}>
           <Icon name="search" />

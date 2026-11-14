@@ -19,6 +19,7 @@ import SearchResults from '../components/browse/SearchResults';
 import { albumart } from '../core/api';
 import { emit } from '../core/socket';
 import { useBrowse } from '../core/store/browse';
+import { useBrowseUrl, browseBack } from '../core/browseUrl';
 
 export default function Browse({ dedicated }: { dedicated?: boolean }) {
   const b = useBrowse();
@@ -74,12 +75,14 @@ export default function Browse({ dedicated }: { dedicated?: boolean }) {
       let prevent: boolean;
       if ((tag === 'INPUT' && ['TEXT', 'PASSWORD', 'FILE', 'SEARCH', 'EMAIL', 'NUMBER', 'DATE'].indexOf(type) > -1) || tag === 'TEXTAREA') { prevent = (d as HTMLInputElement).readOnly || (d as HTMLInputElement).disabled; }
       else { prevent = true; }
-      if (prevent) { e.preventDefault(); useBrowse.getState().goBack(); }
+      if (prevent) { e.preventDefault(); browseBack(); }
     };
     document.addEventListener('keydown', onKey, false);
     return () => document.removeEventListener('keydown', onKey, false);
   }, []);
   useEffect(() => { b.setDedicated(!!dedicated); if (dedicated) { window.setTimeout(() => searchInput.current && searchInput.current.focus(), 100); } return () => { if (dedicated) { useBrowse.getState().setDedicated(false); } }; }, [dedicated]); // eslint-disable-line react-hooks/exhaustive-deps
+  // the address bar follows the page (and leads it on Back, Forward and a reload)
+  useBrowseUrl(!!dedicated);
 
   // a new page: the local filter, the order and the artist page's state start over
   const lastUri = useRef<string | null>(null);
@@ -205,7 +208,7 @@ export default function Browse({ dedicated }: { dedicated?: boolean }) {
             ) : null}
 
             {isPlainList ? (
-              <PageHead variant="list" back={() => b.goBack()}
+              <PageHead variant="list" back={browseBack}
                 nav={<Crumbs trail={crumbs} current={listTitle} onHome={() => b.backHome()} onCrumb={goCrumb} />}
                 actions={<>
                   <label className={'aw-filter' + (filter.length ? ' aw-filter--on' : '')}>

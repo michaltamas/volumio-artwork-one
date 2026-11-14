@@ -6,6 +6,7 @@ import { goToMyVolumio } from '../core/store/auth';
 import Icon from './Icon';
 import Spinner from './Spinner';
 import { usePlayer } from '../core/store/player';
+import { browseUrl } from '../core/browseUrl';
 import { useBrowse } from '../core/store/browse';
 import { useMenu } from '../core/store/menu';
 import { useUi } from '../core/store/ui';
@@ -38,7 +39,7 @@ export default function Rail() {
   useEffect(() => { document.documentElement.classList.toggle('aw-rail-open', open); }, [open]);
   const at = (p: string) => loc.pathname === p;
   const sourceActive = (uri: string) => at('/browse') && current === uri;
-  const goSource = (s: BrowseItem) => { useBrowse.getState().open(s, true); nav('/browse'); };
+  const goSource = (s: BrowseItem) => { useBrowse.getState().open(s, true); nav(browseUrl(s)); };
   const goMusic = () => { useBrowse.getState().home(); nav('/browse'); };
   return (
     <div id="main-menu">

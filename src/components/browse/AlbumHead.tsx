@@ -3,6 +3,7 @@ import Icon from '../Icon';
 import PageHead from '../PageHead';
 import Crumbs from './Crumbs';
 import { albumart } from '../../core/api';
+import { browseBack } from '../../core/browseUrl';
 import { useBrowse, type BrowseItem } from '../../core/store/browse';
 import * as A from '../../core/browseActions';
 import { runtime } from '../../core/format';
@@ -33,7 +34,7 @@ export function AlbumPageHead({ filter, onFilter }: { filter?: string; onFilter?
   const title = info.title || info.album;
   const placeholder = 'Filter ' + (isPlaylistInfo(info as BrowseItem) ? 'playlist' : 'album');
   return (
-    <PageHead variant="album" back={() => useBrowse.getState().goBack()}
+    <PageHead variant="album" back={browseBack}
       nav={<Crumbs trail={crumbs} current={title} onHome={() => useBrowse.getState().backHome()} onCrumb={goCrumb} />}
       actions={onFilter ? (
         <label className={'aw-filter' + (filter ? ' aw-filter--on' : '')}>

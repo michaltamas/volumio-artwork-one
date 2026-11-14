@@ -5,6 +5,7 @@ import Icon from '../Icon';
 import { useModal } from '../../core/store/modal';
 import { usePlayer } from '../../core/store/player';
 import { useUiSettings } from '../../core/store/uiSettings';
+import { browseUrl } from '../../core/browseUrl';
 import { useBrowse } from '../../core/store/browse';
 import { HOST, emit } from '../../core/socket';
 import { addToPlaylist } from '../../core/browseActions';
@@ -46,7 +47,7 @@ export default function TrackActionsSheet() {
       const item = type === 'artist'
         ? { uri: 'artists://' + encodeURIComponent(st.artist), title: st.artist, name: st.artist, type: 'folder', service: 'mpd' }
         : { uri: 'albums://' + encodeURIComponent(st.artist) + '/' + encodeURIComponent(st.album || ''), title: st.album, name: st.album, type: 'folder', service: 'mpd' };
-      useBrowse.getState().open(item, true); nav('/browse'); close(); return;
+      useBrowse.getState().open(item, true); nav(browseUrl(item)); close(); return;
     }
     useBrowse.getState().backHome(); nav('/browse'); window.setTimeout(() => { useBrowse.setState({ isSearching: true, isBrowsing: false }); emit('goTo', { type, value: st[type], artist: st.artist, album: st.album }); }, 0); close();
   };

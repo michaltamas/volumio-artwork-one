@@ -8,6 +8,7 @@ import Icon from '../components/Icon';
 import PageHead from '../components/PageHead';
 import Dropdown from '../components/Dropdown';
 import { usePlayer } from '../core/store/player';
+import { browseUrl } from '../core/browseUrl';
 import { useBrowse, type BrowseItem } from '../core/store/browse';
 import { usePins, pinEyebrow, pinGlyph, type Pin } from '../core/store/pins';
 import { useQueue } from '../core/store/queue';
@@ -52,7 +53,7 @@ export default function Home() {
   const continueArt = albumart(st.albumart);
   const streaming = sources.filter(s => BUILT_IN.indexOf(s.uri) === -1);
   const radio = sources.find(s => s.uri === 'radio');
-  const openSource = (s: BrowseItem) => { useBrowse.getState().open(s, true); nav('/browse'); };
+  const openSource = (s: BrowseItem) => { useBrowse.getState().open(s, true); nav(browseUrl(s)); };
   const pages = Math.ceil(recent.length / SHELF);
   const shelf = recent.slice(page * SHELF, page * SHELF + SHELF);
   const openPin = (p: Pin) => {

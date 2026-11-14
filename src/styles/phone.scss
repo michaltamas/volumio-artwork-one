@@ -225,14 +225,14 @@
   body#artwork .aw-browse .aw-browse-stats { font-size: 11px; color: var(--ink-45); }
   body#artwork .aw-browse .aw-cards, body#artwork .aw-browse .aw-sources { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 20px; }
   body#artwork .aw-browse .aw-sources { margin-top: 16px; }
-  body#artwork .aw-browse .aw-card, body#artwork .aw-browse .aw-source { display: flex; flex-direction: column; align-items: stretch; gap: 8px; padding: 0; background: transparent; border: 0; box-shadow: none; }
+  body#artwork .aw-browse .aw-card, body#artwork .aw-browse .aw-source { display: flex; flex-direction: column; align-items: stretch; gap: 8px; height: auto; padding: 0; background: transparent; border: 0; box-shadow: none; }
   body#artwork .aw-browse .aw-tile, body#artwork .aw-browse .aw-source > .material-symbols-rounded:first-child, body#artwork .aw-browse .aw-source > .aw-source-logo:first-child {
     width: auto; height: auto; aspect-ratio: 1; border-radius: 14px; display: grid; place-items: center; overflow: hidden;
     background: var(--fill-06); border: 1px solid var(--fill-10); color: var(--ink-25); font-size: 34px; }
   /* the source's own square is the logo's box; the img inside is centred like a glyph */
   body#artwork .aw-browse .aw-source-logo__img { width: 100%; height: 100%; object-fit: contain; padding: 22px; box-sizing: border-box; }
   body#artwork .aw-browse .aw-source-logo__img--pad { width: 100%; height: 100%; object-fit: contain; padding: 22px; box-sizing: border-box; transform: scale(1.35); }
-  body#artwork .aw-browse .aw-tile img, body#artwork .aw-browse .aw-tile--lines i { display: none; }
+  body#artwork .aw-browse .aw-tile img, body#artwork .aw-browse .aw-tile--lines i, body#artwork .aw-browse .aw-tile__blank { display: none; }
   body#artwork .aw-browse .aw-tile--mosaic, body#artwork .aw-browse .aw-tile--avatars, body#artwork .aw-browse .aw-tile--stack { display: grid; grid-template-columns: 1fr; gap: 0; place-items: center; }
   body#artwork .aw-browse .aw-tile .material-symbols-rounded { font-size: 34px; color: var(--ink-25); }
   body#artwork .aw-browse .aw-tile__glyph { display: block; }

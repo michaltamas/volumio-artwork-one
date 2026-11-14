@@ -72,6 +72,7 @@ interface BrowseStore {
   refine: (uri: string) => void;
   open: (item: BrowseItem, fresh?: boolean) => void;
   goBack: () => void;
+  goTo: (at: number) => void;
   backHome: () => void;
   home: () => void;
   refresh: () => void;
@@ -144,6 +145,13 @@ export const useBrowse = create<BrowseStore>((set, get) => ({
   // another uri — it replaces the page on the trail, so Back does not step through every change
   refine: (uri) => { const cur = get().request; if (!uri || !cur) { return; } get().fetch({ ...cur, uri, refine: true } as BrowseItem); },
   open: (item, fresh) => { if (fresh) { set({ trail: [], isSearching: false, searchField: '' }); } get().fetch(item); },
+  // back to a page on the trail (the browser's Back, Forward over pages already walked): shown from the trail, not asked for again
+  goTo: (at) => {
+    const trail = get().trail;
+    const to = trail[at];
+    if (!to) { return; }
+    set({ lists: to.lists, info: to.info, prev: to.prev, request: to, currentUri: String(to.uri || ''), trail: trail.slice(0, at + 1), isBrowsing: true, isSearching: false, stamp: get().stamp + 1 });
+  },
   goBack: () => {
     const trail = get().trail;
     const depth = trail.length;
@@ -184,7 +192,7 @@ export const useBrowse = create<BrowseStore>((set, get) => ({
   },
   setDedicated: (on) => {
     if (on) { set({ dedicatedSearch: true, isSearching: true, isBrowsing: false, lists: [], info: null, request: null, trail: [] }); }
-    else if (get().dedicatedSearch) { set({ dedicatedSearch: false, isSearching: false, lists: null, searchField: '' }); }
+    else if (get().dedicatedSearch) { set({ dedicatedSearch: false, isSearching: false, lists: get().isBrowsing ? get().lists : null, searchField: '' }); }   // a page opened from the results keeps its lists: the route moved to /browse under it
   },
   // Volumio does not flag library items: the Favourites list is read over REST and the rows are marked from it
   loadFavourites: () => {

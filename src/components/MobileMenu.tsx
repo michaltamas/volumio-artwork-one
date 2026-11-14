@@ -6,6 +6,7 @@ import Icon from './Icon';
 import Spinner from './Spinner';
 import { usePlayer } from '../core/store/player';
 import { useUi } from '../core/store/ui';
+import { browseUrl } from '../core/browseUrl';
 import { useBrowse } from '../core/store/browse';
 import { useMultiroom } from '../core/store/multiroom';
 import { useSignal } from '../core/store/signal';
@@ -55,7 +56,7 @@ export default function MobileMenu() {
           <a className={'aw-mm__item' + (at('/home') ? ' active' : '')} onClick={() => go('/home')}><Icon name="home" /><span className="aw-mm__label">Home</span></a>
           <a className={'aw-mm__item' + (at('/browse') && !inMenu.some(s => isSource(s.uri)) ? ' active' : '')} onClick={() => { useBrowse.getState().home(); go('/browse'); }}>
             <Icon name="album" /><span className="aw-mm__label">Music</span>{sources.length ? <span className="aw-mm__value mono">{sources.length}</span> : null}</a>
-          {inMenu.map(s => <a key={s.uri} className={'aw-mm__item' + (isSource(s.uri) ? ' active' : '')} onClick={() => { useBrowse.getState().open(s, true); go('/browse'); }}><SourceGlyph source={s} /><span className="aw-mm__label">{String(s.name || s.title || s.uri)}</span></a>)}
+          {inMenu.map(s => <a key={s.uri} className={'aw-mm__item' + (isSource(s.uri) ? ' active' : '')} onClick={() => { useBrowse.getState().open(s, true); go(browseUrl(s)); }}><SourceGlyph source={s} /><span className="aw-mm__label">{String(s.name || s.title || s.uri)}</span></a>)}
           <a className={'aw-mm__item' + (at('/playback') ? ' active' : '')} onClick={() => go('/playback')}><Icon name="graphic_eq" /><span className="aw-mm__label">Now Playing</span></a>
         </div>
         <div className="aw-mm__eyebrow mono">SYSTEM</div>
