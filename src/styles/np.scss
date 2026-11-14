@@ -9,7 +9,8 @@
   --np-title: clamp(28px, min(3.4vw, 6.6vh), 64px);              /* a long title; .np-len-s / -m step it up */
   position: relative; z-index: 1; display: flex; flex-direction: column;
   height: 100%; min-height: 100%; overflow: hidden; box-sizing: border-box;
-  padding: clamp(14px, 1.8vw, 36px) clamp(16px, 3.2vw, 64px) clamp(12px, 1.4vw, 28px);
+  --np-pt: clamp(14px, 1.8vw, 36px); --np-px: clamp(16px, 3.2vw, 64px); --np-pb: clamp(12px, 1.4vw, 28px);
+  padding: var(--np-pt) var(--np-px) var(--np-pb);
   color: var(--ink-1);
 
   /* ---- the top bar: collapse, the zone and its output, the bit-perfect badge ---- */
@@ -33,6 +34,10 @@
   --np-gap: clamp(8px, 1vw, 20px);
   gap: var(--np-gap);
   &.np--info #np-stage, &.np--lyrics #np-stage { overflow-x: hidden; overflow-y: auto; scrollbar-width: thin; padding: calc(44px + var(--np-gap)) 72px 0; margin: calc(-44px - var(--np-gap)) -72px 0; }
+  /* the bars' strips and tints run to the screen's edges, as the page head's do (the head is full-bleed; these bars sit
+     inside the page's padding, and a strip the bar's own size showed as a box) */
+  #np-topbar .aw-hblur, #np-topbar.aw-hbar::after { left: calc(-1 * var(--np-px)); right: calc(-1 * var(--np-px)); top: calc(-1 * var(--np-pt)); }
+  #np-footer .aw-hblur, #np-footer.aw-hbar::after { left: calc(-1 * var(--np-px)); right: calc(-1 * var(--np-px)); bottom: calc(-1 * var(--np-pb)); }
   /* the strips and the tint only where something scrolls under the bars */
   &:not(.np--info):not(.np--lyrics) { .aw-hblur { display: none; } .aw-hbar::after { content: none; } }
   #np-hero { margin: auto 0; width: 100%; display: grid; grid-template-columns: var(--np-s) minmax(0, 920px); column-gap: clamp(28px, 4vw, 80px);
