@@ -64,7 +64,7 @@
      on, it collapses #np-hero to 0 height, and every sibling after it (.np-m-actions) renders
      where the hero's box should be, on top of the cover instead of below the whole hero block */
   body#artwork #np #np-stage { display: contents; }   /* the desk's scrolling stage is no box here */
-  body#artwork #np #np-hero { display: flex; flex: none; flex-direction: column; align-items: center; margin-top: 20px; gap: 0; container-type: normal; }
+  body#artwork #np #np-hero { display: flex; flex: none; flex-direction: column; align-items: center; margin: 20px 0 0; gap: 0; container-type: normal; }   /* no auto bottom margin (the desk's centring): the tiles follow the words */
   body#artwork #np .np-text { display: contents; }
   body#artwork #np #np-cover { height: auto; width: min(calc(100% - 32px), calc(100vh - 450px - var(--sa-t) - var(--sa-b))); max-width: none; border-radius: 11px;
     img { border-radius: 11px; box-shadow: 0 34px 66px -22px var(--shadow-deep); } }
