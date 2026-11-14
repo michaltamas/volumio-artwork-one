@@ -148,7 +148,8 @@ body#artwork #browse.browsing-album #browseTablesWrapper {
   /* the crumb bar spans both columns: its filter sits at the right edge, over the track list, as on every list page */
   > .aw-head { grid-column: 1 / -1; grid-row: 1; position: static; padding-left: 0; padding-right: 0; }
   > .aw-headwrap { grid-column: 1; grid-row: 2; align-self: stretch; min-height: 0; overflow: visible; }
-  > #browse-page { grid-column: 2; grid-row: 2; align-self: stretch; min-height: 0; margin-top: 0; height: calc(100% - var(--mini-h) - 18px); overflow-y: auto; overscroll-behavior: contain; padding-bottom: 12px;
+  /* the list starts where the cover starts: the head column's 32px under the crumb bar (.aw-head + .aw-headwrap), here too */
+  > #browse-page { grid-column: 2; grid-row: 2; align-self: stretch; min-height: 0; margin-top: 32px; height: calc(100% - var(--mini-h) - 50px); overflow-y: auto; overscroll-behavior: contain; padding-bottom: 12px;
     .main__list .album__tracks:first-child { padding-top: 0; }
     .main__source:last-child { margin-bottom: 0; }
     .main__list .album__tracks:last-child { padding-bottom: 0; } }
