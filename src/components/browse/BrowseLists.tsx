@@ -32,7 +32,9 @@ export default function BrowseLists({ lists, filter, sortDesc, isArtist, artists
   const q = serviceSearch ? '' : norm(filter).trim();
   // on an album's or a playlist's page every row carries the album's name: the filter looks at the titles and the artists only
   const onAlbumPage = useBrowse(s => !!s.info);
-  const fileCards = useBrowse(s => isFileBrowser(s.request));   // the Music Library tree: its grid is cards, not covers
+  // the Music Library tree: its grid is cards, not covers. Asked of the page the lists came with (the trail's last), not of the
+  // request: while the next page loads the request is already the new one, and the old lists would be drawn its way
+  const fileCards = useBrowse(s => { const top = s.trail[s.trail.length - 1]; return isFileBrowser(top && top.lists === s.lists ? top : s.request); });
   const matches = (it: BrowseItem, q: string) => [it.title || it.name, it.artist, onAlbumPage ? '' : it.album].some(f => norm(f).indexOf(q) > -1);
   const albumsIdx = isArtist ? artistLists(lists, 'albums').map(x => x.i) : [];
   const songsIdx = isArtist ? artistLists(lists, 'songs').map(x => x.i) : [];
@@ -46,12 +48,15 @@ export default function BrowseLists({ lists, filter, sortDesc, isArtist, artists
   }
   const cell = (li: number, ii: number, items: BrowseItem[], asGrid: boolean, hidden: boolean, order: number | undefined) => {
     const item = items[ii], key = (at + li) + ':' + ii;
+    // React's key carries the uri too: the next page's item at the same place is a new tile, not this one with its picture
+    // (an <img> keeps the old picture until the new one is in) and its counts under another name
+    const rk = key + '|' + String(item.uri || '');
     const u = normUri(item.uri);
     const playing = !!playingUri && u === playingUri;
-    if (asGrid && fileCards) { return <FileCard key={key} item={item} list={items} itemIndex={ii} hidden={hidden} order={order} playing={playing} paused={playing && paused} />; }
+    if (asGrid && fileCards) { return <FileCard key={rk} item={item} list={items} itemIndex={ii} hidden={hidden} order={order} playing={playing} paused={playing && paused} />; }
     return asGrid
-      ? <MusicCard key={key} item={item} list={items} listIndex={at + li} itemIndex={ii} hidden={hidden} order={order} artistCounts={artistsPage} onMenuOpen={(o) => onMenuOpen(key, o)} />
-      : <MusicRow key={key} item={item} list={items} listIndex={at + li} itemIndex={ii} hidden={hidden} order={order} playing={playing} paused={playing && paused} fav={!!fav[u]} active={activeMenu === key} onMenuOpen={(o) => onMenuOpen(key, o)} />;
+      ? <MusicCard key={rk} item={item} list={items} listIndex={at + li} itemIndex={ii} hidden={hidden} order={order} artistCounts={artistsPage} onMenuOpen={(o) => onMenuOpen(key, o)} />
+      : <MusicRow key={rk} item={item} list={items} listIndex={at + li} itemIndex={ii} hidden={hidden} order={order} playing={playing} paused={playing && paused} fav={!!fav[u]} active={activeMenu === key} onMenuOpen={(o) => onMenuOpen(key, o)} />;
   };
   return (
     <>

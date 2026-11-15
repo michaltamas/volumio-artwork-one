@@ -111,7 +111,7 @@ function Actions({ info, isPlaylist }: { info: BrowseItem; isPlaylist: boolean }
       {collect ? <button type="button" className="aw-iconbtn" onClick={() => A.addToFavorites(info)} title="Favourite"><Icon name="favorite" /></button> : null}
       {collect ? <button type="button" className="aw-iconbtn" onClick={() => A.addToPlaylist(info)} title="Add to playlist"><Icon name="playlist_add" /></button> : null}
       {isPlaylist
-        ? <button type="button" className="aw-btn aw-btn--ghost" onClick={() => A.addToQueue(info)}><Icon name="queue_music" /><span>Add to queue</span></button>
+        ? <button type="button" className="aw-btn aw-btn--ghost" onClick={() => A.addToQueue(info)} title="Add to queue"><Icon name="queue_music" /><span>Add to queue</span></button>
         : <button type="button" className="aw-iconbtn" onClick={() => A.addToQueue(info)} title="Add to queue"><Icon name="queue_music" /></button>}
     </div>
   );

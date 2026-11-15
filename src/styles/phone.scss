@@ -49,7 +49,9 @@
   body#artwork #footer-content .mini-identity .track-info-rates { font-size: 9px; letter-spacing: .1em; color: var(--ink-muted); }   /* outranks the badge colour, as the theme's did */
 
   /* --- Now Playing --- */
-  body#artwork #content.playback { overflow-y: auto; }
+  /* the sheet fits the screen (the cover is measured to), so the area under it does not scroll — a finger
+     or a coasting scroll would carry the sheet away; where it cannot fit, the sheet asks for it */
+  body#artwork #content.playback[data-np-scroll] { overflow-y: auto; }
   body#artwork #np { height: auto; min-height: 100%; overflow: visible; padding: var(--phone-top) 20px 0; display: flex; flex-direction: column; gap: 0; }
   body#artwork #np #np-topbar { display: flex; align-items: center; gap: 0; margin-top: 0; min-height: 44px; }
   body#artwork #np .np-menu-btn { display: grid; place-items: center; height: 44px; width: 32px; border: 0; background: transparent; padding: 0; color: var(--ink-2); cursor: pointer; .material-symbols-rounded { font-size: 26px; } }
@@ -156,6 +158,8 @@
   body#artwork .aw-head__actions { min-width: 0; }
   body#artwork .aw-head .aw-menu-btn, body#artwork #artwork-home .aw-menu-btn { display: grid; place-items: center; height: 44px; width: 32px; border: 0; background: transparent; padding: 0; color: var(--ink-2); cursor: pointer; .material-symbols-rounded { font-size: 24px; } }
   body#artwork .aw-head__row { min-height: 44px; margin-top: 0; }
+  /* Back's arrow is 22px in a 44px target: the words start 15px after the arrow, as the arrow does after the menu's lines */
+  body#artwork .aw-head__back { margin-right: -8px; }
   body#artwork .aw-head--start .aw-head__row, body#artwork .aw-head--home .aw-head__row { gap: 12px; flex-wrap: nowrap; }
   body#artwork .aw-head--start .aw-head__actions, body#artwork .aw-head--home .aw-head__actions { flex: 1; min-width: 0; }
   /* --- Home --- */
@@ -217,7 +221,9 @@
     &:focus-within, &.aw-filter--on { width: min(45vw, 300px); flex: 0 1 auto; min-width: 0; padding: 0 16px; gap: 11px; cursor: text; input { width: auto; flex: 1; opacity: 1; } }
   }
 
-  /* --- Browse landing: hamburger + search, title + count, 3-column tiles --- */
+  /* --- Browse landing: hamburger + search, title + count, 3-column tiles ---
+     a service's own links (My playlists, My albums…: .aw-linkcards) and the Music Library (NAS, USB,
+     the folders and the tracks inside: .aw-fcards) are the same tiles on the phone */
   body#artwork .aw-head--home .aw-head__row { gap: 12px; flex-wrap: nowrap; }
   body#artwork .aw-browse .aw-tab, body#artwork .aw-browse .aw-search-key { display: none; }
   body#artwork .aw-browse .aw-menu-btn { display: grid; place-items: center; border: 0; background: transparent; padding: 0; color: var(--ink-2); cursor: pointer; .material-symbols-rounded { font-size: 24px; } }
@@ -225,10 +231,11 @@
   body#artwork .aw-browse .aw-browse-head { margin-top: 20px; align-items: baseline; gap: 12px; }
   body#artwork .aw-browse .aw-browse-title { font-size: 30px; letter-spacing: -.025em; }
   body#artwork .aw-browse .aw-browse-stats { font-size: 11px; color: var(--ink-45); }
-  body#artwork .aw-browse .aw-cards, body#artwork .aw-browse .aw-sources { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 20px; }
+  body#artwork .aw-browse .aw-cards, body#artwork .aw-browse .aw-sources, body#artwork .aw-linkcards, body#artwork .aw-fcards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 20px; }
   body#artwork .aw-browse .aw-sources { margin-top: 16px; }
-  body#artwork .aw-browse .aw-card, body#artwork .aw-browse .aw-source { display: flex; flex-direction: column; align-items: stretch; gap: 8px; height: auto; padding: 0; background: transparent; border: 0; box-shadow: none; }
-  body#artwork .aw-browse .aw-tile, body#artwork .aw-browse .aw-source > .material-symbols-rounded:first-child, body#artwork .aw-browse .aw-source > .aw-source-logo:first-child {
+  body#artwork .aw-linkcards { padding-top: 0; }
+  body#artwork .aw-browse .aw-card, body#artwork .aw-browse .aw-source, body#artwork .aw-linkcards .aw-linkcard, body#artwork .aw-fcards .aw-fcard { display: flex; flex-direction: column; align-items: stretch; gap: 8px; height: auto; padding: 0; background: transparent; border: 0; box-shadow: none; }
+  body#artwork .aw-browse .aw-tile, body#artwork .aw-browse .aw-source > .material-symbols-rounded:first-child, body#artwork .aw-browse .aw-source > .aw-source-logo:first-child, body#artwork .aw-linkcards .aw-linkcard__glyph, body#artwork .aw-fcards .aw-fcard__glyph {
     width: auto; height: auto; aspect-ratio: 1; border-radius: 14px; display: grid; place-items: center; overflow: hidden;
     background: var(--fill-06); border: 1px solid var(--fill-10); color: var(--ink-25); font-size: 34px; }
   /* the source's own square is the logo's box; the img inside is centred like a glyph */
@@ -236,12 +243,21 @@
   body#artwork .aw-browse .aw-source-logo__img--pad { width: 100%; height: 100%; object-fit: contain; padding: 22px; box-sizing: border-box; transform: scale(1.35); }
   body#artwork .aw-browse .aw-tile img, body#artwork .aw-browse .aw-tile--lines i, body#artwork .aw-browse .aw-tile__blank { display: none; }
   body#artwork .aw-browse .aw-tile--mosaic, body#artwork .aw-browse .aw-tile--avatars, body#artwork .aw-browse .aw-tile--stack { display: grid; grid-template-columns: 1fr; grid-template-rows: 1fr; gap: 0; place-items: center; }
-  body#artwork .aw-browse .aw-tile .material-symbols-rounded { font-size: 34px; color: var(--ink-25); }
+  body#artwork .aw-browse .aw-tile .material-symbols-rounded, body#artwork .aw-linkcards .aw-linkcard__glyph .material-symbols-rounded, body#artwork .aw-fcards .aw-fcard__glyph .material-symbols-rounded { font-size: 34px; color: var(--ink-25); }
+  /* a service's own picture stands where the glyph would: in the glyph's 34px box */
+  body#artwork .aw-linkcards .aw-linkcard__glyph img { width: 34px; height: 34px; padding: 0; }
   body#artwork .aw-browse .aw-tile__glyph { display: block; }
   body#artwork .aw-browse .aw-card-body, body#artwork .aw-browse .aw-source-body { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
-  body#artwork .aw-browse .aw-card-title, body#artwork .aw-browse .aw-source-name { font-size: 13px; font-weight: 600; color: var(--ink-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  body#artwork .aw-browse .aw-card-title, body#artwork .aw-browse .aw-source-name, body#artwork .aw-linkcards .aw-linkcard__name, body#artwork .aw-fcards .aw-fcard__name { font-size: 13px; font-weight: 600; color: var(--ink-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  body#artwork .aw-fcards .aw-fcard__thumb { width: 100%; height: auto; aspect-ratio: 1; border-radius: 14px; }
+  body#artwork .aw-linkcards .aw-linkcard__name, body#artwork .aw-fcards .aw-fcard__name { white-space: normal; line-height: 1.2; }   // a long name still wraps to a second line (browse.scss)
+  /* a folder's cover fills the tile; under it the name on two lines, or a track's on one with its artist (the queue row's
+     second line) — the same height either way, a long folder is drawn a window at a time and counts on equal rows */
+  body#artwork .aw-fcards .aw-fcard__text { gap: 2px; min-height: 32px; }
+  body#artwork .aw-fcards .aw-fcard__sub { font-size: 12px; line-height: 1.2; color: var(--ink-55); }
+  body#artwork .aw-fcards .aw-fcard.aw-playing .aw-fcard__glyph { background: var(--fill-12); }
   body#artwork .aw-browse .aw-card-sub { font-family: var(--font-mono); font-size: 10px; color: var(--ink-55); margin: 0; }
-  body#artwork .aw-browse .aw-card-meta, body#artwork .aw-browse .aw-card-chev, body#artwork .aw-browse .aw-source-chev { display: none; }
+  body#artwork .aw-browse .aw-card-meta, body#artwork .aw-browse .aw-card-chev, body#artwork .aw-browse .aw-source-chev, body#artwork .aw-linkcards .aw-linkcard__chev { display: none; }
   body#artwork .aw-browse .aw-sources-head { margin-top: 22px; }
 
   /* --- Album page: 150px square cover beside the title, then compact rows --- */
@@ -357,10 +373,22 @@
   /* the page title sits where the list pages put theirs: right under the head */
   body#artwork #pluginWrapper .boxHeader, body#artwork .aw-state-volumio-plugin-manager #content .boxHeader { margin-top: 0; }
 }
-/* --- playlists and favourites on the phone: the album head, with no artist line the title and the count share the cover's height --- */
+/* --- playlists and favourites on the phone: the album head, with no artist line the title and the count share the cover's height;
+   the tile with the glyph is a little over the playlist mockup's 96px (browse.scss), not an album cover's 150px --- */
 @media (max-width: 700px) and (orientation: portrait) {
+  /* the tile is as tall as the words can get beside it: the eyebrow, a title on two lines, the buttons (14 + 48 + 5 + 44) */
+  body#artwork .aw-albumhead--playlist { grid-template-columns: 112px minmax(0, 1fr); grid-template-rows: auto auto auto auto 1fr; align-items: start; padding-bottom: 12px; }
   body#artwork .aw-albumhead--playlist .aw-albumhead__meta { grid-row: 3; margin-top: 8px; }
-  body#artwork .aw-albumhead--playlist .aw-albumhead__cover { grid-row: 2 / 4; }
+  body#artwork .aw-albumhead--playlist .aw-albumhead__cover { grid-row: 2 / 6; width: 112px; align-self: start; }
+  body#artwork .aw-albumhead--playlist .aw-albumhead__cover--glyph .material-symbols-rounded { font-size: 38px; }   // the mockup's glyph to tile, 33 to 96
+  /* the words start at the tile's top edge, Play and Add to queue sit under the title beside the tile and end on its bottom edge:
+     a longer title stops at two lines, a third would push the buttons under the tile */
+  body#artwork .aw-albumhead--playlist .aw-albumhead__eyebrow { align-self: start; }
+  body#artwork .aw-albumhead--playlist .aw-albumhead__title { -webkit-line-clamp: 2; }
+  body#artwork .aw-albumhead--playlist .aw-albumhead__artist { grid-row: 4; }
+  body#artwork .aw-albumhead--playlist .aw-albumhead__actions { grid-column: 2; grid-row: 5; align-self: end; margin-top: 5px !important; flex-wrap: nowrap; min-width: 0; }
+  /* Add to queue is its round icon here, as in an album's head */
+  body#artwork .aw-albumhead--playlist .aw-albumhead__actions .aw-btn--ghost { width: 44px; padding: 0; justify-content: center; flex: none; > span:not(.material-symbols-rounded) { display: none; } }
 }
 
 /* --- MyVolumio profile on the phone: the shared head (hamburger · MyVolumio · Logout), the tile beside the name, e-mail and Edit under it --- */
@@ -401,19 +429,17 @@
   body#artwork #browse.browsing-album .music-item .item__play { left: 8px; }
 }
 
-/* the album's head on the phone (volumio-album-2.html ≤699): the cover centred at 72%, the words and the actions centred under it */
+/* the album's head on the phone: the cover at 150px beside the words, Play and the three rounds under both — the phone's
+   shared head above, said again at the album page's own weight so the desk's head (browse.scss, volumio-album-2.html) stays off it */
 @media (max-width: 700px) and (orientation: portrait) {
-  body#artwork #browse.browsing-album .aw-albumhead { display: flex; flex-direction: column; align-items: center; text-align: center; }
-  body#artwork #browse.browsing-album .aw-albumhead .aw-albumhead__cover { width: min(72%, 300px); max-width: none; margin-bottom: 22px; img { box-shadow: 0 40px 80px -28px rgba(0, 0, 0, .9); } }
-  body#artwork #browse.browsing-album .aw-albumhead .aw-albumhead__body { display: flex; flex-direction: column; align-items: center; min-width: 0; max-width: 100%; }
-  /* the shared phone head above places these by grid lines (align-self end / start): centred here, in a column */
-  body#artwork #browse.browsing-album .aw-albumhead .aw-albumhead__cover, body#artwork #browse.browsing-album .aw-albumhead .aw-albumhead__title, body#artwork #browse.browsing-album .aw-albumhead .aw-albumhead__artist, body#artwork #browse.browsing-album .aw-albumhead .aw-albumhead__meta, body#artwork #browse.browsing-album .aw-albumhead .aw-albumhead__actions { align-self: center; grid-area: auto; }
-  body#artwork #browse.browsing-album .aw-albumhead .aw-albumhead__title { font-size: 32px !important; line-height: 1.02; margin: 0; }
-  body#artwork #browse.browsing-album .aw-albumhead .aw-albumhead__title--long { font-size: 24px !important; line-height: 1.06; }
-  body#artwork #browse.browsing-album .aw-albumhead .aw-albumhead__artist { white-space: normal; margin-top: 6px; font-size: 17px; color: var(--ink-2); }
-  body#artwork #browse.browsing-album .aw-albumhead .aw-albumhead__meta { margin-top: 10px; font-size: 10px; }
-  body#artwork #browse.browsing-album .aw-albumhead .aw-albumhead__actions { justify-content: center; margin-top: 18px !important; gap: 10px; }
-  body#artwork #browse.browsing-album .aw-albumhead .aw-albumhead__actions .aw-btn { height: 48px; padding: 0 22px 0 16px; font-size: 15px; }
-  body#artwork #browse.browsing-album .aw-albumhead .aw-albumhead__actions .aw-iconbtn { width: 48px; height: 48px; }
+  body#artwork #browse.browsing-album .aw-albumhead { display: grid; grid-template-columns: 150px minmax(0, 1fr); column-gap: 16px; align-items: center; }
+  body#artwork #browse.browsing-album .aw-albumhead .aw-albumhead__cover { width: 150px; max-width: none; img { box-shadow: 0 16px 34px -16px var(--shadow-strong); } }
+  body#artwork #browse.browsing-album .aw-albumhead .aw-albumhead__body { display: contents; }
+  body#artwork #browse.browsing-album .aw-albumhead .aw-albumhead__title { font-size: 22px !important; line-height: 1.1; margin: 0; overflow-wrap: normal; text-wrap: wrap; padding-bottom: 0; }
+  body#artwork #browse.browsing-album .aw-albumhead .aw-albumhead__artist { white-space: normal; margin-top: 6px; font-size: 15px; color: var(--ink-25); }
+  body#artwork #browse.browsing-album .aw-albumhead .aw-albumhead__meta { margin-top: 8px; font-size: 10px; letter-spacing: .08em; line-height: inherit; }
+  body#artwork #browse.browsing-album .aw-albumhead .aw-albumhead__actions { margin-top: 18px !important; gap: 10px; flex-wrap: wrap; }
+  body#artwork #browse.browsing-album .aw-albumhead .aw-albumhead__actions .aw-btn { height: 44px; padding: 0 18px; font-size: 14px; border-radius: 999px; font-weight: 600; }
+  body#artwork #browse.browsing-album .aw-albumhead .aw-albumhead__actions .aw-iconbtn { width: 44px; height: 44px; }
   body#artwork #browse.browsing-album #browseTablesWrapper > #browse-page { margin-top: 22px; }
 }

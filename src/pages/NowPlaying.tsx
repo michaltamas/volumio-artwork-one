@@ -98,24 +98,27 @@ export default function NowPlaying() {
   useEffect(() => { try { localStorage.setItem(VIEW_KEY, chosenView); } catch { /* private mode */ } }, [chosenView]);
   // Phone layout: the cover takes exactly what the other parts leave, measured (a title may wrap
   // to two or three lines), so the sheet never scrolls. Re-run on track/resize; cleared otherwise.
+  // Only where the parts cannot fit even around the smallest cover is the area allowed to scroll.
   const fitKey = [st.title, st.artist, st.album, st.samplerate, st.bitdepth, st.trackType].join('|');
   useEffect(() => {
     const fit = () => {
       const np = document.getElementById('np'), cover = document.getElementById('np-cover');
       if (!np || !cover) { return; }
-      cover.style.width = '';
-      if (!window.matchMedia('(max-width: 700px) and (orientation: portrait)').matches) { return; }
       const content = document.getElementById('content');
+      cover.style.width = ''; if (content) { delete content.dataset.npScroll; }
+      if (!window.matchMedia('(max-width: 700px) and (orientation: portrait)').matches) { return; }
       const avail = content ? content.clientHeight : window.innerHeight;
       const others = np.scrollHeight - cover.getBoundingClientRect().height;
       const maxW = np.clientWidth - 40 - 32;   /* the sheet's 20px sides and the mockup's 16px inset */
       cover.style.width = Math.max(96, Math.min(maxW, avail - others)) + 'px';
+      if (content && others + 96 > avail) { content.dataset.npScroll = '1'; }
     };
     let t1 = window.setTimeout(fit, 60); const t2 = window.setTimeout(fit, 600);
     const onResize = () => { window.clearTimeout(t1); t1 = window.setTimeout(fit, 60); };
     window.addEventListener('resize', onResize);
     return () => { window.clearTimeout(t1); window.clearTimeout(t2); window.removeEventListener('resize', onResize); };
   }, [fitKey]);
+  useEffect(() => () => { const c = document.getElementById('content'); if (c) { delete c.dataset.npScroll; } }, []);
   void alsa;
 
   const pos = typeof st.position === 'number' ? st.position : 0;

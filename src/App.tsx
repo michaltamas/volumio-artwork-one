@@ -59,8 +59,14 @@ function Shell() {
   const contentScroll = useRef(0);
   useLayoutEffect(() => {
     const c = document.getElementById('content'); if (!c) { return; }
-    if (covered) { contentScroll.current = c.scrollTop; c.scrollTop = 0; }
-    else { c.scrollTop = contentScroll.current; }
+    if (!covered) { c.scrollTop = contentScroll.current; return; }
+    contentScroll.current = c.scrollTop; c.scrollTop = 0;
+    // under the sheet the area stays at its top: a scroll still coasting when the sheet rises, or one that
+    // reaches it while the sheet is up, would carry the sheet off the screen (the sheet asks for scrolling
+    // itself when it cannot fit: data-np-scroll, pages/NowPlaying)
+    const pin = () => { if (c.scrollTop && !c.dataset.npScroll) { c.scrollTop = 0; } };
+    c.addEventListener('scroll', pin, { passive: true });
+    return () => c.removeEventListener('scroll', pin);
   }, [covered]);
   // the wrapper's state classes follow the page beneath as soon as it is uncovered (the sheet slides over a styled page)
   const shownPage = covered ? page : underPage;

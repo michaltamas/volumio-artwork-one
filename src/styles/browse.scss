@@ -670,6 +670,16 @@ body#artwork #browse.browsing-album .aw-albumhead {
   body#artwork #browse.boxTable.aw-tracklist .music-item .item__album { padding: 0; }
   body#artwork #browse.boxTable.aw-tracklist .music-item .item__info__separator { flex: none; padding: 0; }   /* the base 6px padding doubled the 6px margin */
   body#artwork #browse.boxTable.aw-tracklist .music-item .item__album { flex: 1 1 0; }
+  /* a plain list's rows (Playlists, Genres…): the track rows' measures — number · glyph or cover · name · ⋯ at the row's end.
+     The desk's six columns left two empty ones and their gaps before the edge, and a glyph sat in a cover's 44px */
+  body#artwork #browse.boxTable.browsing-list:not(.aw-tracklist) .music-item { grid-template-columns: 22px minmax(0, 1fr) 24px; gap: 12px; padding: 10px 12px; min-height: 56px; }
+  body#artwork #browse.boxTable.browsing-list:not(.aw-tracklist) .music-item:has(.item__image:not(.hidden)) { grid-template-columns: 22px 44px minmax(0, 1fr) 24px; min-height: 64px; }
+  body#artwork #browse.boxTable.browsing-list:not(.aw-tracklist) .music-item:has(.item__albumart.hidden + .item__albumart-icon:not(.hidden)) { grid-template-columns: 22px 24px minmax(0, 1fr) 24px; min-height: 56px;
+    .item__image, .item__albumart-icon { width: 24px; height: 24px; margin: 0; } }
+  body#artwork #browse.boxTable.browsing-list:not(.aw-tracklist) .music-item .item__number { font-size: 11px; }
+  body#artwork #browse.boxTable.browsing-list:not(.aw-tracklist) .music-item .item__title { font-size: 15px; }
+  body#artwork #browse.boxTable.browsing-list:not(.aw-tracklist) .music-item .item__favorite, body#artwork #browse.boxTable.browsing-list:not(.aw-tracklist) .music-item .item__duration { display: none; }
+  body#artwork #browse.boxTable.browsing-list:not(.aw-tracklist) .music-item .item__play { left: 12px; width: 22px; .play-btn { width: 22px; .play-btn__icon { width: 22px; } } }
 }
 body#artwork .aw-artist__hero { flex-wrap: wrap; row-gap: 18px; gap: clamp(16px, 2vw, 28px); }
 body#artwork .aw-artist__img { width: clamp(96px, 11vw, 158px); height: clamp(96px, 11vw, 158px); }
@@ -801,7 +811,7 @@ body#artwork .aw-more { display: flex; flex-direction: column; gap: 12px; min-wi
 /* the album's Play: "Play album" where the head is wide, "Play" beside its three icon buttons in a
    narrow head (a two-column album page under 1200px), so the row stays one row */
 .aw-btn__short { display: none; }
-@media (min-width: 701px) and (max-width: 1199px) { body#artwork #browse.browsing-album .aw-btn__long { display: none; } body#artwork #browse.browsing-album .aw-btn__short { display: inline; } }
+@media (max-width: 1199px) { body#artwork #browse.browsing-album .aw-btn__long { display: none; } body#artwork #browse.browsing-album .aw-btn__short { display: inline; } }
 
 /* ============ the file browser's cards (volumio-files-root/usb/folder.html) ============
    Music Library in its grid view: NAS and USB, the folders and the tracks inside, as cards —
