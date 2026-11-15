@@ -6,6 +6,21 @@ All notable changes to this project are documented here. The format is based on
 
 Versions 1.x and 2.x were published in [volumio-artwork-theme](https://github.com/michaltamas/volumio-artwork-theme).
 
+## [3.2.13] - 2026-11-15
+
+### Changed
+
+- **The album page on a phone** is back to the cover beside the title, with Play and the round buttons under both. The desktop and the tablet keep the head from 3.2.12.
+- **A playlist's head on a phone**: a smaller cover, the title level with its top edge, Play and Add to queue (a round icon) under the title, more air before the list.
+- **A service's own links and the Music Library on a phone** are tiles, three in a row, as on the library's landing page: a service's links with their pictures, a folder with its cover and the name under it.
+- **Plain lists on a phone** (Playlists, Genres): the rows take the track rows' measures, so the name has the room the empty columns took.
+- **The page head on a phone**: the trail starts closer to Back's arrow.
+
+### Fixed
+
+- **Now Playing on a phone** no longer slides off the screen when it opens over a page that is still scrolling.
+- **A page that is still loading** no longer shows the previous page's pictures under the new names: opening Artists from the Music Library drew the NAS and USB icons in the first artists' tiles until their pictures arrived.
+
 ## [3.2.12] - 2026-11-15
 
 ### Added
