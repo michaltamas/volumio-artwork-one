@@ -6,6 +6,44 @@ All notable changes to this project are documented here. The format is based on
 
 Versions 1.x and 2.x were published in [volumio-artwork-theme](https://github.com/michaltamas/volumio-artwork-theme).
 
+## [3.2.12] - 2026-11-15
+
+### Added
+
+- **Keyboard shortcuts**, the same keys as Volumio's Nova: Space plays and pauses, ← and → seek, ↑ and ↓ change the volume, M mutes. They stay out of the way while you type in a field.
+- **The tab's icon turns green while music plays**, so a playing Volumio is easy to find among the browser's tabs.
+- **Stop after this track.** Every row of the queue has a menu: play now, play next, stop after this, add to Favorites or to a playlist, go to the album or the artist, remove. The marked row carries a stop glyph and playback ends when that track does.
+- **Search sorted by kind.** The results are grouped as artists, albums, tracks, playlists and radios, with a tab for each source; the page keeps your recent searches and has a menu to search in one source only.
+- **Info on Now Playing: credits, related artists and the album's year.** A related artist is a chip that searches for that artist. An artist tagged a letter off ("Phil Collin") still gets a bio, under the name as MusicBrainz spells it.
+- **Aurora**, a new background for the ambient display: soft colours taken from the cover drift behind it.
+- **The library lives in the address bar.** Back and Forward walk the pages you opened (each comes back as it was, with its own trail), a reload keeps the page, and a page can be bookmarked or opened in a new tab.
+- **The Music Library as file cards**: folders and files as cards, a folder with its own cover where it has one.
+- **Something shows while an answer is on its way**: a page or a search that is still loading says so instead of standing empty.
+
+### Changed
+
+- **The library's landing page**: the sources as cards in a fluid grid, recent searches in one row, the source menu beside the search field.
+- **The list pages** (a service's page, a genre, an artist): one head, sections with their counts, covers, the service's own links and its "Show more", the same on every source.
+- **The album page** on the desktop, the tablet and the phone: a larger cover in its own column, the title up to three lines, Play album and the round buttons under it; the track list starts level with the cover. In a window that is wide but not tall enough for the whole head, the cover gives way so that the buttons stay above the player bar.
+- **A playlist's page**: a new head, and a mosaic of its songs' covers as its cover.
+- **Now Playing**: a larger cover and larger words on the desktop, the heart beside the Cover / Info / Lyrics switch, Info and Lyrics the full width of the text column and scrolling between the top and the bottom bar.
+- **The queue page is the queue panel** laid out in the page, with everything the panel can do.
+- **One switch everywhere** in the settings, and a readable version on the Update page.
+- **A service's artist page** keeps its groups (albums, singles, top tracks), shows the similar artists and the artist's picture.
+- **An album's filter** works on every service and sits over the track list.
+- **Favourites** show their full hearts: one click takes a track out.
+- **On a phone** the track rows leave the quality pill out, so the title keeps its room.
+
+### Fixed
+
+- **The system update's release notes** read as notes, not as markup.
+- **The library's artist page** draws its albums as albums again.
+- **A typed search** no longer lands on the page that was opened after it, and a search cut down to one letter no longer leaves a spinner turning.
+- **Info lookups** are more reliable: a busy MusicBrainz is asked again, a lost answer is not kept as "nothing found", and a skipped track's requests leave the queue.
+- **The elapsed time** stays right after the tab was in the background, where the browser slows a page's timers down.
+- **Closing Now Playing** goes back to the page under it, so Back does not open it again.
+- **A tooltip** no longer stays on screen after its button is gone.
+
 ## [3.2.11] - 2026-11-01
 
 ### Fixed
