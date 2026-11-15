@@ -135,7 +135,7 @@ export default function Browse({ dedicated }: { dedicated?: boolean }) {
     const q = v.trim(); const sc = scope.current;
     if (sc.timer) { window.clearTimeout(sc.timer); sc.timer = null; }
     if (!q) { const from = sc.from; sc.from = null; sc.searching = false; useBrowse.setState({ searching: false }); if (from && from.uri) { emit('browseLibrary', { uri: from.uri }); } return; }
-    if (q.length < 2) { return; }
+    if (q.length < 2) { useBrowse.setState({ searching: false }); return; }   // one letter is not asked for: the search dropped above leaves no spinner
     const r: any = request;
     if (!sc.from) { sc.from = r; }
     useBrowse.setState({ searching: true });

@@ -106,7 +106,7 @@ body#artwork { --queue-dock-w: 440px; }
 /* the queue page (/queue): the same panel laid out in the page — static, the page's width between its paddings, scrolling with
    the page under the fixed head (its spacer carries the top, as the list pages); every measure inside is the panel's own */
 body#artwork .aw-qpage { padding: 0 var(--pad-screen) 48px; }
-body#artwork .aw-queue.aw-queue--page { position: static; width: auto; border-radius: 0; border: 0; box-shadow: none; background: transparent; -webkit-backdrop-filter: none; backdrop-filter: none;
+body#artwork .aw-queue.aw-queue--page { position: static; width: auto; overflow: visible;   /* a row's menu opens past the last rows */ border-radius: 0; border: 0; box-shadow: none; background: transparent; -webkit-backdrop-filter: none; backdrop-filter: none;
   opacity: 1; transform: none; visibility: visible; pointer-events: auto; transition: none;
   .aw-queue__head { padding: 26px 0 0; }
   .aw-queue__chips { padding: 18px 0 16px; }
@@ -125,5 +125,5 @@ body#artwork .aw-queue__more { flex: none; display: grid; place-items: center; w
     .material-symbols-rounded { font-size: 20px; } &:hover { color: var(--ink); } }
   .dropdown.open .aw-queue__more-btn { opacity: 1; color: var(--ink); } }
 body#artwork .aw-queue__row:hover .aw-queue__more-btn, body#artwork .aw-queue__row:focus-within .aw-queue__more-btn { opacity: 1; }
-@media (pointer: coarse) { body#artwork .aw-queue__more-btn { opacity: 1; } }
+@media (pointer: coarse) { body#artwork .aw-queue__more .aw-queue__more-btn { opacity: 1; } }
 body#artwork .aw-queue__stop { flex: none; display: grid; place-items: center; color: var(--ink-55); .material-symbols-rounded { font-size: 18px; } }

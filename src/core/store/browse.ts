@@ -40,7 +40,7 @@ export interface BrowseItem {
 }
 export interface BrowseList { title?: string; icon?: string; availableListViews?: string[]; items: BrowseItem[]; [k: string]: any }
 export interface BrowseInfo { uri?: string; title?: string; service?: string; type?: string; albumart?: string; artist?: string; album?: string; year?: string | number; genre?: string; duration?: string | number; trackType?: string; [k: string]: any }
-interface Trail extends BrowseItem { lists: BrowseList[]; info: BrowseInfo | null; prev: any }
+export interface Trail extends BrowseItem { lists: BrowseList[]; info: BrowseInfo | null; prev: any }
 
 // the same key (and JSON value) Volumio's localStorageService used, so a preference set in one build holds in the other; unset = list
 const GRID_KEY = 'ls.showGridView';
@@ -186,8 +186,9 @@ export const useBrowse = create<BrowseStore>((set, get) => ({
         if (sc) { pendingPlaylists = null; emit('search', { type: 'any', value, service: sc.service || sc.plugin_name, plugin_name: sc.plugin_name, plugin_type: sc.plugin_type || 'music_service', uri: sc.uri }); }
         else { pendingPlaylists = searchPlaylists(value).catch(() => null); emit('search', { type: 'any', value }); }
       }, 600);
-    } else if (!value) {
-      get().clearSearch();
+    } else {
+      set({ searching: false });   // one letter is not asked for: no spinner left turning over the search that was dropped
+      if (!value) { get().clearSearch(); }
     }
   },
   setSearchScope: (sc) => { set({ searchScope: sc }); const v = get().searchField; if (v && v.length >= 2) { get().search(v); } },
@@ -196,8 +197,8 @@ export const useBrowse = create<BrowseStore>((set, get) => ({
     set({ searchField: '', isSearching: false, searching: false, lists: get().isBrowsing ? get().lists : null });
   },
   setDedicated: (on) => {
-    if (on) { set({ dedicatedSearch: true, isSearching: true, isBrowsing: false, lists: [], info: null, request: null, trail: [] }); }
-    else if (get().dedicatedSearch) { set({ dedicatedSearch: false, isSearching: false, lists: get().isBrowsing ? get().lists : null, searchField: '' }); }   // a page opened from the results keeps its lists: the route moved to /browse under it
+    if (on) { if (!get().dedicatedSearch) { set({ dedicatedSearch: true, isSearching: true, isBrowsing: false, lists: [], info: null, request: null, trail: [], searchField: '' }); } }   // once: a link that already asked for a search (a related artist) keeps it as the page mounts
+    else if (get().dedicatedSearch) { if (searchTimer) { window.clearTimeout(searchTimer); searchTimer = null; } set({ dedicatedSearch: false, isSearching: false, searching: false, lists: get().isBrowsing ? get().lists : null, searchField: '' }); }   // a page opened from the results keeps its lists: the route moved to /browse under it
   },
   // Volumio does not flag library items: the Favourites list is read over REST and the rows are marked from it
   loadFavourites: () => {

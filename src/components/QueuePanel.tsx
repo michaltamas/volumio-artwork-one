@@ -38,7 +38,7 @@ function rowEntries(t: QueueItem, i: number, position: number, goTo: (item: any)
   const out: MenuEntry[] = [];
   if (!current) { out.push({ icon: 'play_arrow', label: 'Play now', onClick: () => q.play(i) }); }
   if (!current && position >= 0 && i !== position + 1) { out.push({ icon: 'playlist_play', label: 'Play next', onClick: () => q.move(i, i > position ? position + 1 : position) }); }
-  out.push({ icon: 'stop_circle', label: sa.isMarked(i) ? "Don't stop after this" : 'Stop after this', onClick: () => sa.toggle(i) });
+  if (t.service !== 'webradio' && (t as any).trackType !== 'webradio') { out.push({ icon: 'stop_circle', label: sa.isMarked(i) ? "Don't stop after this" : 'Stop after this', onClick: () => sa.toggle(i) }); }   // a radio stream has no end to stop at
   if (song.uri && t.service) {
     out.push({ label: '-', onClick: () => {} });
     out.push({ icon: 'favorite', label: 'Add to Favorites', onClick: () => usePlaylists.getState().addToFavourites(song) });
@@ -85,7 +85,7 @@ export default function QueuePanel({ page }: { page?: boolean }) {
   const minutesLeft = secondsLeft === null ? null : Math.round(secondsLeft / 60);
   let endsAt: string | null = null;
   if (secondsLeft !== null && (!st.repeat || stopAt >= 0)) { const d = new Date(Date.now() + secondsLeft * 1000); endsAt = ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2); }
-  const endNote = stopAt >= 0 ? (stopAt === position ? 'Stops after this track' : 'Stops after ' + (queue[stopAt].name || queue[stopAt].title || 'the marked track'))
+  const endNote = stopAt >= 0 ? (stopAt === position ? 'Stops after this track' : 'Stops after ' + ((queue[stopAt] && (queue[stopAt].name || queue[stopAt].title)) || 'the marked track'))
     : st.repeat && st.repeatSingle ? 'Repeats this track' : st.repeat ? 'Repeats the queue' : 'Stops after the queue ends';
   // the library's page for a row's artist or album: the floating queue goes away, the page opens
   const goTo = (item: any) => { if (!docked && !page) { useUi.getState().hideQueue(); } useBrowse.getState().open(item, true); nav(browseUrl(item)); };
@@ -100,7 +100,7 @@ export default function QueuePanel({ page }: { page?: boolean }) {
     const el = root.current?.querySelector('.aw-queue__row.is-current');
     if (el) { el.scrollIntoView({ block: 'nearest' }); }
     if (docked || page) { return; }   // docked (or the page) it is part of the page: Escape does not take it away
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') { useUi.getState().hideQueue(); } };
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape' && !root.current?.querySelector('.dropdown.open')) { useUi.getState().hideQueue(); } };   // a row's open menu takes the key for itself
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
   }, [open, docked, page]);

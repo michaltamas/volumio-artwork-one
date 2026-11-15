@@ -7,6 +7,9 @@
  * never starts; if the clock was off and the next track did start, the stop follows at once.
  * A track that ends early (a skip, Next, a tap on another row) was not played to its end: the
  * mark is dropped, nothing stops.
+ *
+ * The mark lives in this browser: the page has to stay open (a tab in the background will do; there
+ * the stop may come a moment into the next track), and another device does not see it.
  */
 import { create } from 'zustand';
 import { emit } from '../socket';
@@ -31,7 +34,7 @@ const uriAt = (i: number) => { const t = useQueue.getState().queue[i]; return t 
 
 export const useStopAfter = create<StopAfterStore>((set, get) => ({
   mark: null,
-  set: (position) => set({ mark: { position, uri: uriAt(position) } }),
+  set: (position) => { if (!useQueue.getState().queue[position]) { return; } set({ mark: { position, uri: uriAt(position) } }); },   // no such row (the queue changed under the menu): nothing to mark
   clear: () => set({ mark: null }),
   toggle: (position) => { if (get().isMarked(position)) { get().clear(); } else { get().set(position); } },
   isMarked: (position, uri) => { const m = get().mark; return !!m && m.position === position && (uri === undefined || m.uri === uri); },
@@ -79,6 +82,8 @@ useQueue.subscribe((q) => {
   const m = useStopAfter.getState().mark; if (!m) { return; }
   const at = q.queue[m.position];
   if (at && String(at.uri || '') === m.uri) { return; }
-  const i = q.queue.findIndex(t => String(t.uri || '') === m.uri);
+  // the same track twice in the queue: the copy nearest to where the mark was
+  let i = -1;
+  q.queue.forEach((t, n) => { if (String(t.uri || '') === m.uri && (i < 0 || Math.abs(n - m.position) < Math.abs(i - m.position))) { i = n; } });
   if (i < 0) { useStopAfter.getState().clear(); } else { useStopAfter.setState({ mark: { position: i, uri: m.uri } }); }
 });

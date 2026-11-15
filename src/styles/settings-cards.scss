@@ -34,7 +34,7 @@ body#artwork #pluginWrapper :is(.aw-sc-switch, .aw-sp-enabled) {
     &:has(input:focus-visible) { outline: 2px solid var(--ink-1); outline-offset: 2px; } } }
 body#artwork #pluginWrapper .aw-sc-switch { display: flex; justify-content: flex-end; align-items: center; gap: 12px;
   &__state { font-size: 14px; color: var(--ink-muted); }
-  &:has(.bootstrap-switch-on) .aw-sc-switch__state { color: var(--ink-3); }
+  &:has(.aw-switch.on) .aw-sc-switch__state { color: var(--ink-3); }
   .bootstrap-switch { width: 52px !important; height: 30px; border-radius: 15px;
     &::before { top: 3px; left: 3px; width: 24px; height: 24px; } &.bootstrap-switch-on::before { left: 25px; } } }
 

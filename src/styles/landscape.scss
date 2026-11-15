@@ -47,7 +47,7 @@
   /* --- Now Playing: the cover the screen's height on the left; the bar, the text, the seek bar and the
      transport on the right. #np is the size container, so the cover is a square of its whole height. --- */
   body#artwork #np { height: 100%; min-height: 0; overflow: hidden; container-type: size;
-    display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto; column-gap: clamp(16px, 3.4vw, 36px);
+    display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto; column-gap: clamp(16px, 3.4vw, 36px); row-gap: 0;
     padding: 12px var(--pad-screen) calc(10px + var(--sa-b)) clamp(16px, 2.4vw, 28px); }
   body#artwork #np #np-topbar { grid-column: 2; grid-row: 1; min-height: 36px; gap: 10px;
     .np-chevron { width: 36px; height: 36px; }
@@ -101,7 +101,7 @@
   body#artwork #np #np-meta .np-quality, body#artwork #np #np-meta .np-album { display: none; }
   body#artwork #np #np-transport .player-action-shuffle, body#artwork #np #np-transport .repeat-button { display: none; }
   /* the queue sheet: the list keeps the room — no actions row (shuffle, repeat, save and clear stay on the queue page) and no footer */
-  body#artwork .aw-queue .aw-queue__chips, body#artwork .aw-queue .aw-queue__foot { display: none; }
+  body#artwork .aw-queue:not(.aw-queue--page) .aw-queue__chips, body#artwork .aw-queue:not(.aw-queue--page) .aw-queue__foot { display: none; }
   body#artwork .aw-queue .aw-queue__head { padding-top: 14px; }
   body#artwork .aw-queue .aw-queue__sechead { margin-top: 10px; }
 }

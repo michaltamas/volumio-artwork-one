@@ -93,7 +93,7 @@ export default function TrackActionsSheet() {
             <Icon name="headphones" /><span className="aw-track__label">{here ? 'Stop playing in this browser' : 'Play in this browser'}</span>
           </button>
         ) : null}
-        {typeof st.position === 'number' && st.position >= 0 && !st.disableUi ? (
+        {typeof st.position === 'number' && st.position >= 0 && !st.disableUi && st.trackType !== 'webradio' && st.stream !== true && (st.duration || 0) > 0 ? (   /* a stream has no end to stop at */
           <button type="button" className={'aw-track__row' + (stopAfter ? ' active' : '')} onClick={() => { useStopAfter.getState().toggle(st.position); close(); }}>
             <Icon name="stop_circle" /><span className="aw-track__label">{stopAfter ? "Don't stop after this track" : 'Stop after this track'}</span>
           </button>

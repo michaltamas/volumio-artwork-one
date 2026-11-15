@@ -1,4 +1,4 @@
-import { BrowserRouter, Navigate, Route, Routes, useLocation, type Location } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes, useLocation, useNavigationType, type Location } from 'react-router-dom';
 import ArtStack from './components/ArtStack';
 import Rail from './components/Rail';
 import MiniPlayer from './components/MiniPlayer';
@@ -29,12 +29,17 @@ import ErrorBoundary from './components/ErrorBoundary';
 import { useEffect, useLayoutEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useBrowse } from './core/store/browse';
+import { noteNav, noteEntry } from './core/browseUrl';
 import { useUi, isQueueDocked } from './core/store/ui';
 import MyVolumio, { myVolumioState } from './pages/myvolumio/MyVolumio';
 
 function Shell() {
   const loc = useLocation();
   const nav = useNavigate();
+  // what the router did and where it stands, for the library's address (browseUrl.ts): the pages are
+  // drawn inside `<Routes location>`, where every navigation reads as POP
+  noteNav(loc.key, useNavigationType());
+  useEffect(() => { noteEntry(); }, [loc.key]);
   // ⌘K / Ctrl+K: the library's search, from anywhere
   useEffect(() => {
     const key = (e: KeyboardEvent) => { if ((e.metaKey || e.ctrlKey) && String(e.key).toLowerCase() === 'k') { e.preventDefault(); useBrowse.getState().backHome(); useUi.setState({ searchFocus: true }); nav('/browse'); const el = document.getElementById('aw-search-input') as HTMLInputElement | null; if (el) { el.focus(); el.select(); } } };

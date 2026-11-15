@@ -31,7 +31,7 @@ export default function InfoFace() {
   const albumSub = [album && album.label, (album && album.year) || info.year, info.genre, n ? n + (n === 1 ? ' track' : ' tracks') : ''].filter(Boolean).join(' · ');
   const goArtist = () => { if (!canGo) { return; } const item = { uri: 'artists://' + encodeURIComponent(st.artist), title: st.artist, name: st.artist, type: 'folder', service: 'mpd' }; useBrowse.getState().open(item, true); nav(browseUrl(item)); };
   // a related artist: the search page, with the name typed in
-  const findArtist = (e: React.MouseEvent, name: string) => { e.stopPropagation(); nav('/search'); window.setTimeout(() => useBrowse.getState().search(name), 50); };
+  const findArtist = (e: React.MouseEvent, name: string) => { e.stopPropagation(); const b = useBrowse.getState(); b.setDedicated(true); b.search(name); nav('/search?q=' + encodeURIComponent(name)); };   // the store leads, the address names the same search: one history entry
   const creditRows = (list: Credit[]) => (
     <dl className="np-about__credits">
       {list.map(c => <div className="np-about__credit" key={c.role}><dt className="np-about__role mono">{c.role.toUpperCase()}</dt><dd className="np-about__names">{c.names.join(', ')}</dd></div>)}

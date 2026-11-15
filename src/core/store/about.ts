@@ -55,12 +55,20 @@ async function related(mbid: string): Promise<Related[]> {
 const order: [Record<string, any>, string][] = [];
 let mbLast = 0; let mbChain: Promise<any> = Promise.resolve();
 let lastKeys = '';
+// a request that never answers (a dead connection) is given up after a while: it would hold the queue and the placeholder for good
+const TIMEOUT = 12000;
+function get(url: string, init?: RequestInit): Promise<Response> {
+  const ac = new AbortController(); const t = setTimeout(() => ac.abort(), TIMEOUT);
+  return fetch(url, { ...init, signal: ac.signal }).finally(() => clearTimeout(t));
+}
 
 // a busy server (MusicBrainz answers 503 now and then, even at one request a second) gets two more tries, after
 // 1.5 and 3 seconds, so a lookup is not lost to a hiccup — one lost answer used to be kept as "nothing known"
-const json = async (url: string, params: Record<string, string>, retry = 2): Promise<any> => {
-  const r = await fetch(url + '?' + new URLSearchParams(params).toString(), { headers: { Accept: 'application/json' } });
-  if ((r.status === 503 || r.status === 429) && retry > 0) { await new Promise(res => setTimeout(res, retry === 2 ? 1500 : 3000)); return json(url, params, retry - 1); }
+// `sent` is told as each try goes out: the one-a-second queue counts from the last try, not the first
+const json = async (url: string, params: Record<string, string>, retry = 2, sent?: () => void): Promise<any> => {
+  if (sent) { sent(); }
+  const r = await get(url + '?' + new URLSearchParams(params).toString(), { headers: { Accept: 'application/json' } });
+  if ((r.status === 503 || r.status === 429) && retry > 0) { await new Promise(res => setTimeout(res, retry === 2 ? 1500 : 3000)); return json(url, params, retry - 1, sent); }
   if (!r.ok) { throw new Error(String(r.status)); }
   return r.json();
 };
@@ -73,33 +81,32 @@ function mb(path: string, params: Record<string, string>, live?: () => boolean):
     if (live && !live()) { throw STALE; }
     const wait = Math.max(0, mbLast + MB_GAP - Date.now()); await new Promise(res => setTimeout(res, wait));
     if (live && !live()) { throw STALE; }
-    mbLast = Date.now(); return json(MB + path, { fmt: 'json', ...params });
+    return json(MB + path, { fmt: 'json', ...params }, 2, () => { mbLast = Date.now(); });
   };
   const p = mbChain.then(run, run);
   mbChain = p.catch(() => {});
   return p;
 }
 // an answer that failed (the network, a dropped request) is not kept: the next time the track plays, it is asked again
-function forget(map: Record<string, any>, k: string) { delete map[k]; }
+function forget(map: Record<string, any>, k: string) { delete map[k]; const at = order.findIndex(([m, key]) => m === map && key === k); if (at > -1) { order.splice(at, 1); } }
 const lucene = (v: any) => '"' + String(v).replace(/["\\]/g, ' ').trim() + '"';
 
+// null: no page. A failed request throws, so the caller can tell "nothing written" from "not reached".
 async function wiki(rels: any[]): Promise<Wiki | null> {
   const rel = (rels || []).find(r => r.type === 'wikidata' && r.url && r.url.resource);
   const m = rel && /\/(Q\d+)$/.exec(rel.url.resource);
   if (!m) { return null; }
-  try {
-    const d = await json(WIKIDATA, { action: 'wbgetentities', ids: m[1], props: 'sitelinks', sitefilter: 'enwiki', format: 'json', origin: '*' });
-    const e = d && d.entities && d.entities[m[1]]; const t = e && e.sitelinks && e.sitelinks.enwiki && e.sitelinks.enwiki.title;
-    return t ? summary(t) : null;
-  } catch { return null; }
+  const d = await json(WIKIDATA, { action: 'wbgetentities', ids: m[1], props: 'sitelinks', sitefilter: 'enwiki', format: 'json', origin: '*' });
+  const e = d && d.entities && d.entities[m[1]]; const t = e && e.sitelinks && e.sitelinks.enwiki && e.sitelinks.enwiki.title;
+  return t ? summary(t) : null;
 }
 async function summary(title: string): Promise<Wiki | null> {
-  try {
-    const r = await fetch(WIKI_SUMMARY + encodeURIComponent(String(title).replace(/ /g, '_')));
-    const d = r.ok ? await r.json() : null;
-    if (!d || !d.extract) { return null; }
-    return { extract: String(d.extract), description: String(d.description || ''), url: (d.content_urls && d.content_urls.desktop && d.content_urls.desktop.page) || '', thumb: (d.thumbnail && d.thumbnail.source) || '' };
-  } catch { return null; }
+  const r = await get(WIKI_SUMMARY + encodeURIComponent(String(title).replace(/ /g, '_')));
+  if (r.status === 404) { return null; }
+  if (!r.ok) { throw new Error(String(r.status)); }
+  const d = await r.json();
+  if (!d || !d.extract) { return null; }
+  return { extract: String(d.extract), description: String(d.description || ''), url: (d.content_urls && d.content_urls.desktop && d.content_urls.desktop.page) || '', thumb: (d.thumbnail && d.thumbnail.source) || '' };
 }
 function remember(map: Record<string, any>, k: string, v: any) { map[k] = v; order.push([map, k]); while (order.length > KEEP) { const [m, key] = order.shift()!; delete m[key]; } }
 
@@ -108,6 +115,7 @@ const fold = (v: string) => String(v || '').toLowerCase().normalize('NFD').repla
 function near(a: string, b: string): boolean {
   const x = fold(a), y = fold(b); if (!x || !y) { return false; }
   if (x === y || x.replace(/^the /, '') === y.replace(/^the /, '')) { return true; }
+  if (x.length < 6 || y.length < 6) { return false; }   // a short name one letter off is another name ("Cake", "Cave")
   if (Math.abs(x.length - y.length) > 1) { return false; }
   let i = 0, j = 0, miss = 0;   // one edit apart
   while (i < x.length && j < y.length) { if (x[i] === y[j]) { i++; j++; continue; } if (++miss > 1) { return false; } if (x.length > y.length) { i++; } else if (y.length > x.length) { j++; } else { i++; j++; } }
@@ -127,7 +135,8 @@ function lookupArtist(name: string): Promise<AboutArtist | null> {
       if (!a) { return null; }
     }
     const full = await mb('artist/' + a.id, { inc: 'url-rels' }, live);
-    const [w, rel] = await Promise.all([wiki(full.relations), related(a.id)]);
+    // Wikipedia not reached: what MusicBrainz knows is shown, and the answer is not kept, so the text is asked for again next time
+    const [w, rel] = await Promise.all([wiki(full.relations).catch(() => { forget(artists, name); return null; }), related(a.id)]);
     const begin = ((a['life-span'] && a['life-span'].begin) || '').slice(0, 4);
     return { name: a.name, mbid: a.id, kind: a.type || '', country: a.country || (a.area && a.area.name) || '', begin, area: (a['begin-area'] && a['begin-area'].name) || (a.area && a.area.name) || '',
       since: begin ? (a.type === 'Group' ? 'FORMED ' : a.type === 'Person' ? 'BORN ' : 'SINCE ') + begin : '', mbUrl: 'https://musicbrainz.org/artist/' + a.id,
@@ -150,7 +159,7 @@ function lookupAlbum(artist: string, album: string): Promise<AboutAlbum | null> 
       return { label, id: rs[0] ? rs[0].id : '' };
     }).catch(() => ({ label: '', id: '' }));
     const full = await mb('release-group/' + g.id, { inc: 'url-rels' }, live);
-    const [w, rel] = await Promise.all([wiki(full.relations), release]);
+    const [w, rel] = await Promise.all([wiki(full.relations).catch(() => { forget(albums, k); return null; }), release]);
     const cr = rel.id ? await mb('release/' + rel.id, { inc: 'artist-rels' }, live).then(r => credits(r.relations)).catch(() => []) : [];
     return { title: g.title, date: g['first-release-date'] || '', year: (g['first-release-date'] || '').slice(0, 4), kind: [g['primary-type']].concat(g['secondary-types'] || []).filter(Boolean).join(' · '),
       label: rel.label, mbUrl: 'https://musicbrainz.org/release-group/' + g.id, extract: w ? w.extract : '', description: w ? w.description : '', url: w ? w.url : '', credits: cr } as AboutAlbum;
@@ -189,22 +198,23 @@ function refresh() {
   if (sig === lastKeys) { return; }
   const albumSame = lastKeys.split('|').slice(0, 2).join('|') === artist + '|' + album;
   lastKeys = sig;
-  // the same record, the next track: the artist and the album stay on the screen
   const pend = (patch: Partial<AboutStore['pending']>) => useAbout.setState(s => ({ pending: { ...s.pending, ...patch } }));
+  // the same record, the next track: what is known of the artist and the album stays on the screen
+  const had = useAbout.getState();
   useAbout.setState(albumSame ? { track: null } : { artist: null, album: null, track: null });
   if (!artist) { pend({ artist: false, album: false, track: false }); return; }
+  // Every track asks for all it needs and answers only for itself: what an earlier track of the
+  // same record already asked for comes back from the kept answers at once, what it lost (a track
+  // skipped before the artist was in, a lookup that failed) is asked for again.
+  const cur = () => sig === lastKeys;
+  pend({ artist: !(albumSame && had.artist), album: !!album && !(albumSame && had.album), track: !!title });
   // the order on the one-a-second queue: the artist (the bio) first, then the track (its credits), the record last
-  pend({ track: !!title });
-  const trackThen = () => { if (title) { lookupTrack(artist, title, album).then(t => { if (keys()[2] === title) { useAbout.setState({ track: t }); pend({ track: false }); } }); } };
-  if (!albumSame) {
-    pend({ artist: true, album: !!album });
-    lookupArtist(artist).then(a => {
-      if (keys()[0] === artist) { useAbout.setState({ artist: a }); pend({ artist: false }); }
-      if (sig !== lastKeys) { return; }   // another track by now: its own refresh asked for its things
-      trackThen();
-      if (album) { lookupAlbum(artist, album).then(b => { if (keys()[1] === album) { useAbout.setState({ album: b }); pend({ album: false }); } }); }
-    });
-  } else { trackThen(); }
+  lookupArtist(artist).then(a => {
+    if (!cur()) { return; }   // another track by now: its own refresh asked for its things
+    useAbout.setState({ artist: a }); pend({ artist: false });
+    if (title) { lookupTrack(artist, title, album).then(t => { if (cur()) { useAbout.setState({ track: t }); pend({ track: false }); } }); }
+    if (album) { lookupAlbum(artist, album).then(b => { if (cur()) { useAbout.setState({ album: b }); pend({ album: false }); } }); }
+  });
 }
 usePlayer.subscribe((s, prev) => { if (s.state !== prev.state) { refresh(); } });
 refresh();

@@ -6,7 +6,7 @@
  * new push resets it. Everything a screen reads about the current track comes from here.
  */
 import { create } from 'zustand';
-import { on, emit } from '../socket';
+import { on, emit, connected } from '../socket';
 import type { PlayerState } from '../format';
 
 const TICK = 250;
@@ -54,7 +54,7 @@ export const usePlayer = create<PlayerStore>((set, get) => ({
   },
   prev: () => emit('prev'),
   next: () => emit('next'),
-  seekTo: (seconds) => { emit('seek', Math.max(0, Math.round(seconds))); set({ elapsedMs: seconds * 1000 }); },
+  seekTo: (seconds) => { emit('seek', Math.max(0, Math.round(seconds))); setBase(seconds * 1000); set({ elapsedMs: seconds * 1000 }); },
   shuffle: () => emit('setRandom', { value: !get().state.random }),
   repeat: (repeat, single) => emit('setRepeat', { value: repeat, repeatSingle: single }),
   cycleRepeat: () => {
@@ -75,20 +75,36 @@ export const usePlayer = create<PlayerStore>((set, get) => ({
 }));
 
 function stopClock() { if (timer !== null) { window.clearInterval(timer); timer = null; } }
+// The clock reads the wall, not its own ticks: a tab in the background ticks once a second, after
+// a few minutes once a minute, and counted ticks fell behind the music (the seek bar on return,
+// "stop after this track" taking the track's end for a skip).
+let base = 0, since = 0;   // the position the player gave last, and when
+const STALE_MS = 5000;     // this far past the track's end the player's word was missed (the computer slept, the connection dropped)
+const setBase = (ms: number) => { base = ms; since = Date.now(); };
+// where the track stands by the wall; null when the clock cannot be trusted any more
+function wallMs(): number | null {
+  const dur = (usePlayer.getState().state.duration || 0) * 1000;
+  const now = base + (Date.now() - since);
+  if (dur && now > dur + STALE_MS) { return null; }
+  // the clock stops at the end: the player says what comes after
+  return dur && now > dur ? dur : now;
+}
 function startClock() {
   stopClock();
   timer = window.setInterval(() => {
-    const { state, elapsedMs } = usePlayer.getState();
-    const dur = (state.duration || 0) * 1000;
-    const next = elapsedMs + TICK;
-    // the clock stops at the end: the player says what comes after
-    usePlayer.setState({ elapsedMs: dur && next > dur ? dur : next });
+    const now = wallMs();
+    if (now === null) { stopClock(); if (connected()) { emit('getState'); } return; }   // ask where it really stands, rather than sit at the end of a track long over
+    usePlayer.setState({ elapsedMs: now });
   }, TICK);
 }
 
 on('pushState', (data: PlayerState) => {
   const st = { ...(data || {}) };
   st.disableUi = !!st.disableUiControls || st.service === 'analogin';
+  // the last word of the clock on the state that ends here: whoever compares the two states (stop
+  // after this track) reads how far the track really got, also in a tab that hardly ticks
+  if (timer !== null) { const now = wallMs(); if (now !== null) { usePlayer.setState({ elapsedMs: now }); } }
+  setBase(st.seek || 0);
   usePlayer.setState({ state: st, elapsedMs: (st.seek || 0), ready: true });
   if (st.status === 'play') { startClock(); } else { stopClock(); }
   // the page's own title: what plays, the way Volumio's interface does it; the tab's icon turns green while music plays

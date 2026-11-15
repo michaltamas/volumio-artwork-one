@@ -78,7 +78,7 @@ export default function BrowseLists({ lists, filter, sortDesc, isArtist, artists
         return (
           <div className={'main__source' + cls} key={at + li}>
             <h3 className={'main__source__title panel-title' + (!list.title ? ' hidden' : '')}>{list.title || ''}{list.title ? <span className="main__source__count">{shown(items)}</span> : null}</h3>
-            {!isArtist && items.length > VIRTUAL_FROM
+            {!isArtist && items.length > VIRTUAL_FROM && typeof (list as any).awLimit !== 'number'   /* a search shelf cut to its first few is drawn whole: the long list knows no limit */
               ? <LongList items={items} grid={asGrid} cards={fileCards} q={(list as any).awNoFilter ? '' : q} sortDesc={sortDesc} matches={matches} cell={(ii) => cell(li, ii, items, asGrid, false, undefined)} />
               : (
                 <div className={asGrid ? (fileCards ? 'aw-fcards' : 'main__row') : 'main__list'}>

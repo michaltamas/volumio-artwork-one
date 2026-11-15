@@ -169,7 +169,7 @@
   body#artwork #np.np--info, body#artwork #np.np--lyrics {
     .np-text { flex: 0 0 auto; justify-content: flex-start; margin-top: clamp(8px, 1vw, 16px); }
     .np-title, .np-title.np-len-s, .np-title.np-len-m { --np-title: clamp(24px, min(2.6vw, 5.6vh), 48px); letter-spacing: -.03em; line-height: 1.14; margin-top: 6px; }
-    .np-artist, .np-byline, .np-signalpath { display: none; }
+    .np-artist, .np-byline, .np-signalpath, #np-meta .np-byline, #np-meta .np-artist { display: none; }   /* with the meta column named: the byline's own rule below names it too */
     .np-about, .np-lyrics-host { flex: 1 1 0; min-height: 0; height: auto; overflow-y: auto; scrollbar-width: thin; margin-top: clamp(12px, 1.2vw, 20px); padding: clamp(14px, 1.2vw, 20px) 8px 28px 0;
       -webkit-mask-image: linear-gradient(#000 calc(100% - 32px), transparent); mask-image: linear-gradient(#000 calc(100% - 32px), transparent); }
     .np-lyrics-host { overflow: hidden; -webkit-mask-image: none; mask-image: none; padding-bottom: 0; }
@@ -263,6 +263,12 @@ html.aw-no-volume body#artwork .np-volume, html.aw-no-volume body#artwork .mini-
 /* larger text on a low screen: the meta column may not fit the hero's height — it scrolls there, under the seek bar never */
 html[data-aw-text="l"] body#artwork #np #np-meta, html[data-aw-text="xl"] body#artwork #np #np-meta { overflow-y: auto; scrollbar-width: none; }
 html[data-aw-text="l"] body#artwork #np #np-meta::-webkit-scrollbar, html[data-aw-text="xl"] body#artwork #np #np-meta::-webkit-scrollbar { display: none; }
+/* beside the cover the column is the words' own box (the meta column is no box there): it scrolls, centred by
+   margins — centred by justify-content its top could not be reached */
+@media (min-width: 701px) and (min-height: 521px) {
+  html[data-aw-text="l"] body#artwork #np .np-text, html[data-aw-text="xl"] body#artwork #np .np-text { overflow-y: auto; scrollbar-width: none; justify-content: flex-start;
+    &::-webkit-scrollbar { display: none; } > :first-child { margin-top: auto; } > :last-child { margin-bottom: auto; } }
+}
 
 /* the cover face's byline (16B): the artist on its own line, then the album · year with the quality chip
    beside it; the signal path and an outside source's note on lines of their own (not on the phone) */

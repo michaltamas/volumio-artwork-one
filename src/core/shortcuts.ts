@@ -3,12 +3,19 @@
  * pauses, the left and right arrows seek 10 seconds, up and down step the volume, M mutes.
  * Nothing fires while typing (a field, a select, editable text), with Ctrl, Alt or Meta held, while
  * another app drives the player, or when something before us already handled the key (the ambient
- * screen takes the key that wakes it). A held Space or M does not repeat. A focused button keeps
- * its own Space, a focused slider its own arrows.
+ * screen takes the key that wakes it), or while the player is out of reach (what was pressed then
+ * would all arrive at once when it is back). A held Space or M does not repeat; a held arrow
+ * steps a few times a second, not at the keyboard's rate. A focused button keeps its own Space, a
+ * focused slider its own arrows.
  */
 import { usePlayer } from './store/player';
+import { connected } from './socket';
 
 const SEEK = 10;   // seconds, as Nova
+const HELD_MS = 200;   // a held arrow: one step in this long (the keyboard repeats thirty times a second — the volume was at 100 in a moment)
+let heldAt = 0;
+// a held key between two steps: swallowed (the page must not scroll in the gaps), nothing sent
+const tooSoon = (e: KeyboardEvent) => { if (!e.repeat) { heldAt = Date.now(); return false; } const now = Date.now(); if (now - heldAt < HELD_MS) { return true; } heldAt = now; return false; };
 
 const typing = (t: EventTarget | null) => {
   if (!(t instanceof HTMLElement)) { return false; }
@@ -21,7 +28,7 @@ const slides = (t: EventTarget | null) => t instanceof HTMLElement && !!t.closes
 window.addEventListener('keydown', (e) => {
   if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey || typing(e.target)) { return; }
   const p = usePlayer.getState(); const st = p.state;
-  if (!p.ready || st.disableUi) { return; }
+  if (!p.ready || st.disableUi || !connected()) { return; }
   switch (e.key) {
     case ' ': {
       if (e.repeat || activates(e.target)) { return; }
@@ -31,12 +38,14 @@ window.addEventListener('keydown', (e) => {
       const dur = st.duration || 0;
       if (!dur || st.stream === true || st.trackType === 'webradio' || slides(e.target)) { return; }
       e.preventDefault();
+      if (tooSoon(e)) { return; }
       const to = Math.max(0, Math.min(dur, p.elapsedMs / 1000 + (e.key === 'ArrowRight' ? SEEK : -SEEK)));
       p.seekTo(Math.round(to)); break;
     }
     case 'ArrowUp': case 'ArrowDown': {
       if (st.disableVolumeControl || slides(e.target)) { return; }
       e.preventDefault();
+      if (tooSoon(e)) { return; }
       if (e.key === 'ArrowUp') { p.volumeUp(); } else { p.volumeDown(); }
       break;
     }

@@ -4,7 +4,7 @@
  * plays next and the volume along the bottom. On the phone the parts restack (zz-fluid).
  */
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, type NavigateFunction } from 'react-router-dom';
 import FavIcon from '../components/FavIcon';
 import Icon from '../components/Icon';
 import SeekBar from '../components/SeekBar';
@@ -31,6 +31,7 @@ import { useExternalSource } from '../core/external';
 import NpEmpty from '../components/np/NpEmpty';
 import ClampedTitle from '../components/np/ClampedTitle';
 import { useHeldTrack, leftOver } from '../core/useHeldTrack';
+import { entryBefore } from '../core/browseUrl';
 
 type View = 'cover' | 'info' | 'lyrics';
 const VIEW_KEY = 'aw-np-view';
@@ -46,6 +47,14 @@ function readView(): View {
     const view = v === 'info' || v === 'lyrics' ? v : 'cover';
     return isNarrowNp() ? 'cover' : view;   // no switch to get back with once the window is narrow: always land on Cover there
   } catch { return 'cover'; }
+}
+
+// Leaving: back to the page beneath when that is the history entry before this one, so neither the
+// browser's Back nor the library's finds Now Playing behind it again. Otherwise forward to it, as
+// the frame's $state.go(previousState): a blind history back could leave the site.
+function leave(nav: NavigateFunction): void {
+  const under = useUi.getState().underPath;
+  if (entryBefore() === under) { nav(-1); } else { nav(under); }
 }
 
 export default function NowPlaying() {
@@ -149,7 +158,7 @@ export default function NowPlaying() {
     const np = document.getElementById('np'), box = np && np.parentElement;
     if (np && box) { const r = box.getBoundingClientRect(); np.style.animation = ''; np.style.position = 'fixed'; np.style.top = r.top + 'px'; np.style.left = r.left + 'px'; np.style.width = r.width + 'px'; np.style.height = r.height + 'px'; np.style.minHeight = '0'; np.style.zIndex = '20'; }
     setLeaving(true); useUi.setState({ npLeaving: true });
-    window.setTimeout(() => nav(useUi.getState().underPath), 360);   // forward to the page beneath, as the frame's $state.go(previousState); history back could leave the site
+    window.setTimeout(() => leave(nav), 360);
   };
   useEffect(() => () => { useUi.setState({ npLeaving: false }); }, []);
   // Phone: pull the sheet down to minimise it, as the Zones & outputs sheet. It follows the finger
@@ -199,7 +208,7 @@ export default function NowPlaying() {
       const flicked = dy > 30 && dy / Math.max(1, Date.now() - startAt) > 0.45;
       if (dy > 110 || flicked) {
         np.style.transition = 'transform .22s ease-out'; np.style.transform = 'translateY(100%)';
-        window.setTimeout(() => nav(useUi.getState().underPath), 220);
+        window.setTimeout(() => leave(nav), 220);
       } else {
         np.style.transition = 'transform .2s ease-out'; np.style.transform = '';
         window.setTimeout(release, 220);
