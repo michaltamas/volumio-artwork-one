@@ -6,6 +6,20 @@ All notable changes to this project are documented here. The format is based on
 
 Versions 1.x and 2.x were published in [volumio-artwork-theme](https://github.com/michaltamas/volumio-artwork-theme).
 
+## [3.2.14] - 2026-11-22
+
+### Added
+
+- **The ambient screen without its clock.** Clock format (Appearance → Ambient display) has a third choice, Off, beside 24 H and 12 H. Cover-led, Full-bleed and the idle screen go without the clock; Clock-led keeps it, the layout is built around it.
+- **The Lyrics face scrolls** on a computer and a tablet: read ahead or go back while the song plays. A Back to current line button, or eight seconds left alone, returns the text to the line being sung. A tap on a line still plays from it. The phone's sheet is as it was.
+
+### Fixed
+
+- **The settings of a plugin with a dash in its name** (GPIO Buttons, Volumio Stream Watchdog) opened as an empty page, so its saved values could not be seen or changed. The settings search missed those pages too.
+- **A phone turned sideways with the lyrics open** showed the words over the transport; it now returns to the cover.
+- **Lists between a phone and a tablet** (641–700 px wide): a row had the phone's columns and the desktop's four lines of words.
+- **Lists on a phone**: a folder's row in the Music Library keeps its cover, name and menu in their own columns, also among songs; the Artists list's portrait no longer touches the name; artist • album under a name stays on one line.
+
 ## [3.2.13] - 2026-11-15
 
 ### Changed
