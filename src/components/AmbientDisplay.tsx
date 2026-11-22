@@ -17,7 +17,7 @@ import { signal, format, quality } from '../core/format';
 
 const mmss = (ms: number) => { const s = Math.floor(ms / 1000), m = Math.floor(s / 60), r = s % 60; return m + ':' + (r < 10 ? '0' : '') + r; };
 
-function clockNow(mode: '12' | '24'): { text: string; suffix: string } {
+function clockNow(mode: '12' | '24' | 'off'): { text: string; suffix: string } {
   const d = new Date(); let h = d.getHours(); const m = d.getMinutes();
   if (mode === '12') { const suffix = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12; return { text: h + ':' + (m < 10 ? '0' : '') + m, suffix }; }
   return { text: (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m, suffix: '' };
@@ -37,7 +37,7 @@ export default function AmbientDisplay() {
   // redrawn the moment the screen opens and whenever the settings change
   const [clock, setClock] = useState(() => clockNow(settings.clock));
   useEffect(() => {
-    if (!active) { return; }
+    if (!active || settings.clock === 'off') { return; }   // turned off in Appearance › Ambient display: nothing to keep right
     setClock(clockNow(settings.clock));
     const t = window.setInterval(() => setClock(clockNow(settings.clock)), 10000);
     return () => window.clearInterval(t);
@@ -80,7 +80,8 @@ export default function AmbientDisplay() {
   const playedPct = durMs ? Math.min(100, Math.max(0, elMs / durMs * 100)) : 0;
   const sleepRunning = sleepEnabled && sleepEnds > sleepNow;
   const sleepMin = sleepRunning ? Math.ceil(Math.max(0, sleepEnds - sleepNow) / 60000) : 0;
-  const cls = 'aw-amb aw-amb--' + layout + (stopped ? ' is-stopped' : '') + (paused ? ' is-paused' : '') + (night ? ' is-night' : '') + (swapping ? ' is-swapping' : '');
+  const showClock = settings.clock !== 'off';
+  const cls = 'aw-amb aw-amb--' + layout + (showClock ? '' : ' aw-amb--noclock') + (stopped ? ' is-stopped' : '') + (paused ? ' is-paused' : '') + (night ? ' is-night' : '') + (swapping ? ' is-swapping' : '');
   const clockEl = <>{clock.text}{clock.suffix ? <span className="aw-amb__ampm">{clock.suffix}</span> : null}</>;
   const time = (extra: string) => duration ? <div className={'aw-amb__time ' + extra + ' mono'}><span>{elapsed}</span><span className="aw-amb__slash">/</span><span className="aw-amb__total">{duration}</span></div> : null;
 
@@ -91,7 +92,7 @@ export default function AmbientDisplay() {
         {stopped ? (
           <div className="aw-amb__idle">
             <img className="aw-amb__idle-cover" src={albumart(IDLE_ART)} alt="Volumio" />
-            <div className="aw-amb__clock aw-amb__clock--idle mono">{clockEl}</div>
+            {showClock ? <div className="aw-amb__clock aw-amb__clock--idle mono">{clockEl}</div> : null}
             <div className="aw-amb__name mono">{playerLine}</div>
           </div>
         ) : (
@@ -119,7 +120,7 @@ export default function AmbientDisplay() {
             </div>
           </div>
         )}
-        {!stopped ? <div className="aw-amb__clock mono">{clockEl}</div> : null}
+        {!stopped && showClock ? <div className="aw-amb__clock mono">{clockEl}</div> : null}
         {!stopped ? <div className="aw-amb__name aw-amb__name--corner mono">{playerLine}</div> : null}
         {sleepRunning && !stopped ? <div className="aw-amb__sleep"><span className="material-symbols-rounded">bedtime</span><span className="mono">SLEEP · {sleepMin} MIN</span></div> : null}
       </div>

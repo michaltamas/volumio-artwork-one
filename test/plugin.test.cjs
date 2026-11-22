@@ -232,6 +232,15 @@ test('ambient settings keep the remote, transparency and queue-number options: a
   assert.deepEqual(p.cleanAmbient({ queueNo: 1, on: false }), { on: false });
 });
 
+test('ambient clock: 24, 12 or off (the screen without its clock) kept, anything else dropped', () => {
+  const { ctx } = fakeVolumio();
+  const p = new Plugin(ctx);
+  assert.deepEqual(p.cleanAmbient({ clock: '24' }), { clock: '24' });
+  assert.deepEqual(p.cleanAmbient({ clock: '12' }), { clock: '12' });
+  assert.deepEqual(p.cleanAmbient({ clock: 'off' }), { clock: 'off' });
+  assert.deepEqual(p.cleanAmbient({ clock: 'none', on: true }), { on: true });
+});
+
 test('menu: a source shown or hidden in the rail is kept by its uri, a choice merges into the others, anything else is dropped', () => {
   const { ctx } = fakeVolumio();
   const p = new Plugin(ctx);

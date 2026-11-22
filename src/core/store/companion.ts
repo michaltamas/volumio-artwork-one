@@ -19,7 +19,7 @@ import { useMenuSources } from './menuSources';
 const ENDPOINTS = ['user_interface/artwork_one', 'miscellanea/artwork_companion'];
 let endpoint = ENDPOINTS[0];
 
-export interface AmbientSettings { on: boolean; delay: number; layout: 'cover' | 'clock' | 'bleed'; clock: '12' | '24'; night: boolean; nightFrom: string; nightTo: string }
+export interface AmbientSettings { on: boolean; delay: number; layout: 'cover' | 'clock' | 'bleed'; clock: '12' | '24' | 'off'; night: boolean; nightFrom: string; nightTo: string }
 interface Settings { version?: number; plugin?: string; theme?: ThemeMode; ambient?: Partial<AmbientSettings>; pins?: any[]; menu?: Record<string, boolean>; menuOrder?: string[] }
 
 interface CompanionStore {

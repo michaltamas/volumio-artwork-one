@@ -80,11 +80,13 @@ export default function NowPlaying() {
   const [cramped, setCramped] = useState(false);
   const view: View = cramped ? 'cover' : chosenView;
   useEffect(() => {
-    const mq = window.matchMedia(NARROW_NP_QUERY);
-    const onNarrow = () => { if (mq.matches) { setView('cover'); } };
-    onNarrow();
-    mq.addEventListener('change', onNarrow);
-    return () => mq.removeEventListener('change', onNarrow);
+    // each kind of narrow watched on its own: a phone turned sideways with the words open passes from one
+    // to the other, the two as one query report no change, and the sideways layout has no place for the words
+    const mqs = NARROW_NP_QUERY.split(', ').map(q => window.matchMedia(q));
+    const onNarrow = (e: MediaQueryListEvent) => { if (e.matches) { setView('cover'); } };
+    if (mqs.some(mq => mq.matches)) { setView('cover'); }
+    mqs.forEach(mq => mq.addEventListener('change', onNarrow));
+    return () => mqs.forEach(mq => mq.removeEventListener('change', onNarrow));
   }, []);
   const [leaving, setLeaving] = useState(false);
   const lyricsState = useLyrics(s => s.state);
@@ -309,7 +311,7 @@ export default function NowPlaying() {
           </div>
           </div>
           {view === 'info' ? <InfoFace /> : null}
-          {lyricsOn ? <div className="np-lyrics-host"><LyricsColumn /></div> : null}
+          {lyricsOn ? <div className="np-lyrics-host"><LyricsColumn free /></div> : null}
         </div>
       </div>
       </div>

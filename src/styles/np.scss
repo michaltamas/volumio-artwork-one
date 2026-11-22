@@ -2,7 +2,8 @@
    One grid: the cover | the face switch, the text, the seek and the transport never move between
    Cover and Info. The block sits centred in what the top bar and the bottom bar leave; taller than
    that (Info or Lyrics under it on a compact screen) the stage scrolls. A roomy screen (≥1700 wide
-   and ≥1000 high) keeps Info and Lyrics inside the column, scrolling in their own box. The phone
+   and ≥1000 high) keeps Info and Lyrics inside the column, scrolling in their own box. The words
+   follow the current line and offer a way back to it (volumio-nowplaying.html). The phone
    (phone.scss) and a phone on its side (landscape.scss) keep their own layouts. */
 #np {
   --np-s: clamp(200px, min(36vw, 60vh), 720px);                 /* the cover */
@@ -71,7 +72,7 @@
 
   /* ---- Info and Lyrics: a section under the block, the whole width (compact) ---- */
   .np-about, .np-lyrics-host { grid-column: 1 / -1; grid-row: 3; min-width: 0; margin-top: clamp(20px, 2.4vw, 32px); padding: clamp(18px, 2vw, 28px) 0 8px; border-top: 1px solid var(--fill-14); }
-  .np-lyrics-host { display: flex; flex-direction: column; height: clamp(320px, 56vh, 720px); }
+  .np-lyrics-host { display: flex; flex-direction: column; position: relative; }   /* the button's box on a roomy screen */
   --lyr-near: var(--ink-muted); --lyr-mid: var(--ink-dim); --lyr-far: var(--ink-faint);
   .np-lsheet, .np-lsheet-scrim { display: none; }   /* the phone's lyrics sheet and its scrim: a flex child here, its gap moved the bottom bar */
 
@@ -116,6 +117,24 @@
   .np-lyrics__skeleton { display: flex; flex-direction: column; gap: 18px; padding-top: 6px; animation: aw-lyr-pulse 1.4s ease-in-out infinite;
     i { display: block; height: 18px; border-radius: 4px; background: var(--fill-10); width: 62%; &:nth-child(2) { width: 78%; } &:nth-child(3) { width: 70%; } &:nth-child(4) { width: 54%; } &:nth-child(5) { width: 66%; } } }
   .np-lyrics__eyebrow--synced { flex: none; margin-bottom: 12px; }
+  /* the desk's words (volumio-nowplaying.html): the text scrolls for real and follows the current line. Here (compact) it
+     lies in the page whole and the stage scrolls it; a roomy screen (below) scrolls the column. The phone's sheet keeps
+     the moving stack above. */
+  .np-lyrics--free { flex: none;
+    .np-lyrics__col { flex: none; overflow: visible; }
+    .np-lyrics__col--synced { padding: 12px 0 8px; -webkit-mask-image: none; mask-image: none; }
+    .np-lyrics__stack { will-change: auto; transition: none; }
+    .np-lyrics__eyebrow--synced { margin-bottom: 0; }
+  }
+  /* back to the current line: shown only after the listener scrolled the line out of sight; the arrow points to it */
+  .np-lyrics__back { position: sticky; bottom: 14px; align-self: flex-end; margin-top: -44px; z-index: 2; display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 18px 0 14px; border-radius: 22px;
+    font-family: var(--font-ui); font-size: 14px; font-weight: 600; white-space: nowrap; color: var(--ink); background: rgba(18, 18, 20, .78); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+    border: 1px solid var(--fill-20); box-shadow: 0 10px 30px -10px rgba(0, 0, 0, .7); cursor: pointer; animation: aw-lyr-back-in .18s ease-out;
+    &[hidden] { display: none; }
+    svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform .15s; }
+    &[data-dir="up"] svg { transform: rotate(180deg); }
+    &:focus-visible { outline: 2px solid var(--ink-1); outline-offset: 2px; }
+  }
 
   /* ---- the bottom bar: the seek row the whole width, then up next | the transport | volume · output · queue ---- */
   #np-footer { flex: none; margin-top: 0; padding-top: 0; display: flex; flex-direction: column; gap: clamp(8px, 1vw, 18px); }
@@ -174,6 +193,15 @@
       -webkit-mask-image: linear-gradient(#000 calc(100% - 32px), transparent); mask-image: linear-gradient(#000 calc(100% - 32px), transparent); }
     .np-lyrics-host { overflow: hidden; -webkit-mask-image: none; mask-image: none; padding-bottom: 0; }
   }
+  /* the words scroll in the column, the button in the panel's corner */
+  body#artwork #np .np-lyrics--free { flex: 1 1 0; min-height: 0;
+    .np-lyrics__col { flex: 1 1 0; min-height: 0; overflow: hidden; }
+    .np-lyrics__col--synced { overflow-y: auto; scrollbar-width: none; overscroll-behavior: contain; padding: 20px 0 40px;
+      -webkit-mask-image: linear-gradient(transparent, #000 28px, #000 calc(100% - 44px), transparent); mask-image: linear-gradient(transparent, #000 28px, #000 calc(100% - 44px), transparent);
+      &::-webkit-scrollbar { display: none; } }
+    .np-lyrics__col--plain { overflow-y: auto; }
+  }
+  body#artwork #np .np-lyrics__back { position: absolute; right: 20px; bottom: 14px; margin-top: 0; }
 }
 /* the phone's Info rows (the phone layout itself: phone.scss) */
 @media (max-width: 700px) {
@@ -183,10 +211,14 @@
 }
 @keyframes aw-lyr-in { from { opacity: .4; } to { opacity: 1; } }
 @keyframes aw-lyr-pulse { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+@keyframes aw-lyr-back-in { from { opacity: 0; transform: translateY(6px); } }
+@media (prefers-reduced-motion: reduce) { body#artwork #np .np-lyrics__back { animation: none; } }
 html.aw-is-light body#artwork #np { --lyr-near: #5e646c; --lyr-mid: #676d74; --lyr-far: #8b9098; }
 html.aw-is-light body#artwork #np .np-lyrics__line:active { background: rgba(20, 22, 26, .07); }
 html.aw-is-light body#artwork #np .np-about__go { background: rgba(255, 255, 255, .7); border-color: rgba(20, 22, 26, .12); }
 html.aw-is-light body#artwork #np .np-about__rule { background: rgba(20, 22, 26, .09); }
+/* daylight: the same pill as white glass over the paper, its hairline (--fill-20) and its shadow turned with the theme */
+html.aw-is-light body#artwork #np .np-lyrics__back { background: var(--glass-2-fill); box-shadow: 0 4px 14px -4px var(--shadow-soft); }   /* on a light ground a cut shadow shows: this one ends in the 14px under the button */
 /* below this the seg control has no room to earn its keep: Cover is the only face on offer
    (Lyrics stays reachable through the phone's own tile once that layout kicks in) */
 @media (max-width: 700px) { body#artwork #np .np-seg { display: none; } }   /* the phone has its tiles */

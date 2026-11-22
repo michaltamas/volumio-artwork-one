@@ -13,8 +13,10 @@ let inFlight: Ask | null = null;
 const listeners: Listener[] = [];
 const TIMEOUT = 8000;
 
-// 'audio_interface-alsa_controller' and 'audio_interface/alsa_controller' name the same page
-export const pageKey = (p: string) => String(p || '').replace('-', '/');
+// 'audio_interface-alsa_controller' and 'audio_interface/alsa_controller' name the same page. Only the route's
+// form is turned: a key already turned keeps the dashes of the plugin's own name ('system_hardware/gpio-buttons'
+// turned again asked the player for 'system_hardware/gpio/buttons', and it answered with an empty page)
+export const pageKey = (p: string) => { const s = String(p || ''); return s.indexOf('/') > -1 ? s : s.replace('-', '/'); };
 
 function pump() {
   if (inFlight || !waiting.length) { return; }

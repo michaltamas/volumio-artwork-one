@@ -5,7 +5,7 @@
  */
 import { create } from 'zustand';
 import { on, emit } from '../socket';
-import { askUiConfig, onUiConfig } from '../uiConfig';
+import { askUiConfig, onUiConfig, pageKey } from '../uiConfig';
 import { rest } from '../api';
 import { usePlayer } from './player';
 import { useMenu, itemKey, type MenuItem } from './menu';
@@ -163,7 +163,7 @@ function sectionsOfCfg(page: string, cfg: any): Section[] {
 function indexUiConfig(page: string | null, cfg: any) {
   if (!cfg || !Array.isArray(cfg.sections)) { return; }
   const st = useSettings.getState();
-  const key = page ? page.replace('-', '/') : (st.route.name === 'volumio.plugin' && st.route.pluginName ? st.route.pluginName.replace('-', '/') : null);
+  const key = page ? pageKey(page) : (st.route.name === 'volumio.plugin' && st.route.pluginName ? pageKey(st.route.pluginName) : null);
   if (!key) { return; }
   useSettings.setState({ searchIndex: { ...st.searchIndex, [key]: sectionsOfCfg(key, cfg) } });
 }

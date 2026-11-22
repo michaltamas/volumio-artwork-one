@@ -157,6 +157,8 @@ body#artwork .aw-amb--cover {
   .aw-amb__clock { top: clamp(16px, 4.8vh, 52px); right: var(--amb-x); font-size: calc(clamp(20px, 3vh, 34px) * var(--amb-ts)); letter-spacing: .02em; }
   .aw-amb__ampm { font-size: .5em; }
   .aw-amb__sleep { bottom: auto; top: clamp(16px, 4.8vh, 52px); right: calc(var(--amb-x) + 12vh); }
+  /* without the clock the sleep note takes its corner */
+  &.aw-amb--noclock .aw-amb__sleep { right: var(--amb-x); }
   .aw-amb__seek { left: var(--amb-x); right: var(--amb-x); bottom: auto; top: calc(var(--amb-top) + var(--amb-cover) + 4.9vh); height: 6px; border-radius: 3px; overflow: hidden; }
   .aw-amb__times { position: absolute; left: var(--amb-x); right: var(--amb-x); top: calc(var(--amb-top) + var(--amb-cover) + 4.9vh + 6px + 1.4vh); display: flex; justify-content: space-between; font-size: calc(clamp(11px, 1.7vh, 17px) * var(--amb-ts)); letter-spacing: .06em; color: var(--amb-ink-2); }
   &.is-night .aw-amb__next, &.is-night .aw-amb__times { display: none; }

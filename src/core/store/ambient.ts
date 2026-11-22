@@ -10,7 +10,7 @@ export const DELAYS = [-1, 1, 2, 5, 10, 0];   // -1: always — the display rest
 export const LAYOUTS = ['cover', 'clock', 'bleed'] as const;
 export type DisplayText = 'm' | 'l' | 'xl' | 's';
 export const BACKGROUNDS = ['still', 'aurora'] as const;   // the blurred cover alone, or soft colours from it drifting behind
-export interface AmbientSettings { on: boolean; delay: number; layout: 'cover' | 'clock' | 'bleed'; background: 'still' | 'aurora'; clock: '12' | '24'; night: boolean; nightFrom: string; nightTo: string; textSize: DisplayText; hideVolume: boolean; keysWake: boolean; transparency: boolean; queueNo: boolean }
+export interface AmbientSettings { on: boolean; delay: number; layout: 'cover' | 'clock' | 'bleed'; background: 'still' | 'aurora'; clock: '12' | '24' | 'off'; night: boolean; nightFrom: string; nightTo: string; textSize: DisplayText; hideVolume: boolean; keysWake: boolean; transparency: boolean; queueNo: boolean }
 const DEFAULTS: AmbientSettings = { on: true, delay: 2, layout: 'cover', background: 'still', clock: '24', night: true, nightFrom: '23:00', nightTo: '07:00', textSize: 'm', hideVolume: false, keysWake: true, transparency: true, queueNo: true };
 const ACTIVITY = ['pointerdown', 'pointermove', 'keydown', 'wheel', 'touchstart'];
 
@@ -24,7 +24,8 @@ function clean(saved: any): AmbientSettings {
   if (DELAYS.indexOf(s.delay) < 0) { s.delay = DEFAULTS.delay; }
   if ((LAYOUTS as readonly string[]).indexOf(s.layout) < 0) { s.layout = DEFAULTS.layout; }
   if ((BACKGROUNDS as readonly string[]).indexOf(s.background) < 0) { s.background = DEFAULTS.background; }
-  if (s.clock !== '12' && s.clock !== '24') { s.clock = DEFAULTS.clock; }
+  if (s.clock !== '12' && s.clock !== '24' && s.clock !== 'off') { s.clock = DEFAULTS.clock; }
+  if (s.clock === 'off' && s.layout === 'clock') { s.clock = DEFAULTS.clock; }   // clock-led is its clock: it cannot go without one
   if (['s', 'm', 'l', 'xl'].indexOf(s.textSize) < 0) { s.textSize = DEFAULTS.textSize; }
   s.hideVolume = s.hideVolume === true;
   s.keysWake = s.keysWake !== false;

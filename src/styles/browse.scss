@@ -576,13 +576,17 @@ body#artwork #browse.browsing-artists .main__row { row-gap: clamp(28px, 2.8vw, 4
 body#artwork .aw-head__row { flex-wrap: wrap; row-gap: 10px; }
 body#artwork .aw-filter { width: min(290px, 100%); }
 body#artwork .aw-listhead { flex-wrap: wrap; row-gap: 10px; }
-@media (max-width: 640px) {
+/* the row's words on the phone: the name, and artist • album on one line under it. Up to 700px, the width the phone's rows
+   below start at — between 640 and 700 a plain list's row had the phone's columns and the desk's words, four lines of them */
+@media (max-width: 700px) {
   body#artwork #browse:not(.browsing-album):not(.browsing-artist) .music-item .item__info { display: flex !important; flex-wrap: wrap; align-content: center; gap: 2px 0; min-width: 0; }
   body#artwork #browse:not(.browsing-album):not(.browsing-artist) .music-item .item__title { flex: 0 0 100%; order: 0; width: auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   body#artwork #browse:not(.browsing-album):not(.browsing-artist) .music-item .item__artist { order: 1; }
   body#artwork #browse:not(.browsing-album):not(.browsing-artist) .music-item .item__info__separator { order: 2; display: block; margin: 0 6px; }
   body#artwork #browse:not(.browsing-album):not(.browsing-artist) .music-item .item__album { order: 3; }
   body#artwork #browse:not(.browsing-album):not(.browsing-artist) .music-item .item__artist, body#artwork #browse:not(.browsing-album):not(.browsing-artist) .music-item .item__album, body#artwork #browse:not(.browsing-album):not(.browsing-artist) .music-item .item__info__separator { display: block; flex: 0 1 auto; width: auto; min-width: 0; font-size: 13px; color: var(--ink-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+}
+@media (max-width: 640px) {
   body#artwork .aw-filter { flex-basis: 100%; margin-left: 0; }
   body#artwork .aw-alpha { display: none; }
 }
@@ -678,8 +682,24 @@ body#artwork #browse.browsing-album .aw-albumhead {
     .item__image, .item__albumart-icon { width: 24px; height: 24px; margin: 0; } }
   body#artwork #browse.boxTable.browsing-list:not(.aw-tracklist) .music-item .item__number { font-size: 11px; }
   body#artwork #browse.boxTable.browsing-list:not(.aw-tracklist) .music-item .item__title { font-size: 15px; }
+  /* the Artists list's round portrait is 52px, not a cover's 44: in the cover's column it ended 4px before the name */
+  body#artwork #browse.boxTable.browsing-artists.browsing-list:not(.aw-tracklist) .music-item:has(.item__image:not(.hidden)) { grid-template-columns: 22px 52px minmax(0, 1fr) 24px; }
+  /* artist • album under the name stays one line here too, as on the track rows above (a service's home as a list:
+     the • ended the line and the album took a third) */
+  body#artwork #browse.boxTable.browsing-list:not(.aw-tracklist) .music-item .item__artist { max-width: 60%; padding: 0; }
+  body#artwork #browse.boxTable.browsing-list:not(.aw-tracklist) .music-item .item__info__separator { flex: none; padding: 0; }
+  body#artwork #browse.boxTable.browsing-list:not(.aw-tracklist) .music-item .item__album { flex: 1 1 0; padding: 0; }
   body#artwork #browse.boxTable.browsing-list:not(.aw-tracklist) .music-item .item__favorite, body#artwork #browse.boxTable.browsing-list:not(.aw-tracklist) .music-item .item__duration { display: none; }
   body#artwork #browse.boxTable.browsing-list:not(.aw-tracklist) .music-item .item__play { left: 12px; width: 22px; .play-btn { width: 22px; .play-btn__icon { width: 22px; } } }
+  /* a folder's row (the Music Library as a list) has no number cell: cover or glyph · name · ⋯. The columns above count the
+     number in, and without it the cover took the number's 22px, the name the cover's 44px and the ⋯ the name's room */
+  body#artwork #browse.boxTable.browsing-list:not(.aw-tracklist) .music-item.aw-dir { grid-template-columns: minmax(0, 1fr) 24px; }
+  body#artwork #browse.boxTable.browsing-list:not(.aw-tracklist) .music-item.aw-dir:has(.item__image:not(.hidden)) { grid-template-columns: 44px minmax(0, 1fr) 24px; }
+  body#artwork #browse.boxTable.browsing-list:not(.aw-tracklist) .music-item.aw-dir:has(.item__albumart.hidden + .item__albumart-icon:not(.hidden)) { grid-template-columns: 24px minmax(0, 1fr) 24px; }
+  /* a folder among track rows (a folder holding songs and folders): the track rows' columns without the number — the heart's
+     column stays, empty, as on every track row without a heart, so the ⋯ sits under the songs' */
+  body#artwork #browse.boxTable.aw-tracklist .music-item.aw-dir { grid-template-columns: minmax(0, 1fr) 28px 24px; }
+  body#artwork #browse.boxTable.aw-tracklist .music-item.aw-dir:has(.item__image:not(.hidden)) { grid-template-columns: 44px minmax(0, 1fr) 28px 24px; }
 }
 body#artwork .aw-artist__hero { flex-wrap: wrap; row-gap: 18px; gap: clamp(16px, 2vw, 28px); }
 body#artwork .aw-artist__img { width: clamp(96px, 11vw, 158px); height: clamp(96px, 11vw, 158px); }
